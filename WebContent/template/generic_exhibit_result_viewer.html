@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>Semantic Web Pipes: $pipe_name$</title>
+<link href="$rdf_source$" type="application/n3" rel="exhibit/data" />
+<script src="http://simile.mit.edu/repository/exhibit/branches/2.0/src/webapp/api/exhibit-api.js"
+            type="text/javascript"></script>
+<style>
+.query_div {
+	border-top-width: 8px;
+	border-bottom-style: solid;
+	border-top-color: #00CCFF;
+	border-right-color: #00CCFF;
+	border-bottom-color: #00CCFF;
+	border-left-color: #00CCFF;
+	margin: 12px;
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+.results_div {
+	margin: 12px;
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+.query_textinput_row {
+	margin-top: 4px;
+}
+.error_messages_div {
+	font-size: small;
+	font-weight: bold;
+	color: #CC0000;
+}
+</style>
+</head>
+<body>
+<div class="query_div">
+  <h2>$pipe_name$</h2>
+  <div align="center">$query_form$</div>
+  <div class="error_messages_div">$error_messages$</div>
+</div>
+<div class="results_div">
+    <table width="100%" border="0">
+      <tr>
+        <td><h2>Results</h2></td>
+        <td align="right"><div><img src="../img/rdf_icon.gif" align="absmiddle" /> <a href="$rdf_source$">Show results as RDF/XML</a></div></td>
+      </tr>
+    </table>
+  <table width="100%">
+    <tr valign="top">
+      <td ex:role="viewPanel"><div ex:role="view"></div></td>
+      <td width="25%"><div ex:role="facet" ex:expression=".type" ex:facetLabel="Type"></div>
+      <b>Text search</b>
+      <div ex:role="facet" ex:facetClass="TextSearch"></div></td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>

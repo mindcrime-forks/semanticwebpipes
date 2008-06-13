@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk>
+	<button label="Copy from Codepress"
+		onClick="copy.value = codepress.value" />
+	<button label="Copy to Codepress" onClick="codepress.value = copy.value; codepress.invalidate();" />
+	<listbox id="languageSelector" rows="1" mold="select"
+		onSelect="changeLanguage();">
+		<listitem label="csharp" />
+		<listitem label="css" />
+		<listitem label="generic" />
+		<listitem label="html" />
+		<listitem label="swp" selected="true"/>
+		<listitem label="java" />
+		<listitem label="javascript" />
+		<listitem label="perl" />
+		<listitem label="ruby" />
+		<listitem label="php" />
+		<listitem label="text" />
+		<listitem label="sql" />
+		<listitem label="sparql" />
+		<listitem label="vbscript" />
+		<listitem label="zul"  />
+	</listbox>
+	<codepress id="codepress" language="swp"
+		style="width:100%; height:200px;">
+		<attribute name="value"><![CDATA[
+		
+<textbox id="copy" style="width:100%; height:200px;"rows="20" />
+<zscript>
+	changeLanguage(){ codepress.language =
+	languageSelector.selectedItem.label;
+	codepress.invalidate(); }
+</zscript>
+
+		]]></attribute>
+	</codepress>
+	<textbox id="copy" style="width:100%; height:200px;" rows="20" />
+	<zscript>
+
+		changeLanguage(){ codepress.language =
+		languageSelector.selectedItem.label; codepress.invalidate(); }
+
+	</zscript>
+
+</zk>

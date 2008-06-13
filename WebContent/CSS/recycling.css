@@ -1,0 +1,22 @@
+.drag
+{
+	cursor: pointer;
+	border: 1px solid silver;
+	padding: 2px;
+	font-family: Arial;
+	font-weight: bold;
+	color: #C06401;
+	background-color: #F1ECD6;
+}
+.drop
+{
+	font-family: Arial;
+	font-weight: bold;
+	color: #7FBB28;
+}
+.subTitle
+{
+	font-family: Arial;
+	font-weight: bold;
+	color: #525252;
+}

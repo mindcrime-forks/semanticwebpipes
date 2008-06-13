@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk>
+<style src="/CSS/recycling.css"/>
+	<window id="passwordchecking" border="normal" width="350px" visible="false" sizable="false" >
+        <caption label="Confirm password for editing Pipe"/>
+		<separator bar="true"/>
+		Please enter the password for overwriting the current pipe
+		<separator/> 
+		<textbox id="oldpassword" value=""  type="text"></textbox>
+		<button label="Enter" onClick="checkPassword()"/>
+		<button label="Cancel" onClick="passwordchecking.visible= false"/>		
+    </window>
+    <window id="deleteWin" border="normal" width="350px" visible="false" sizable="false" >
+        <caption label="Confirm password for deleting Pipe"/>
+        Please enter the password for deleting this pipe
+		<separator bar="true"/>				
+    </window>
+    <window id="confirmation" border="normal" width="350px" visible="false" sizable="false" >
+        <caption label="Confirm to overwrite current pipe"/>
+		<separator bar="true"/>
+		Are you sure you want to overwrite the existing Pipe?
+		<separator/> 
+		<button label="Yes" onClick="savePipe()"/>
+		<button label="No" onClick="confirmation.visible= false"/>		
+    </window>
+	<borderlayout>
+				<center border="none" flex="true">
+
+					<borderlayout>
+						<north>
+						<grid>
+						<rows>
+						<row>
+						<hbox>			
+									<label value="Pipe id:" />
+
+										<textbox cols="50" id="pipeid"
+											value="" onChange="hidePassword()" onBlur="hidePassword()" />
+										<label id="idwarnning"
+											pre="true" value="" />
+						</hbox>
+						</row>
+						<row>
+						<hbox>
+									<label value="Pipe description:" />
+									<textbox cols="100" id="pipename"
+										value="" />
+						</hbox>
+						</row>
+						<row>
+						<hbox>
+									<label pre="true"
+										value="Optional password:" />
+									<textbox cols="40" id="password"
+										type="text" value="" />
+						</hbox>
+						</row>
+						</rows>
+						</grid>
+						</north>
+						<center>
+						<borderlayout>
+									
+									<center>
+									    <tabbox>
+									    
+									    <tabs>
+									    <tab label="Designer"/>
+									    <tab label="Source code"/>
+									    
+									    </tabs>
+									    <tabpanels>
+											<tabpanel>
+											<hbox>
+									    <vbox>
+										<html><![CDATA[<br/><br/>]]></html>
+										
+										Pipe
+										<separator bar="true" />
+													<button label="Save"
+												onClick="checkB4Save()" />
+											<button label="Run (debug)"
+												onClick="debugPipe()" />
+											<button
+												label="Clear output view" onClick="debugView.value=null;" />
+										<html><![CDATA[<br/><br/>]]></html>
+
+										Add modules
+										<separator bar="true" />
+										
+										<grid>
+											<rows>
+												<row onClick="addConstruct()">
+												<hbox><label id="construct" value="Construct" sclass="drag" draggable="true" /><image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row onClick="addSimpleMix()" >
+												<hbox><label sclass="drag" draggable="true" value="Simple Mix"/> <image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row onClick="addRDFSMix()" sclass="drag" draggable="true">
+												<hbox><label sclass="drag" draggable="true" value="RDFS Mix"/> <image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row onClick="addForLoop()" sclass="drag" draggable="true">
+												<hbox><label sclass="drag" draggable="true" value="For Loop"/> <image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row onClick="addSmoosher()" sclass="drag" draggable="true">
+												<hbox><label  sclass="drag" draggable="true" value="Smoosher"/> <image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row onClick="addPatchExecutor()" sclass="drag" draggable="true">
+												<hbox><label sclass="drag" draggable="true" value="Patch-Executor"/> <image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row onClick="addPatchGenerator()" sclass="drag" draggable="true">
+												<hbox><label sclass="drag" draggable="true"  value="Patch-Generator"/> <image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row onClick="addFetch()" sclass="drag" draggable="true">
+												<hbox><label sclass="drag" draggable="true"  value="Fetch"/> <image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row onClick="addSelect()" sclass="drag" draggable="true">
+												<hbox><label sclass="drag" draggable="true"  value="Select"/> <image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row onClick="addDynamicOperator()" sclass="drag" draggable="true">
+												<hbox><label sclass="drag" draggable="true" value="Dynamic Operator"/> <image src="/img/arrow_right.gif"/></hbox>
+												</row>
+												<row>
+												<hbox><html><![CDATA[
+													<a href="http://pipes.deri.org/documentation.php" target="_blank"><font size="1">Documentation</font></a>
+													]]></html></hbox>
+												</row>
+											</rows>
+										</grid>
+
+									    </vbox>
+									
+											<workspace width="1000px" height="500px" router="bezier" id="workspace">
+												
+											 </workspace>
+											 </hbox>
+											</tabpanel>
+											<tabpanel>
+											<textbox id="pipesyntax" value="&lt;pipe&gt;&lt;code&gt;Enter pipe code here&lt;/code&gt;&lt;/pipe&gt;" style="font-size:11px; background-image:url(img/pipe_code_background.gif); background-repeat:no-repeat; background-position: right top;" width="100%" height="100%" rows="50">
+											<custom-attributes	selStart="0" />
+											<custom-attributes	selEnd="1" />
+											<attribute	name="onSelection">
+												pipesyntax.setAttribute("selStart",event.start);
+												pipesyntax.setAttribute("selEnd",event.end);
+											</attribute>
+										</textbox>
+										</tabpanel>
+										</tabpanels>
+									    </tabbox>
+										
+									</center>
+							</borderlayout>
+						</center>
+						<south id="debugViewArea" size="10%" splittable="true" minsize="80" style="font-size:11px; background-image:url(img/output_background.gif); background-repeat:no-repeat; background-position: right top;" >
+						   <tabbox> 
+						   <tabs>
+						   <tab label="table view"/>
+						   <tab label="text view"/>
+						   </tabs>
+						   <tabpanels>
+						    
+		    				<tabpanel>
+							<listbox multiple="true" width="1200px">
+								<listhead>
+									<listheader label="subject"/>
+									<listheader label="predicate"/>
+									<listheader label="object"/>
+								</listhead>
+								<listitem>
+									<listcell label="http://www.w3.org/People/Berners-Lee/card#i"/>
+									<listcell label="http://www.w3.org/2000/10/swap/pim/contact#homePage"/>
+									<listcell label="http://www.w3.org/People/Berners-Lee/"/>
+								</listitem>	
+								<listitem>
+									<listcell label="http://www.w3.org/People/Berners-Lee/card#i"/>
+									<listcell label="http://www.w3.org/2000/10/swap/pim/contact#publicHomePage"/>
+									<listcell label="http://www.w3.org/People/Berners-Lee/"/>
+								</listitem>
+								<listitem>
+									<listcell label="http://www.w3.org/People/Berners-Lee/card#i"/>
+									<listcell label="http://www.w3.org/2000/01/rdf-schema#label"/>
+									<listcell label="Tim Berners-Lee"/>
+								</listitem>				
+										
+							</listbox>		
+						   </tabpanel>
+						   <tabpanel> 
+		    				<textbox id="debugView" rows="50" height="100%" width="100%" readonly="true" />
+		    				</tabpanel>
+						   </tabpanels>
+						   </tabbox>
+						</south>
+					</borderlayout>
+				</center>
+				
+    <east  flex="true" border="none" collapsible="true">            
+      <hbox>
+      <vbox align="center">
+      <zscript>
+<![CDATA[
+    import org.zkoss.zk.ui.event.*;
+           import org.zkoss.zul.*;
+           import org.integratedmodelling.zk.diagram.components.*;    
+    public class DropListener implements org.zkoss.zk.ui.event.EventListener {
+			   public void onEvent(Event event) throws UiException {    
+			         createFigure(event.x,event.y,event.dragged.id);   
+			   }    
+		   }
+    workspace.setDroppable("true");
+    workspace.addEventListener("onDrop",new DropListener());
+    
+              
+    public void addZKNode (int x,int y,int width,int height,String opType) {
+             Window wnd=new Window();
+             wnd.setTitle(opType);
+             wnd.appendChild(new Label("URL"));
+ 	         Textbox txtbox =new Textbox("Query");
+             wnd.appendChild(txtbox); 	         	
+ 	         ZKNode node = new ZKNode(x,y,width,height);
+           	 node.appendChild(wnd);   
+           	 Port input =new Port();            
+             node.addPort(input,0,height/2); 
+             Port output =new Port();            
+             node.addPort(output,0,height/2);        
+           	 workspace.addFigure(node);
+     } 
+     
+     void createFigure(int x,int y,figureType){
+	            x-=140;
+	            y-=14;             
+             if(figureType.equalsIgnoreCase("inputNode")){
+             	 addInputNode(x,y);
+             }
+             else if(figureType.equalsIgnoreCase("outputNode")){
+             	 addOutputNode(x,y);
+             }
+             else if(figureType.equalsIgnoreCase("emptyNode")){
+             	 addZKNode(x,y,100,50);
+             }
+             else if(figureType.equalsIgnoreCase("construct")){
+             	 addZKNode(x,y,220,130,"Construct");
+             }
+             else if(figureType.equalsIgnoreCase("image")){
+             	 addImage(x,y);
+             }
+             else if(figureType.equalsIgnoreCase("oval")){
+             	 addOval(x,y);
+             }
+             else if(figureType.equalsIgnoreCase("label")){
+             	 addLabel(x,y);
+             }
+             else if(figureType.equalsIgnoreCase("rectangle")){
+             	 addRectangle(x,y);
+             }
+           }
+           
+	pipesyntax.setAttribute("selStart",0);
+	pipesyntax.setAttribute("selEnd",1);
+    ListModel model = new SimpleListModel(org.deri.execeng.endpoints.PipeManager.getPipeList().toArray());
+    Object[] items=org.deri.execeng.endpoints.PipeManager.getPipeList().toArray();
+    RowRenderer rowRenderer = new org.deri.execeng.endpoints.PipeListRenderer(pipeid,pipename,pipesyntax,debugView,debugViewArea,deleteWin);
+     ]]>
+    </zscript> 
+	      	<label style="font-weight: bold;font-size: 15px;" value="Published Pipes"/>
+	      	<separator bar="false"/>
+			<grid model="${model}" rowRenderer="${rowRenderer}" mold="paging" pageSize="10" align="left"/>
+      </vbox>
+      </hbox>			
+	</east>
+	</borderlayout>
+	
+<zscript>
+<![CDATA[
+    import org.deri.execeng.endpoints.PipeManager;	
+    String tmpPass;
+    void checkB4Save(){
+       if(PipeManager.isExist(pipeid.value))
+         {
+             if(tmpPass==null)
+                 tmpPass=PipeManager.getPassword(pipeid.value);
+             if(tmpPass!=null){
+                 passwordchecking.doModal();
+             }
+             else{
+                 confirmation.doModal();
+             }
+         }
+       else{
+           savePipe();
+	   }   	
+    }
+    void checkPassword(){
+         if(tmpPass!=null){
+	         if(tmpPass.matches(oldpassword.value)){
+	            passwordchecking.visible=false;
+	            confirmation.doModal();
+	            return;
+	         }
+         }
+         alert("Password is incorrect, please re-enter the password for overwriting the Pipe");
+    }
+    void hidePassword(){
+         tmpPass=PipeManager.getPassword(pipeid.value);
+         if(tmpPass!=null){
+             password.value=tmpPass;
+             passwordrow.visible=false;
+             confirmpasswordrow.visible=false;
+             idwarnning.value="(must have password to overwrite)";
+             idwarnning.setStyle("color:red");
+         }
+         else{
+             password.value=null;
+             passwordrow.visible=true;
+             confirmpasswordrow.visible=true;
+             idwarnning.value="";
+             idwarnning.setStyle("color:black");
+         }
+    }
+	void savePipe(){	    
+	    if(!PipeManager.savePipe(pipeid.value,pipename.value,pipesyntax.value,password.value))
+	       alert("There are some errors in your pipe, please check it again and make sure that all required fields are filled out");
+	    else{
+	     alert("Your pipe was successfully saved");
+	     Executions.sendRedirect(".");
+	    }  	
+	}
+	void debugPipe(){
+	    debugView.value="";	
+	    PipeManager.debugPipe(pipesyntax.value,debugView);
+	}
+	
+	void addForLoop(){
+	     String str="<for>\n"+            
+                    "<sourcelist>\n"+
+                       "requires SPARQL XML FORMAT\n"+
+                    "/<sourcelist>\n"+
+                    "<forloop>\n"+
+                    "enter parametric pipe (parameters corresponding to binding name in SPARQL-results) syntax here!\n"+
+                    "</forloop>\n"+
+                     "</for>\n"; 
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);
+	}
+	
+	void addConstruct(){
+	    String str="<construct>\n"+
+                      "<source>Enter one source syntax as based graph here!</source>\n"+
+                      "<source uri=\"uri\">Enter one source syntax here!</source>\n"+
+                    "<query>\n"+
+                    "<"+"![CDATA[\n"+
+                       "Enter SPARQL construct query here!\n"+
+	                   "]"+"]>\n"+
+                     "</query>\n"+
+                     "</construct>\n";
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);
+	}
+	
+	void addSelect(){
+	    String str="<select>\n"+
+                      "<source>Enter one source syntax as based graph here!</source>\n"+
+                      "<source uri=\"uri\">Enter one source syntax here!</source>\n"+
+                    "<query>\n"+
+                    "<"+"![CDATA[\n"+
+                       "Enter SPARQL SELECT query here!\n"+
+	                   "]"+"]>\n"+
+                     "</query>\n"+
+                     "</select>\n";
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);
+	}
+	
+	void addSimpleMix(){
+	    String str="<simplemix>\n"+
+                      "<source>Enter one or more sources</source>\n"+        
+                     "</simplemix>\n";
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);	    
+	}
+	
+	void addSmoosher(){
+	    String str="<smoosher>\n"+
+                      "<source>Enter one or more sources</source>\n"+        
+                     "</smoosher>\n";
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);	    
+	}
+	
+	void addPatchExecutor(){
+	    String str="<patch-executor>\n"+
+                      "<source>Enter one or more sources</source>\n"+        
+                     "</patch-executor>\n";
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);	    
+	}
+	
+	void addPatchGenerator(){
+	    String str="<patch-generator>\n"+
+                      "<source>Enter one or more sources</source>\n"+        
+                     "</patch-generator>\n";
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);	    
+	}
+	
+	void addDynamicOperator(){
+	    String str="<your-pipe-id-here>\n"+
+                      "<parameter-name>Enter parameter value</parameter-name>\n"+        
+                     "</your-pipe-id-here>\n";
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);	    
+	}
+	void addFetch(){
+	    String str="<fetch accept=\"rdfxml/sparqlxml\">\n"+
+                      "<location>Enter one or more sources</location>\n"+        
+                     "</fetch>\n";
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);	    
+	}
+	
+	void addRDFSMix(){
+	    String str="<rdfs>\n"+
+                      "<source>Enter one or more sources\n</source>"+        
+                     "</rdfs>\n";
+	    pipesyntax.setSelectedText(pipesyntax.getAttribute("selStart"),pipesyntax.getAttribute("selEnd"),str,true);	    
+	}
+	 ]]>
+	</zscript>
+</zk>
