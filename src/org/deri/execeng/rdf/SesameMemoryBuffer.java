@@ -5,14 +5,17 @@ import java.net.URL;
 
 import org.deri.execeng.core.ExecBuffer;
 import org.openrdf.OpenRDFException;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
+import org.openrdf.sail.Sail;
 import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.rdfxml.util.RDFXMLPrettyWriter;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.openrdf.rio.n3.N3Writer;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.model.impl.URIImpl;
@@ -22,6 +25,7 @@ public class SesameMemoryBuffer extends ExecBuffer {
 	public static final int RDFS=1;
 	public static final int OWL=2;
 	private int reasoningType=0;
+	private Sail sail;
 	public SesameMemoryBuffer(int reasoningType){
 		this.reasoningType=reasoningType;
 	}
@@ -30,15 +34,15 @@ public class SesameMemoryBuffer extends ExecBuffer {
 	}
 	public  RepositoryConnection getConnection(){
 		if(buffRepository==null){
+			sail=new MemoryStore();
 			switch (reasoningType){
 			   case RDFS:
 				   buffRepository =new SailRepository(
-	                          new ForwardChainingRDFSInferencer(
-	                          new MemoryStore()));
+	                          new ForwardChainingRDFSInferencer(sail));
 				   break;
 			   case NONE:
 			   default:
-				   buffRepository = new SailRepository(new MemoryStore());
+				   buffRepository = new SailRepository(sail);
 			       break;
 			}
 			
@@ -60,13 +64,17 @@ public class SesameMemoryBuffer extends ExecBuffer {
 		}
 		return null;
 	}
-	public void loadFromURL(String url){
+	
+	public Sail getSail(){
+		return sail;
+	}
+	public void loadFromURL(String url,RDFFormat format){
 		RepositoryConnection conn=this.getConnection() ;
     	try{
 	    	HttpURLConnection urlConn=(HttpURLConnection)((new URL(url)).openConnection());
-			urlConn.setRequestProperty("Accept", "application/rdf+xml");
+			urlConn.setRequestProperty("Accept", format.getDefaultMIMEType());
 			urlConn.connect();
-			conn.add(urlConn.getInputStream(), url, RDFFormat.RDFXML);
+			conn.add(urlConn.getInputStream(), url, format);
 	    }
 		catch (OpenRDFException e) {
 			ExecBuffer.log.append(e.toString()+"\n");
@@ -80,6 +88,19 @@ public class SesameMemoryBuffer extends ExecBuffer {
 		RepositoryConnection conn=this.getConnection() ;
     	try{
 	    	conn.add(new java.io.StringReader(text), "http://pipes.deri.org/", RDFFormat.RDFXML);
+	    }
+		catch (OpenRDFException e) {
+			ExecBuffer.log.append(e.toString()+"\n");
+		}
+		catch (java.io.IOException e) {
+			ExecBuffer.log.append(e.toString()+"\n");
+		}
+	}
+	
+	public void loadFromText(String text,String baseURL){
+		RepositoryConnection conn=this.getConnection() ;
+    	try{
+	    	conn.add(new java.io.StringReader(text), baseURL, RDFFormat.RDFXML);
 	    }
 		catch (OpenRDFException e) {
 			ExecBuffer.log.append(e.toString()+"\n");
@@ -124,20 +145,14 @@ public class SesameMemoryBuffer extends ExecBuffer {
 		}
 	   return null; 	
 	}
+	
 	public void toOutputStream(java.io.OutputStream output){
-		try{
-		  getConnection().export(new RDFXMLPrettyWriter(output));
-		}
-		catch(RepositoryException e){
-			log.append(e.toString()+"\n");
-		}catch(RDFHandlerException e){
-			log.append(e.toString()+"\n");
-		}
+		toOutputStream(output, RDFFormat.RDFXML);
 	}
 	
-	public void toOutputStreamN3(java.io.OutputStream output){
+	public void toOutputStream(java.io.OutputStream output,RDFFormat format){
 		try{
-		  getConnection().export(new N3Writer(output));
+		  getConnection().export(Rio.createWriter(format, output));
 		}
 		catch(RepositoryException e){
 			log.append(e.toString()+"\n");

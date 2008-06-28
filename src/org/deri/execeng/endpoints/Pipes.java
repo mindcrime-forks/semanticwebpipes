@@ -26,6 +26,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.xpath.*;
+import edu.mit.simile.babel.exhibit.BibtexExhibitJsonWriter;
+import edu.mit.simile.babel.exhibit.BibtexExhibitJsonpWriter;
+import edu.mit.simile.babel.exhibit.ExhibitJsonWriter;
+import edu.mit.simile.babel.exhibit.ExhibitJsonpWriter;
+import edu.mit.simile.babel.BabelWriter;
+import org.openrdf.sail.Sail;
 
 import org.openrdf.rio.RDFFormat;
 public class Pipes extends HttpServlet {
@@ -33,69 +39,42 @@ public class Pipes extends HttpServlet {
   public void doGet(HttpServletRequest req, HttpServletResponse res)
                                throws ServletException, IOException {
 	  
-	  String acceptHeaderValue = req.getHeader("Accept") + "";	
-	  String pipeOutputFormat = req.getParameter("pipe_output_format") + "";
+	  String acceptHeaderValue = getMimeHeader(req.getHeader("Accept") + "",req.getParameter("pipe_output_format") + "");	
 	  //System.out.println("acceptHeaderValue: " + acceptHeaderValue);
 	  
 	  res.setStatus(HttpServletResponse.SC_OK);
 	  	
 	  // choose output format depending on Accept header sent by client. "pipe_output_format=rdfxml" in the GET request forces the output to be RDF/XML, regardless of the Accept header.
-	 if (acceptHeaderValue.contains("application/n3") || pipeOutputFormat.equalsIgnoreCase("n3")) {
-		  res.setContentType(RDFFormat.N3.getDefaultMIMEType());
-		  
-			// get pipe code 
-			String pipeid = req.getParameter("id");
-			BoxParserImplRDF parser = new BoxParserImplRDF();
-			Stream stream = null;
-			String syntax = PipeManager.getPipeSyntax(pipeid);
+	 RDFFormat rdfFormat=RDFFormat.forMIMEType(acceptHeaderValue); 
+	 if (rdfFormat!=null) {
+		  res.setContentType(acceptHeaderValue); 
+		  SesameMemoryBuffer buffer=getRDFBuffer(req, res); 		  
+		  if(buffer!=null)
+			  buffer.toOutputStream(res.getOutputStream(),rdfFormat);
 			
-			for (Enumeration parameterIds = req.getParameterNames(); parameterIds.hasMoreElements();) {
-				String parameterId = parameterIds.nextElement().toString();
-				String parameterValue = (String) req.getParameter(parameterId);
-				syntax = syntax.replace("${" + parameterId + "}", parameterValue);
-			}
-			if (syntax != null) {
-				stream = parser.parse(syntax);
-				if (stream instanceof RDFBox) {
-					((RDFBox) stream).execute();
-					((SesameMemoryBuffer)((RDFBox) stream).getExecBuffer())
-					              .toOutputStreamN3(res.getOutputStream());
-				} else {
-					System.out.println("parsing error");
-				}
-			}
 	  }
-	  else if(acceptHeaderValue.contains("application/rdf+xml") || pipeOutputFormat.equalsIgnoreCase("rdfxml")){
-		  res.setContentType(RDFFormat.RDFXML.getDefaultMIMEType());
-		  
-		// get pipe code 
-		String pipeid = req.getParameter("id");
-		BoxParserImplRDF parser = new BoxParserImplRDF();
-		Stream stream = null;
-		String syntax = PipeManager.getPipeSyntax(pipeid);
-		
-		for (Enumeration parameterIds = req.getParameterNames(); parameterIds.hasMoreElements();) {
-			String parameterId = parameterIds.nextElement().toString();
-			String parameterValue = (String) req.getParameter(parameterId);
-			syntax = syntax.replace("${" + parameterId + "}", parameterValue);
-		}
-		if (syntax != null) {
-			stream = parser.parse(syntax);
-			if (stream instanceof RDFBox) {
-				((RDFBox) stream).execute();
-				((RDFBox) stream).getExecBuffer().toOutputStream(
-						res.getOutputStream());
-			} else {
-				System.out.println("parsing error");
-			}
-		}	
-	  }	
+	 else if(acceptHeaderValue.contains("application/json")||(acceptHeaderValue.contains("application/jsonp"))){
+		    res.setContentType(acceptHeaderValue);
+		    SesameMemoryBuffer buffer=getRDFBuffer(req, res); 
+		    if(buffer!=null){
+				BabelWriter writer;
+				if(acceptHeaderValue.contains("application/json"))
+					writer =new ExhibitJsonWriter();
+				else
+					writer =new ExhibitJsonpWriter();
+				try{
+					writer.write(res.getOutputStream(),buffer.getSail(),null,null);
+				}catch(Exception e){
+					
+				}
+		    }
+	 }
 	  else{
 			res.setContentType("text/html");
 			
 		  	// the URL of the pipe result in RDF/XML format
 		  	//String rdfSourceUrl = new String("http://pipes.deri.org:8080/pipes/Pipes/?pipe_output_format=rdfxml&" + req.getQueryString());
-		    String rdfSourceUrl = new String(req.getRequestURL()+"?pipe_output_format=n3&" + req.getQueryString());
+		    String rdfSourceUrl = new String(req.getRequestURL()+"?pipe_output_format=rdfxml&" + req.getQueryString());
 			
 		  	// read HTML template from file
 		  	FileInputStream file = new FileInputStream (getServletContext().getRealPath("/") + "template/generic_exhibit_result_viewer.html");
@@ -111,6 +90,19 @@ public class Pipes extends HttpServlet {
 			    
 	        // TODO: Implement HTML template substitution for query form, based on pipe parameters and default values
 	        // get pipe code 
+	        SesameMemoryBuffer buffer=getRDFBuffer(req, res);
+	        String json="";
+	        if(buffer!=null){
+	        	StringWriter sw=new StringWriter();
+	        	ExhibitJsonWriter jsonWriter=new ExhibitJsonWriter();
+	        	try{
+	        		jsonWriter.write(sw,buffer.getSail(),null,null);
+	        		json=sw.getBuffer().toString();
+	        	}
+	        	catch(Exception e){
+	        		
+	        	}
+	        }
 		    String pipeid = req.getParameter("id");
 			DOMParser myDOMParser = new DOMParser();
 			String syntax = PipeManager.getPipeSyntax(pipeid);
@@ -188,13 +180,52 @@ public class Pipes extends HttpServlet {
 				}
 			}	
 				
-
+	        outputString.replace("$textarea$", json);
 			PrintWriter outputWriter = res.getWriter();		
 			outputWriter.write(outputString);
 			
 		}
 	}
-	
+  	public SesameMemoryBuffer getRDFBuffer(HttpServletRequest req, HttpServletResponse res){
+  		String pipeid = req.getParameter("id");
+		BoxParserImplRDF parser = new BoxParserImplRDF();
+		Stream stream = null;
+		String syntax = PipeManager.getPipeSyntax(pipeid);
+		
+		for (Enumeration parameterIds = req.getParameterNames(); parameterIds.hasMoreElements();) {
+			String parameterId = parameterIds.nextElement().toString();
+			String parameterValue = (String) req.getParameter(parameterId);
+			syntax = syntax.replace("${" + parameterId + "}", parameterValue);
+		}
+		if (syntax != null) {
+			stream = parser.parse(syntax);
+			if (stream instanceof RDFBox) {
+				((RDFBox) stream).execute();
+				return (SesameMemoryBuffer)((RDFBox) stream).getExecBuffer();
+		
+			} else {
+				System.out.println("parsing error");
+			}
+		}
+  		return null;
+  	}
+    private String getMimeHeader(String accept,String format){
+    	if(accept.contains(RDFFormat.RDFXML.getDefaultMIMEType())||format.equalsIgnoreCase("rdfxml")) 
+    		return RDFFormat.RDFXML.getDefaultMIMEType();
+    	if(accept.contains(RDFFormat.N3.getDefaultMIMEType())||format.equalsIgnoreCase("n3")) 
+    		return RDFFormat.N3.getDefaultMIMEType();
+    	if(accept.contains(RDFFormat.NTRIPLES.getDefaultMIMEType())||format.equalsIgnoreCase("ntriples")) 
+    		return RDFFormat.NTRIPLES.getDefaultMIMEType();
+    	if(accept.contains(RDFFormat.TRIG.getDefaultMIMEType())||format.equalsIgnoreCase("trig")) 
+    		return RDFFormat.TRIG.getDefaultMIMEType();
+    	if(accept.contains(RDFFormat.TRIX.getDefaultMIMEType())||format.equalsIgnoreCase("trix")) 
+    		return RDFFormat.TRIX.getDefaultMIMEType();
+    	if(accept.contains(RDFFormat.TURTLE.getDefaultMIMEType())||format.equalsIgnoreCase("turtle")) 
+    		return RDFFormat.TURTLE.getDefaultMIMEType();
+    	if(accept.contains("application/json")||format.equalsIgnoreCase("json")) return "application/json";
+    	if(accept.contains("application/jsonp")||format.equalsIgnoreCase("jsonp")) return "application/jsonp";
+    	return null;
+	}
    
   
   public String getServletInfo() {

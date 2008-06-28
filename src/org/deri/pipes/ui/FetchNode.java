@@ -1,19 +1,27 @@
 package org.deri.pipes.ui;
-import org.integratedmodelling.zk.diagram.components.*;
-import org.zkoss.zul.*;
-public class FetchNode extends InPipeNode{
-	Textbox urlTextbox=null;
-	Port urlPort=null;
-	Listbox listbox;
-	
-	public FetchNode(int x,int y){
-		super(PipePortType.getPType(PipePortType.RDFOUT),x,y,200,70);
+
+import org.deri.execeng.utils.XMLUtil;
+import org.integratedmodelling.zk.diagram.components.CustomPort;
+import org.integratedmodelling.zk.diagram.components.Port;
+import org.openrdf.rio.RDFFormat;
+import org.w3c.dom.Element;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Textbox;
+
+public class FetchNode extends InPipeNode {
+	protected Textbox urlTextbox=null;
+	protected Port urlPort=null;
+
+	public FetchNode(byte outType,int x,int y,int width,int height,String title,String tagName){
+		super(PipePortType.getPType(outType),x,y,width,height);
+		this.tagName=tagName;
+		
 		urlPort =new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
 		urlPort.setPosition("none");
 		urlPort.setPortType("custom");
         addPort(urlPort,35,33);
         
-		wnd.setTitle("Fetch");
+		wnd.setTitle(title);
 		org.zkoss.zul.Label label=new org.zkoss.zul.Label(" URL: ");
         wnd.appendChild(label);
         urlTextbox =new Textbox();
@@ -21,39 +29,15 @@ public class FetchNode extends InPipeNode{
 		wnd.appendChild(urlTextbox);
 		//urlTextbox.setReadonly(true);
         wnd.appendChild(label);
-         listbox =new Listbox();
-         listbox.setMold("select");
-         listbox.appendItem("RDF/XML", "rdf/xml");
-         listbox.appendItem("N3", "n3");
-        wnd.appendChild(listbox);
-    }
+        
+	}
 	
-	public String getCode(){
-		if(getWorkspace()!=null){
-			String code="<fetch>\n<location>";
-			boolean isConnected=false;
-			for(Port p:getWorkspace().getIncomingConnections(urlPort.getUuid())){
-				if(p.getParent() instanceof URLBuilderNode){
-					code+=((URLBuilderNode)p.getParent()).getCode();
-					isConnected=true;
-					break;
-				}
-				if(p.getParent() instanceof TextInNode){
-					code+=((TextInNode)p.getParent()).getParameter();
-					isConnected=true;
-					if (OutPipeNode.paraList.indexOf((TextInNode)p.getParent())<0){
-						OutPipeNode.paraList.add((TextInNode)p.getParent());
-					}
-					break;
-				}
-			}
-			if(!isConnected){
-				code+=urlTextbox.getValue();
-			}
-			code+="</location>\n</fetch>\n";
-			return code;
-		}
+	public String getFormat(){
 		return null;
+	}
+	
+	public void setFormat(String format){
+		
 	}
 	
 	public void disableURLTextbox(){
@@ -64,5 +48,91 @@ public class FetchNode extends InPipeNode{
 	public void enableURLTextbox(){
 		urlTextbox.setValue("");
 		urlTextbox.setReadonly(false);
+	}
+	
+	public void setURL(String url){
+		urlTextbox.setValue(url);
+	}
+	
+	public Port getURLPort(){
+		return urlPort;
+	}
+	
+	public String getCode(){
+		if(getWorkspace()!=null){
+			String code="<"+tagName+" format=\""+getFormat()+"\">\n<location>";
+			boolean isConnected=false;
+			for(Port p:getWorkspace().getIncomingConnections(urlPort.getUuid())){
+				if(p.getParent() instanceof URLBuilderNode){
+					code+=((URLBuilderNode)p.getParent()).getCode();
+					isConnected=true;
+					break;
+				}
+				if(p.getParent() instanceof ParameterNode){
+					code+=((ParameterNode)p.getParent()).getParameter();
+					isConnected=true;
+					if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
+						OutPipeNode.paraList.add((ParameterNode)p.getParent());
+					}
+					break;
+				}
+			}
+			if(!isConnected){
+				code+=urlTextbox.getValue();
+			}
+			code+="</location>\n</"+tagName+">\n";
+			return code;
+		}
+		return null;
+	}
+	
+	public String getConfig(){
+		if(getWorkspace()!=null){
+			String code="<"+tagName+" format=\""+getFormat()+"\" x=\""+getX()+"\" y=\""+getY()+"\">\n<location>";
+			boolean isConnected=false;
+			for(Port p:getWorkspace().getIncomingConnections(urlPort.getUuid())){
+				if(p.getParent() instanceof URLBuilderNode){
+					code+=((URLBuilderNode)p.getParent()).getConfig();
+					isConnected=true;
+					break;
+				}
+				if(p.getParent() instanceof ParameterNode){
+					code+=((ParameterNode)p.getParent()).getParameter();
+					isConnected=true;
+					if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
+						OutPipeNode.paraList.add((ParameterNode)p.getParent());
+					}
+					break;
+				}
+			}
+			if(!isConnected){
+				code+=urlTextbox.getValue();
+			}
+			code+="</location>\n</"+tagName+">\n";
+			return code;
+		}
+		return null;
+	}
+	
+	public void _loadConfig(Element elm){		
+		setFormat(elm.getAttribute("format"));
+		Element locElm=XMLUtil.getFirstSubElementByName(elm, "location");
+		Element linkedElm=XMLUtil.getFirstSubElement(locElm);
+		String url;
+		if(linkedElm!=null){
+			PipeNode linkedNode=PipeNode.loadConfig(linkedElm,(PipeEditor)getWorkspace());
+			linkedNode.connectTo(urlPort);
+			disableURLTextbox();
+		}else if((url=XMLUtil.getTextData(locElm))!=null){
+			if(url.indexOf("${")>=0){
+				ParameterNode paraNode=OutPipeNode.getParaNode(url);
+				paraNode.connectTo(urlPort);
+				disableURLTextbox();
+			}
+			else{
+				setURL(url);
+			}
+		}
+
 	}
 }

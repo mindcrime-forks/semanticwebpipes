@@ -90,9 +90,9 @@
 									    </tabs>
 									    <tabpanels>
 											<tabpanel id="wspPanel">
-											<workspace width="1600px" height="1000px" router="bezier" id="workspace">
+											<!-- <workspace width="1600px" height="1000px" router="bezier" id="workspace">
 												
-											 </workspace>
+											 </workspace>  -->
 										
 											</tabpanel>
 											<tabpanel >
@@ -132,8 +132,8 @@
 		    				<textbox id="debugView" rows="50" height="100%" width="100%" style="font-size:11px; background-image:url(img/output_background.gif); background-repeat:no-repeat; background-position: right top; background-color:white;" readonly="true" />
 		    				
 		    				</tabpanel>
-		    				<tabpanel>
-							<listbox multiple="true" width="700px">
+		    				<tabpanel id="tabularDebugView">
+						<!-- 	<listbox multiple="true" width="700px">
 								<listhead>
 									<listheader label="subject"/>
 									<listheader label="predicate"/>
@@ -155,7 +155,7 @@
 									<listcell style="font-size: 8px;" label="Tim Berners-Lee"/>
 								</listitem>				
 										
-							</listbox>		
+							</listbox>  -->		
 						   </tabpanel>
 						  
 						   </tabpanels>
@@ -176,9 +176,39 @@
       import org.zkoss.zk.ui.event.*;
            import org.zkoss.zul.*;
            import org.integratedmodelling.zk.diagram.components.*;
-      ListModel model = new SimpleListModel(org.deri.execeng.endpoints.PipeManager.getPipeList().toArray());
+           
+           import org.deri.pipes.ui.*;
+     import org.deri.pipes.ui.events.*;     
+     ViewPort viewPort=new ViewPort("99%","93%");
+	 wspPanel.appendChild(viewPort);	 
+     PipeEditor workspace =new PipeEditor("1000px","1600px");
+     //workspace.setHeight("1600px");
+     //workspace.setWidth("1000px");
+     
+	 workspace.setViewPort(viewPort);
+	 workspace.setTextDebugPanel(debugView);
+	 workspace.setTabularDebugPanel(tabularDebugView);
+	 workspace.setConfigComps(pipeid,pipename,password);
+	    public class DropListener implements org.zkoss.zk.ui.event.EventListener {
+				   public void onEvent(Event event) throws UiException {    
+				         createFigure(event.x,event.y,event.dragged.id);   
+				   }    
+	    }
+    
+    workspace.setDroppable("true");
+    workspace.addEventListener("onDrop",new DropListener());
+    workspace.addEventListener("onConnectionCreated",new ConnectionCreatedListener());
+    
+    void createFigure(int x,int y,figureType){         
+	     workspace.createFigure(x,y,figureType);
+    }
+    
+    ListModel model = new SimpleListModel(org.deri.execeng.endpoints.PipeManager.getPipeList().toArray());
     Object[] items=org.deri.execeng.endpoints.PipeManager.getPipeList().toArray();
-    RowRenderer rowRenderer = new org.deri.execeng.endpoints.PipeListRenderer(pipeid,pipename,pipesyntax,debugView,debugViewArea,deleteWin);
+    RowRenderer rowRenderer = new org.deri.execeng.endpoints.PipeListRenderer(workspace,deleteWin);
+     /* ListModel model = new SimpleListModel(org.deri.execeng.endpoints.PipeManager.getPipeList().toArray());
+    Object[] items=org.deri.execeng.endpoints.PipeManager.getPipeList().toArray();
+    RowRenderer rowRenderer = new org.deri.execeng.endpoints.PipeListRenderer(pipeid,pipename,pipesyntax,debugView,debugViewArea,deleteWin);*/
     </zscript>
      	      	
 	      	<separator bar="false"/>
@@ -325,73 +355,7 @@
      import org.zkoss.zk.ui.event.*;
      import org.zkoss.zul.*;
      import org.integratedmodelling.zk.diagram.components.*;    
-     import org.deri.pipes.ui.*;
-     import org.deri.pipes.ui.events.*;      
-    
-    public class DropListener implements org.zkoss.zk.ui.event.EventListener {
-			   public void onEvent(Event event) throws UiException {    
-			         createFigure(event.x,event.y,event.dragged.id);   
-			   }    
-    }
-    
-    workspace.setDroppable("true");
-    workspace.addEventListener("onDrop",new DropListener());
-    workspace.addEventListener("onConnectionCreated",new ConnectionCreatedListener());
-    
-    ZKNode outputNode =null;
-    void createFigure(int x,int y,figureType){
-	            x-=180;
-	            y-=30;             
-	         if(outputNode==null){
-	              outputNode=new OutPipeNode(500,400);
-	              outputNode.setWorkspace(workspace);
-	              workspace.addFigure(outputNode);
-	              
-	         }    
-             if(figureType.equalsIgnoreCase("fetchop")){
-             	 workspace.addFigure(new FetchNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("simplemixop")){
-             	 workspace.addFigure(new SimpleMixNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("deleteop")){
-             	  workspace.addFigure(new RDFDeleteNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("constructop")){
-             	 workspace.addFigure(new ConstructNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("fetch")){
-             	  workspace.addFigure(new FetchNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("selectop")){
-             	 workspace.addFigure(new SelectNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("patch-gen")){
-             	 workspace.addFigure(new PatchGeneratorNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("patch-exec")){
-             	 workspace.addFigure(new PatchExecutorNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("rdfsmixop")){
-             	 workspace.addFigure(new RDFSMixNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("smoosherop")){
-             	 workspace.addFigure(new SmoosherNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("forop")){
-             	workspace.addFigure(new ForNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("urlbuilder")){
-             	workspace.addFigure(new URLBuilderNode(x,y));
-             }
-             else if(figureType.equalsIgnoreCase("parameter")){
-             	workspace.addFigure(new TextInNode(x,y));
-             }
-    }
-    
-    ListModel model = new SimpleListModel(org.deri.execeng.endpoints.PipeManager.getPipeList().toArray());
-    Object[] items=org.deri.execeng.endpoints.PipeManager.getPipeList().toArray();
-    RowRenderer rowRenderer = new org.deri.execeng.endpoints.PipeListRenderer(pipeid,pipename,pipesyntax,debugView,debugViewArea,deleteWin);
+     
      ]]>
     </zscript> 	
 <zscript>
@@ -445,29 +409,29 @@
 	    debugView.value="";
 	    pipesyntax.setValue("");	
 	}
+	
 	void savePipe(){
 	    updateCode();	    
-	    if(!PipeManager.savePipe(pipeid.value,pipename.value,pipesyntax.value,password.value))
+	    if(!PipeManager.savePipe(workspace))
 	       alert("There are some errors in your pipe, please check it again and make sure that all required fields are filled out");
 	    else{
 	     alert("Your pipe was successfully saved");
 	     Executions.sendRedirect(".");
 	    }  	
 	}
+	
 	void debugPipe(){
 	    updateCode();
 	    debugView.value="";	
-	    PipeManager.debugPipe(pipesyntax.value,debugView);
+	    workspace.debug();
 	}
 	
 	void updateCode(){
 	    if(outputNode!=null)
-	    	pipesyntax.setValue(outputNode.getCode());
+	    	pipesyntax.setValue(workspace.getCode());
 	    pipesyntax.invalidate();
 	}
-	ViewPort viewPort=new ViewPort("99%","93%");
-	wspPanel.appendChild(viewPort);
-	workspace.setViewPort(viewPort);
+	
 	 ]]>
 	</zscript>
 </zk>

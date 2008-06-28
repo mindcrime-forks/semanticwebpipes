@@ -3,35 +3,35 @@ package org.deri.execeng.rdf;
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.core.BoxParser;
+import org.deri.execeng.utils.XMLUtil;
 import org.w3c.dom.Element;
 import java.net.URLEncoder;
+import info.aduna.lang.FileFormat;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.rio.RDFFormat;
+
 public class FetchBox extends RDFBox {
 	private ExecBuffer buffer=null;
 	private boolean isExecuted=false;
 	private String url=null;
-	private int acceptHeader=0;
+	private FileFormat format=null;
 	public static final int RDFXML=0;
 	public static final int SPARQLXML=1;
 	
 	public FetchBox(String url){
-		this.acceptHeader=RDFXML;
+		this.format=RDFFormat.RDFXML;
 		this.url=url;
 	}
 	
-	public FetchBox(String url,String acceptHeader){
-		if(acceptHeader!=null){
-			if(acceptHeader.equalsIgnoreCase("rdfxml")){
-				this.acceptHeader=RDFXML;
-			}
-			else if(acceptHeader.equalsIgnoreCase("sparqlxml")){
-				this.acceptHeader=SPARQLXML;
-			}
-			else{
-				this.acceptHeader=RDFXML;
-			}
-		}
-		else{
-			this.acceptHeader=RDFXML;
+	public FetchBox(String url,String format){
+		this.format=RDFFormat.valueOf(format);
+		if(this.format==null){
+			if (TupleQueryResultFormat.SPARQL.getName().equalsIgnoreCase(format)) 
+				this.format=TupleQueryResultFormat.SPARQL;
+			else if(TupleQueryResultFormat.JSON.getName().equalsIgnoreCase(format))
+				this.format=TupleQueryResultFormat.JSON;
+			else if(TupleQueryResultFormat.BINARY.getName().equalsIgnoreCase(format))
+				this.format=TupleQueryResultFormat.BINARY;
 		}
 		this.url=url;
 	}	
@@ -53,15 +53,13 @@ public class FetchBox extends RDFBox {
 	}
 	
 	public void execute(){
-		switch (acceptHeader){
-		case RDFXML:
+		if(format instanceof RDFFormat){			
 			SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-			rdfBuffer.loadFromURL(url);			
+			rdfBuffer.loadFromURL(url,(RDFFormat)format);			
 			buffer=rdfBuffer;
-			break;
-		case SPARQLXML:
-			buffer=new SesameTupleBuffer(url);
-			break;
+		}
+		else{		
+			buffer=new SesameTupleBuffer(url,(TupleQueryResultFormat)format);			
 		}
 		isExecuted=true;
 	}
@@ -86,20 +84,20 @@ public class FetchBox extends RDFBox {
 		}
     }
     public static Stream loadStream(Element element){
-    	String tmpStr=BoxParser.getTextFromFirstSubEleByName(element, "location");
+    	String tmpStr=XMLUtil.getTextFromFirstSubEleByName(element, "location");
     	//System.out.println("fetchbox");
     	
     	if(tmpStr!=null)
-    		return new FetchBox(tmpStr,element.getAttribute("accept"));
+    		return new FetchBox(tmpStr,element.getAttribute("format"));
     	else{
-    		Element tmpEle=BoxParser.getFirstSubElementByName(element, "sparqlendpoint");
+    		Element tmpEle=XMLUtil.getFirstSubElementByName(element, "sparqlendpoint");
     		//System.out.println("sparqlendpoint");
     		if(tmpEle!=null){
     			try{
     				//System.out.println("try");
-		    		String endpoint=BoxParser.getTextFromFirstSubEleByName(tmpEle,"endpoint");
-		    		String defaultgraph="default-graph-uri="+URLEncoder.encode(BoxParser.getTextFromFirstSubEleByName(tmpEle,"defaultgraph"),"UTF-8");
-		    		String query="&query="+URLEncoder.encode(BoxParser.getTextFromFirstSubEleByName(tmpEle,"query"),"UTF-8");
+		    		String endpoint=XMLUtil.getTextFromFirstSubEleByName(tmpEle,"endpoint");
+		    		String defaultgraph="default-graph-uri="+URLEncoder.encode(XMLUtil.getTextFromFirstSubEleByName(tmpEle,"defaultgraph"),"UTF-8");
+		    		String query="&query="+URLEncoder.encode(XMLUtil.getTextFromFirstSubEleByName(tmpEle,"query"),"UTF-8");
 		    		System.out.println(endpoint+"?"+defaultgraph+query+"&format="+URLEncoder.encode(endPointFormat(element.getAttribute("accept")),"UTF-8"));
 		    		return new FetchBox(endpoint+"?"+defaultgraph+query+"&format="+URLEncoder.encode(endPointFormat(element.getAttribute("accept")),"UTF-8"));
     			}

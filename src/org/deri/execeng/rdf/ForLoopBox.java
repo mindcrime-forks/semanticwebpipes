@@ -2,14 +2,14 @@ package org.deri.execeng.rdf;
 
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.model.Box;
-import org.deri.execeng.core.BoxParser;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.TupleQueryResult;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.apache.xml.serialize.XMLSerializer;
-import org.apache.xml.serialize.OutputFormat;
+//import org.apache.xml.serialize.XMLSerializer;
+//import org.apache.xml.serialize.OutputFormat;
+import org.deri.execeng.utils.XMLUtil;
 
 public class ForLoopBox extends RDFBox{
    
@@ -62,31 +62,38 @@ public class ForLoopBox extends RDFBox{
     	ForLoopBox forLoopBox= new ForLoopBox();
     	java.io.StringWriter  strWriter =new java.io.StringWriter(); 
 		try{
-			(new XMLSerializer(strWriter,
+			java.util.Properties props = 
+			org.apache.xml.serializer.OutputPropertiesFactory.getDefaultMethodProperties(org.apache.xml.serializer.Method.XML);
+			org.apache.xml.serializer.Serializer ser = org.apache.xml.serializer.SerializerFactory.getSerializer(props);
+			ser.setWriter(strWriter);
+			ser.asDOMSerializer().serialize((Element)(XMLUtil.getFirstChildByType(
+							                   			XMLUtil.getFirstSubElementByName(element,"forloop"),
+							                               Node.ELEMENT_NODE)));
+			/*(new XMLSerializer(strWriter,
 					new OutputFormat())).serialize(
-							(Element)(BoxParser.getFirstChildByType(
-							    BoxParser.getFirstSubElementByName(element,"forloop"),
-							       Node.ELEMENT_NODE)));
+							(Element)(XMLUtil.getFirstChildByType(
+							    XMLUtil.getFirstSubElementByName(element,"forloop"),
+							       Node.ELEMENT_NODE)));*/
 		}
 		catch(java.io.IOException e){ }
 		forLoopBox.setPipeCode(strWriter.toString());
     	
-    	Element sourcelistEle=BoxParser.getFirstSubElementByName(element,"sourcelist");
-    	String tmpStr=BoxParser.getTextData(sourcelistEle);
+    	Element sourcelistEle=XMLUtil.getFirstSubElementByName(element,"sourcelist");
+    	String tmpStr=XMLUtil.getTextData(sourcelistEle);
     	SesameTupleBuffer tmpSourceList=null;
     	if(tmpStr!=null){
     		tmpSourceList=new SesameTupleBuffer();
     		tmpSourceList.loadFromText(tmpStr);
     	}
     	else{
-    		Element tmpSubEle=BoxParser.getFirstSubElementByName(sourcelistEle, "fetch");
+    		Element tmpSubEle=XMLUtil.getFirstSubElementByName(sourcelistEle, "fetch");
     		if(tmpSubEle!=null){
     			FetchBox fetch=(FetchBox)FetchBox.loadStream(tmpSubEle);
     			fetch.execute();
     			tmpSourceList=(SesameTupleBuffer)fetch.getExecBuffer();
     		}
     		else{
-    			tmpSubEle=BoxParser.getFirstSubElementByName(sourcelistEle, "select");
+    			tmpSubEle=XMLUtil.getFirstSubElementByName(sourcelistEle, "select");
     			if(tmpSubEle!=null){
     				tmpSourceList=new SesameTupleBuffer();
     	    		tmpSourceList.loadFromSelect(tmpSubEle);

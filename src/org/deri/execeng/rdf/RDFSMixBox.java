@@ -5,6 +5,7 @@ import org.deri.execeng.core.BoxParser;
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.model.Box;
 import org.w3c.dom.Element;
+import org.deri.execeng.utils.XMLUtil;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -43,11 +44,11 @@ public class RDFSMixBox extends RDFBox{
      
      public static Stream loadStream(Element element){    
     	RDFSMixBox rdfsMixBox= new RDFSMixBox();
-    	java.util.ArrayList<Element> childNodes=BoxParser.getSubElementByName(element, "source");
+    	java.util.ArrayList<Element> childNodes=XMLUtil.getSubElementByName(element, "source");
  		for(int i=0;i<childNodes.size();i++){
- 			Element tmp=BoxParser.getFirstSubElement((Element)(childNodes.get(i)));
+ 			Element tmp=XMLUtil.getFirstSubElement((Element)(childNodes.get(i)));
  			if(tmp==null){
- 				rdfsMixBox.addStream(new TextBox(BoxParser.getTextData(childNodes.get(i))));
+ 				rdfsMixBox.addStream(new TextBox(XMLUtil.getTextData(childNodes.get(i))));
  			}
  			else
  				rdfsMixBox.addStream(BoxParserImplRDF.loadStream(tmp)); 			

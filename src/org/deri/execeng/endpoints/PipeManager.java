@@ -17,6 +17,7 @@ import org.zkoss.zul.Textbox;
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.rdf.BoxParserImplRDF;
 import org.deri.execeng.core.ExecBuffer;
+import org.deri.pipes.ui.PipeEditor;
 public class PipeManager {
 	public static Connection getConnection(){
     	Connection conn = null;
@@ -39,6 +40,7 @@ public class PipeManager {
 		}
     	return conn;
     }
+	
 	public static  ArrayList<Pipe> getPipeList(){
 		Connection conn = getConnection();
 		Statement stmt = null;
@@ -48,7 +50,7 @@ public class PipeManager {
 			rs = stmt.executeQuery("SELECT pipeid,pipename FROM pipes");	
 			ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
 			while(rs.next()){				
-				pipeList.add(new Pipe(rs.getString("pipeid"),rs.getString("pipename"),null));
+				pipeList.add(new Pipe(rs.getString("pipeid"),rs.getString("pipename")));
 			}
 			return pipeList;
 		}
@@ -73,6 +75,7 @@ public class PipeManager {
 		}
 		return null;
 	}
+	
 	public static String getPipeSyntax(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
@@ -107,15 +110,18 @@ public class PipeManager {
 		}
 		return null;
 	}
-	public static Pipe getPipe(String pipeid){
+	
+	public static String getPipeConfig(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
 		try {
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT syntax,pipename FROM pipes where pipeid='"+pipeid+"'");
+			rs = stmt.executeQuery("SELECT config FROM pipes where pipeid='"+pipeid+"'");	
+			//System.out.println(rs.getString("syntax"));
 			if(rs.next()){
-				return new Pipe(pipeid,rs.getString("pipename"),rs.getString("syntax"));
+				///System.out.println(rs.getString("syntax"));
+				return rs.getString("config");
 			}
 		}
 		catch(SQLException e){
@@ -139,6 +145,40 @@ public class PipeManager {
 		}
 		return null;
 	}
+	
+	public static Pipe getPipe(String pipeid){
+		Connection conn = getConnection();
+		Statement stmt = null;
+		ResultSet rs=null;
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("SELECT syntax,pipename,config FROM pipes where pipeid='"+pipeid+"'");
+			if(rs.next()){
+				return new Pipe(pipeid,rs.getString("pipename"),rs.getString("syntax"),rs.getString("config"));
+			}
+		}
+		catch(SQLException e){
+			System.out.println("query Exception"+e);
+			e.printStackTrace();
+		}
+		finally { 
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} 
+				catch (SQLException ex) {
+				}
+			}
+			if (conn != null) {
+				try {
+				conn.close();
+				} catch (SQLException ex) {
+				}
+			}
+		}
+		return null;
+	}
+	
 	public static void deletePipe(String pipeid){
 		Connection conn = getConnection();
 		try {
@@ -160,27 +200,7 @@ public class PipeManager {
 			}
 		}
 	}
-	public static boolean debugPipe(String syntax,Textbox view){
-		if(syntax!=null) {
-		   BoxParserImplRDF parser= new BoxParserImplRDF();
-		   if(Stream.log.length()>0)
-			   Stream.log.delete(0,Stream.log.length());
-		   if (ExecBuffer.log.length()>0)
-			   ExecBuffer.log.delete(0,ExecBuffer.log.length());
-		   Stream    stream= parser.parse(syntax);
-		       if(stream instanceof RDFBox){
-		    		  ((RDFBox)stream).execute();
-		    		  if(Stream.log.length()+ExecBuffer.log.length()==0)
-		    	      view.setValue((new StringBuffer("Successful!!!\n\n Output RDF: \n\n").append(stream.toString())).toString());
-		    		  else
-		    			  view.setValue((new StringBuffer("Error!!! \n Syntax:\n").append(Stream.log.toString()+"Executing:\n"+ExecBuffer.log.toString())).toString());  
-		       }
-		       else{		    	  
-		    	   view.setValue((new StringBuffer("Error!!! \n Syntax:\n").append(Stream.log.toString()+"Executing:\n "+ExecBuffer.log.toString())).toString());
-		       }
-		} 
-		return false;
-	}
+	
 	public static boolean isExist(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
@@ -245,44 +265,46 @@ public class PipeManager {
 		return null;
 	}
 	
-	public static boolean savePipe(String pipeid,String pipename,String syntax,String password){
-		if(pipeid!=null){
-			if(pipeid.trim().length()>0){
-				Connection conn = getConnection();
-				Statement stmt = null;
-				ResultSet rs=null;
-				try {
-					stmt = conn.createStatement();
-					rs = stmt.executeQuery("SELECT pipeid FROM pipes where pipeid='"+pipeid+"'");	
-					PreparedStatement pstmt;
-					if(rs.next())
-					   pstmt = conn.prepareStatement("UPDATE  pipes set pipeid=?,pipename=?,syntax=?,password=? where pipeid='"+pipeid+"'");
-					else
-					   pstmt = conn.prepareStatement("INSERT INTO pipes(pipeid,pipename,syntax,password) values(?, ?,?,?)");				
-					pstmt.setString(1, pipeid);
-					pstmt.setString(2, pipename);
-					pstmt.setString(3, syntax);
-					pstmt.setString(4, password);
-					pstmt.executeUpdate();					
-					return true;
-				}
-				catch(SQLException e){
-					System.out.println("query Exception"+e);
-					e.printStackTrace();
-				}
-				finally { 
-					if (stmt != null) {
-						try {
-							stmt.close();
-						} 
-						catch (SQLException ex) {
-						}
+	public static boolean savePipe(PipeEditor wsp){
+		String pipeid=wsp.getPipeId(),pipename=wsp.getPipeName(),
+			password=wsp.getPassword(),syntax=wsp.getCode(),config=wsp.getConfig();
+		
+		if((null!=pipeid)&&(pipeid.trim().length()>0)){
+			Connection conn = getConnection();
+			Statement stmt = null;
+			ResultSet rs=null;
+			try {
+				stmt = conn.createStatement();
+				rs = stmt.executeQuery("SELECT pipeid FROM pipes where pipeid='"+pipeid+"'");	
+				PreparedStatement pstmt;
+				if(rs.next())
+				   pstmt = conn.prepareStatement("UPDATE  pipes set pipeid=?,pipename=?,syntax=?,config=?,password=? where pipeid='"+pipeid+"'");
+				else
+				   pstmt = conn.prepareStatement("INSERT INTO pipes(pipeid,pipename,syntax,config,password) values(?, ?,?,?,?)");				
+				pstmt.setString(1, pipeid);
+				pstmt.setString(2, pipename);
+				pstmt.setString(3, syntax);
+				pstmt.setString(4, config);
+				pstmt.setString(5, password);
+				pstmt.executeUpdate();					
+				return true;
+			}
+			catch(SQLException e){
+				System.out.println("query Exception"+e);
+				e.printStackTrace();
+			}
+			finally { 
+				if (stmt != null) {
+					try {
+						stmt.close();
+					} 
+					catch (SQLException ex) {
 					}
-					if (conn != null) {
-						try {
-						conn.close();
-						} catch (SQLException ex) {
-						}
+				}
+				if (conn != null) {
+					try {
+					conn.close();
+					} catch (SQLException ex) {
 					}
 				}
 			}

@@ -82,7 +82,7 @@ public class BoxParserImplRDF extends BoxParser{
     	
     	//RDF construct
     	if(element.getTagName().equalsIgnoreCase("construct")){    
-    		return TransformBox.loadStream(element);
+    		return ConstructBox.loadStream(element);
 		}
     	
     	//RDF for loop
@@ -90,9 +90,14 @@ public class BoxParserImplRDF extends BoxParser{
     		return ForLoopBox.loadStream(element);
 		}
     	 
-    	//Fetch 
-    	if(element.getTagName().equalsIgnoreCase("fetch")){    
-    		return FetchBox.loadStream(element);
+    	//RDFFetch 
+    	if(element.getTagName().equalsIgnoreCase("rdffetch")){    
+    		return RDFFetchBox.loadStream(element);
+		}
+    	
+    	//Tuple Fetch 
+    	if(element.getTagName().equalsIgnoreCase("tuplefetch")){    
+    		return TupleQueryResultFetchBox.loadStream(element);
 		}
     	
     	Stream tmp=StoredPipe.loadStream(element);

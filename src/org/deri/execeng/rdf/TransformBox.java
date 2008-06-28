@@ -11,6 +11,11 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.repository.RepositoryException;
 import org.w3c.dom.Element;
 import java.util.ArrayList;
+import org.deri.execeng.utils.XMLUtil;
+/**
+ * @author Danh Le Phuoc, danh.lephuoc@deri.org
+ *
+ */
 public class TransformBox extends RDFBox{
    
     private ArrayList<Stream> baseStreams =new ArrayList<Stream>();
@@ -65,8 +70,8 @@ public class TransformBox extends RDFBox{
     
     public static Stream loadStream(Element element){    
     	TransformBox transformBox= new TransformBox();
-    	java.util.ArrayList<Element> sources=BoxParser.getSubElementByName(element, "source");
-    	String constructQuery=BoxParser.getTextFromFirstSubEleByName(element, "query");
+    	java.util.ArrayList<Element> sources=XMLUtil.getSubElementByName(element, "source");
+    	String constructQuery=XMLUtil.getTextFromFirstSubEleByName(element, "query");
     	if((sources.size()<=0)&&(constructQuery==null)){
 			Stream.log.append("Construct operator syntax error at\n");
 		    Stream.log.append(element.toString());
@@ -75,10 +80,10 @@ public class TransformBox extends RDFBox{
 		}
     	
     	for(int i=0;i<sources.size();i++){
-    		Element tmp=BoxParser.getFirstSubElement((Element)(sources.get(i)));
+    		Element tmp=XMLUtil.getFirstSubElement((Element)(sources.get(i)));
     		Stream tmpStream=null;
  			if(tmp==null)
- 				tmpStream= new TextBox(BoxParser.getTextData(sources.get(i)));
+ 				tmpStream= new TextBox(XMLUtil.getTextData(sources.get(i)));
  			else
  				tmpStream=BoxParserImplRDF.loadStream(tmp);
     		transformBox.addBaseStream(tmpStream,sources.get(i).getAttribute("uri"));

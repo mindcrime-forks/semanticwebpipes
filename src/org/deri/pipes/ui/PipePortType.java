@@ -25,6 +25,7 @@ public class PipePortType implements PortType {
 	@Override
 	public boolean isConnectableFrom(PortType portType) {
 		PipePortType pType=(PipePortType)portType;		
+		//System.out.println(idx+"-->"+pType.idx);
 		if((pType.getIdx()==RDFOUT)&&(idx==RDFIN))return true;
 		if((pType.getIdx()==TEXTOUT)&&(idx==TEXTIN))return true;
 		if((pType.getIdx()==SPARQLRESULTOUT)&&(idx==SPARQLRESULTIN))return true;

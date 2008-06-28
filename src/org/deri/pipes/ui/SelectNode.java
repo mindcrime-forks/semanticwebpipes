@@ -1,6 +1,7 @@
 package org.deri.pipes.ui;
 
 import org.integratedmodelling.zk.diagram.components.Workspace;
+import org.w3c.dom.Element;
 
 public class SelectNode extends QueryNode {
 
@@ -11,7 +12,10 @@ public class SelectNode extends QueryNode {
 		tagName="select";
 	}
 	
-	public String getCode(){
-		return super.getCode();
+	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
+		SelectNode node= new SelectNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		wsp.addFigure(node);
+		node.connectSource(elm);
+		return node;
 	}
 }

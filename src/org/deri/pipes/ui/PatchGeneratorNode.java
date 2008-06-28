@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
+import org.deri.execeng.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.*;
+import org.w3c.dom.Element;
 public class PatchGeneratorNode extends InOutNode {
 
 	public PatchGeneratorNode(int x, int y) {
@@ -9,7 +11,10 @@ public class PatchGeneratorNode extends InOutNode {
 		tagName="patch-generator";
 	}
     
-	public String getCode(){
-		return super.getCode();
+	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
+		PatchGeneratorNode node= new PatchGeneratorNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		wsp.addFigure(node);
+		node.connectSource(elm);  
+		return node;
 	}
 }

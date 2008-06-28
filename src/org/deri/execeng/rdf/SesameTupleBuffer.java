@@ -15,14 +15,15 @@ import org.openrdf.repository.RepositoryException;
 import org.w3c.dom.Element;
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.model.Box;
+import org.deri.execeng.utils.XMLUtil;
 public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 	private TupleQueryResult buffer=null;
 	
 	public SesameTupleBuffer(){		
 	}
 	
-	public SesameTupleBuffer(String url){
-		loadFromURL(url);
+	public SesameTupleBuffer(String url,TupleQueryResultFormat format){
+		loadFromURL(url,format);
 	}
 	
 	public SesameTupleBuffer(TupleQueryResult buffer){
@@ -33,13 +34,13 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 		return buffer;
 	}
 	
-	public void loadFromURL(String url){
+	public void loadFromURL(String url,TupleQueryResultFormat format){
 		if (url==null) buffer=null;
 		try{
 	    	HttpURLConnection urlConn=(HttpURLConnection)((new URL(url.trim())).openConnection());
-			urlConn.setRequestProperty("Accept", "application/sparql-results+xml");
+			urlConn.setRequestProperty("Accept", format.getDefaultMIMEType());
 			urlConn.connect();
-		    buffer=QueryResultIO.parse(urlConn.getInputStream(), TupleQueryResultFormat.SPARQL);
+		    buffer=QueryResultIO.parse(urlConn.getInputStream(), format);
 	    }
     	catch(org.openrdf.query.resultio.QueryResultParseException e){							
 		}
@@ -69,13 +70,13 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 	
 	public void loadFromSelect(Element element){	
 		SesameMemoryBuffer tmpBuffer=new SesameMemoryBuffer();
-		java.util.ArrayList<Element> sources=BoxParser.getSubElementByName(element, "source");
-    	String query=BoxParser.getTextFromFirstSubEleByName(element, "query");
+		java.util.ArrayList<Element> sources=XMLUtil.getSubElementByName(element, "source");
+    	String query=XMLUtil.getTextFromFirstSubEleByName(element, "query");
     	for(int i=0;i<sources.size();i++){
-    		Element tmpEle=BoxParser.getFirstSubElement((Element)(sources.get(i)));
+    		Element tmpEle=XMLUtil.getFirstSubElement((Element)(sources.get(i)));
     		Stream tmpStream=null;
  			if(tmpEle==null)
- 				tmpStream= new TextBox(BoxParser.getTextData(sources.get(i)));
+ 				tmpStream= new TextBox(XMLUtil.getTextData(sources.get(i)));
  			else
  				tmpStream=BoxParserImplRDF.loadStream(tmpEle);  	
      	   if(tmpStream instanceof Box) 
@@ -111,6 +112,23 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 	}
 
 	public void toOutputStream(java.io.OutputStream output){
-		
+		try{
+			QueryResultIO.write(buffer, TupleQueryResultFormat.SPARQL, output);
+		}
+		catch(org.openrdf.query.QueryEvaluationException  e){							
+		}
+		catch(org.openrdf.query.TupleQueryResultHandlerException e){							
+		}
+		catch(org.openrdf.query.resultio.UnsupportedQueryResultFormatException e){							
+		}
+		catch (java.io.IOException e) {
+			ExecBuffer.log.append(e.toString()+"\n");
+		}
+	}
+	
+	public String toString(){
+		java.io.ByteArrayOutputStream strOut=new java.io.ByteArrayOutputStream();
+		toOutputStream(strOut);		
+		return strOut.toString();		
 	}
 }

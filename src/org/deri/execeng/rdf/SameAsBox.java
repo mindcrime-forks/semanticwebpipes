@@ -8,6 +8,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.w3c.dom.Element;
+import org.deri.execeng.utils.XMLUtil;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -50,11 +51,11 @@ public class SameAsBox extends RDFBox{
      
      public static Stream loadStream(Element element){    	 
     	SameAsBox sameAsBox= new SameAsBox();
- 		java.util.ArrayList<Element> childNodes=BoxParser.getSubElementByName(element, "source");
+ 		java.util.ArrayList<Element> childNodes=XMLUtil.getSubElementByName(element, "source");
  		for(int i=0;i<childNodes.size();i++){
- 			Element tmp=BoxParser.getFirstSubElement((Element)(childNodes.get(i)));
+ 			Element tmp=XMLUtil.getFirstSubElement((Element)(childNodes.get(i)));
  			if(tmp==null){
- 				sameAsBox.addStream(new TextBox(BoxParser.getTextData(childNodes.get(i))));
+ 				sameAsBox.addStream(new TextBox(XMLUtil.getTextData(childNodes.get(i))));
  			}
  			else
  				sameAsBox.addStream(BoxParserImplRDF.loadStream(tmp)); 			

@@ -3,6 +3,7 @@ package org.deri.pipes.ui;
 import org.deri.pipes.ui.PipeNode.DeleteListener;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
+import org.integratedmodelling.zk.diagram.components.Connection;
 import org.integratedmodelling.zk.diagram.components.PortType;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Toolbarbutton;
@@ -26,5 +27,8 @@ public class InPipeNode extends PipeNode{
  	   wnd.appendChild(caption);
  	   caption.appendChild(delButton);
 	}
-
+	
+	public void connectTo(Port port){
+		getWorkspace().connect(output,port,false);
+	}
 }

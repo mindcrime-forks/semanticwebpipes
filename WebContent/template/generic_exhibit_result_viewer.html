@@ -1,9 +1,33 @@
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <title>Semantic Web Pipes: $pipe_name$</title>
-<link href="$rdf_source$" type="application/n3" rel="exhibit/data" />
-<script src="http://simile.mit.edu/repository/exhibit/branches/2.0/src/webapp/api/exhibit-api.js"
+<script src="http://static.simile.mit.edu/exhibit/api-2.0/exhibit-api.js?autoCreate=false"
             type="text/javascript"></script>
+<script type="text/javascript">
+            var exhibit;
+            function getTextarea() {
+                return document.getElementById("data-textarea");
+            }
+            
+            function onLoad() {
+                var data = eval("(" + getTextarea().value + ")");
+                
+                window.database = Exhibit.Database.create();
+                window.database.loadData(data);
+                
+                var facets = [ "<div ex:role='facet' ex:expression='.type'></div>" ];
+                for (var p in data.properties) {
+                    facets.push("<div ex:role='facet' ex:expression='." + p + "'></div>");
+                }
+                document.getElementById("facets").innerHTML = facets.join("");
+                
+                window.exhibit = Exhibit.create();
+                window.exhibit.configureFromDOM();
+            }
+
+        </script>
+            
 <style>
 .query_div {
 	border-top-width: 8px;
@@ -31,7 +55,7 @@
 }
 </style>
 </head>
-<body>
+<body onLoad="onLoad();">
 <div class="query_div">
   <h2>$pipe_name$</h2>
   <div align="center">$query_form$</div>
@@ -47,11 +71,15 @@
   <table width="100%">
     <tr valign="top">
       <td ex:role="viewPanel"><div ex:role="view"></div></td>
-      <td width="25%"><div ex:role="facet" ex:expression=".type" ex:facetLabel="Type"></div>
+      <td width="25%">
       <b>Text search</b>
-      <div ex:role="facet" ex:facetClass="TextSearch"></div></td>
+      <div ex:role="facet" ex:facetClass="TextSearch"></div>
+      <br/>
+      <div id="facets"></div>
+      </td>
     </tr>
   </table>
+  <textarea rows="15" wrap="off" id="data-textarea" name="content">$textarea$</textarea>
 </div>
 </body>
 </html>

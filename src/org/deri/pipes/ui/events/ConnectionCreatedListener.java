@@ -12,7 +12,7 @@ public class ConnectionCreatedListener implements EventListener {
 	        		 ((FetchNode)e.getDestination().getParent()).disableURLTextbox();
 	        		 return;
 	        	 }
-	        	 if(e.getSource().getParent() instanceof TextInNode){
+	        	 if(e.getSource().getParent() instanceof ParameterNode){
 	        		 ((FetchNode)e.getDestination().getParent()).disableURLTextbox();
 	        		 return;
 	        	 }
@@ -22,21 +22,21 @@ public class ConnectionCreatedListener implements EventListener {
 	        		 ((FetchNode)e.getSource().getParent()).disableURLTextbox();
 	        		 return;
 	        	 }
-	        	 if(e.getDestination().getParent() instanceof TextInNode){
+	        	 if(e.getDestination().getParent() instanceof ParameterNode){
 	        		 ((FetchNode)e.getSource().getParent()).disableURLTextbox();
 	        		 return;
 	        	 }
 	         }
 	         
-	         if((e.getDestination().getParent() instanceof URLBuilderNode)&&(e.getSource().getParent() instanceof TextInNode)){
+	         if((e.getDestination().getParent() instanceof URLBuilderNode)&&(e.getSource().getParent() instanceof ParameterNode)){
 	        	 ((URLBuilderNode)e.getDestination().getParent()).disableTextbox((Port)e.getDestination());
 	        	 return;
 	         }
-	         if((e.getDestination().getParent() instanceof URLBuilderNode)&&(e.getSource().getParent() instanceof TextInNode)){
+	         if((e.getDestination().getParent() instanceof URLBuilderNode)&&(e.getSource().getParent() instanceof ParameterNode)){
 	        	 ((URLBuilderNode)e.getDestination().getParent()).disableTextbox((Port)e.getDestination());
 	        	 return;
 	         }
-	         if((e.getDestination().getParent() instanceof TextInNode)&&(e.getSource().getParent() instanceof URLBuilderNode)){
+	         if((e.getDestination().getParent() instanceof ParameterNode)&&(e.getSource().getParent() instanceof URLBuilderNode)){
 	        	 ((URLBuilderNode)e.getSource().getParent()).disableTextbox((Port)e.getSource());
 	        	 return;
 	         }

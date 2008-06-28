@@ -2,6 +2,7 @@ package org.deri.pipes.ui;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.PortType;
 import org.integratedmodelling.zk.diagram.components.Workspace;
+import org.w3c.dom.Element;
 import org.zkforge.codepress.*;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zk.ui.event.*;
@@ -90,6 +91,23 @@ public class QueryNode extends InOutNode{
 	public String getCode(){
 		if(getWorkspace()!=null){
 	    	String code="<"+tagName+">\n";
+	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
+	    		code+="<source>\n";
+	    		code+=((PipeNode)port.getParent()).getCode();
+	    		code+="</source>\n";
+	    	}
+	    	code+="<query>\n";
+	    	code+="<![CDATA[\n"+textBox.getValue()+"\n]]>";
+	    	code+="</query>\n";
+	    	code+="</"+tagName+">\n";
+	    	return code;
+	    }
+		return null;
+	}
+	
+	public String getConfig(){
+		if(getWorkspace()!=null){
+			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
 	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
 	    		code+="<source>\n";
 	    		code+=((PipeNode)port.getParent()).getCode();

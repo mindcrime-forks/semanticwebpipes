@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
+import org.deri.execeng.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.*;
+import org.w3c.dom.Element;
 public class PatchExecutorNode extends InOutNode {
 
 	public PatchExecutorNode(int x, int y) {
@@ -9,7 +11,10 @@ public class PatchExecutorNode extends InOutNode {
 		tagName="patch-executor";
 	}
     
-	public String getCode(){
-		return super.getCode();
+	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
+		PatchExecutorNode node= new PatchExecutorNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		wsp.addFigure(node);
+		node.connectSource(elm);  
+		return node;
 	}
 }

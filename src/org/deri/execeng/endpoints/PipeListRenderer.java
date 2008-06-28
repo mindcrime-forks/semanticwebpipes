@@ -21,20 +21,16 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zul.impl.MessageboxDlg;
 import org.zkoss.zkex.zul.LayoutRegion;
+import org.deri.pipes.ui.PipeEditor;
 
 public class PipeListRenderer implements RowRenderer {
-	Textbox pipeidTextbox=null,pipenameTextbox=null,debugView=null,checkPassText;
-	Codepress syntaxTextbox=null;
-	LayoutRegion debugViewArea=null;
+	Textbox checkPassText;
 	Window checkPassWin=null;
 	Button checkPassEnter,checkPassCancel;
 	CheckPassListener checkPassListener;
-	public PipeListRenderer(Textbox pipeidTextbox,Textbox pipenameTextbox,Codepress syntaxTextbox,Textbox debugView,LayoutRegion debugViewArea,Window checkPassWin){
-		this.pipeidTextbox=pipeidTextbox;
-		this.pipenameTextbox=pipenameTextbox;
-		this.syntaxTextbox=syntaxTextbox;
-		this.debugView=debugView;
-		this.debugViewArea=debugViewArea;
+	PipeEditor wsp;
+	public PipeListRenderer(PipeEditor wsp,Window checkPassWin){
+		this.wsp=wsp;
 		this.checkPassWin=checkPassWin;
 		init();
 	}
@@ -54,6 +50,7 @@ public class PipeListRenderer implements RowRenderer {
 		});
 		checkPassCancel.setParent(checkPassWin);
 	}
+	
 	String justify(String str,int length){
 		StringBuffer result=new StringBuffer();
 		String[] words= str.split(" ");
@@ -70,6 +67,7 @@ public class PipeListRenderer implements RowRenderer {
 		}
 		return result.toString();
 	}
+	
     public void render(Row row, Object data) {
       row.setValign("top");	
       String pipeid=((Pipe)data).pipeid;
@@ -83,15 +81,9 @@ public class PipeListRenderer implements RowRenderer {
       Menupopup popup=new Menupopup();
       popup.setParent(action);
        
-      Menuitem  copy2Editor=new Menuitem("Copy code to current editor");
-      copy2Editor.addEventListener("onClick", new PipeListener(pipeid,PipeListener.COPY_SYNTAX));
+      Menuitem  copy2Editor=new Menuitem("Clone this pipe");
+      copy2Editor.addEventListener("onClick", new PipeListener(pipeid,PipeListener.CLONE));
       copy2Editor.setParent(popup);
-      Menuitem  copySource2Editor=new Menuitem("Insert as source in editor");
-      copySource2Editor.addEventListener("onClick", new PipeListener(pipeid,PipeListener.COPY_URL_AS_SOURCE));
-      copySource2Editor.setParent(popup);
-      Menuitem  copyUrl2Editor=new Menuitem("Insert URL in editor");
-      copyUrl2Editor.addEventListener("onClick", new PipeListener(pipeid,PipeListener.COPY_URL));
-      copyUrl2Editor.setParent(popup);      
       if(!(pipeid.equalsIgnoreCase("nested")||pipeid.equalsIgnoreCase("simplemix")||pipeid.equalsIgnoreCase("transform"))){
     	  Menuitem edit=new Menuitem("Edit this pipe");
 	      edit.addEventListener("onClick", new PipeListener(pipeid,PipeListener.EDIT));
@@ -109,29 +101,15 @@ public class PipeListRenderer implements RowRenderer {
       row.setNowrap(true);
     }
     public class PipeListener implements EventListener{
-        public static final int COPY_SYNTAX=1;
-        public static final int COPY_URL=2;
-        public static final int COPY_URL_AS_SOURCE=3;
-        public static final int EDIT=4;
-        public static final int DELETE=5;
-        public static final int DEBUG=6;
+        public static final int CLONE=1;
+        public static final int EDIT=2;
+        public static final int DELETE=3;
+        public static final int DEBUG=4;
     	private String pipeid=null;
     	private int type;
     	public PipeListener(String pipeid,int type){
     		this.pipeid=pipeid;
     		this.type=type;
-    	}
-    	public void copy(String str){
-    		int start=0;
-    		int end=0;
-    		try{
-    		   start=Integer.parseInt(syntaxTextbox.getAttribute("selStart").toString());
-    		   end=Integer.parseInt(syntaxTextbox.getAttribute("selEnd").toString());
-    		}
-    		catch(ClassCastException e){
-    			//System.out.println(" sel"+start+"---"+end);
-    		}
-    		syntaxTextbox.setSelectedText(start,end,str,true);
     	}
     	public String getBaseUrl(){
     		Execution exec=Executions.getCurrent();
@@ -139,18 +117,11 @@ public class PipeListRenderer implements RowRenderer {
     	}
     	public void onEvent(org.zkoss.zk.ui.event.Event event) throws org.zkoss.zk.ui.UiException {
     		switch(type){
-    		    case COPY_SYNTAX:
-    		    		copy(PipeManager.getPipeSyntax(pipeid));
+    		    case CLONE:
+    		    		wsp.clone(pipeid);
     		    	break;
-    		    case COPY_URL:
-		    		copy(getBaseUrl()+"/pipe/?id="+pipeid);
-		    	break;	
-    		    case COPY_URL_AS_SOURCE:    		    	
-		    		copy("<source url=\""+getBaseUrl()+"/pipe/?id="+pipeid+"\"/>");
-		    		break;
     		    case DELETE:
-    		    	if(PipeManager.getPassword(pipeid)!=null){     		    		
-		    			
+    		    	if(PipeManager.getPassword(pipeid)!=null){   
     		    		try{
     		    			checkPassListener.setPipeId(pipeid);
     		    			checkPassWin.doModal();    		    			
@@ -171,17 +142,11 @@ public class PipeListRenderer implements RowRenderer {
     		    	}
 		    		break;	
     		    case EDIT:
-    		    	Pipe pipe=PipeManager.getPipe(pipeid);    		    	
-    		    	pipeidTextbox.setValue(pipe.pipeid);
-    		    	pipeidTextbox.focus();
-    		    	pipenameTextbox.setValue(pipe.pipename);
-    		    	syntaxTextbox.setValue(pipe.syntax);
+    		    	wsp.edit(pipeid);
 		    		break;
     		    case DEBUG:  
-    		    	debugView.setValue("");
-    		    	//debugViewArea.setOpen(true); //opening/unncollapsing the debug area does not work for unknown reasons
-    		    	PipeManager.debugPipe(PipeManager.getPipeSyntax(pipeid),debugView);
-    		    	//debugView.setVisible(true);
+    		    	wsp.debug(PipeManager.getPipeSyntax(pipeid));
+    	
 		    		break;	    		    	
     		}
     		
