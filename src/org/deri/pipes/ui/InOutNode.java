@@ -30,13 +30,7 @@ public class InOutNode extends PipeNode{
      	output.setPosition("bottom");
         output.setPortType("custom");
         addPort(output,0,0);
-        
-       Caption caption =new Caption();
- 	   Toolbarbutton delButton= new Toolbarbutton("","img/del-16x16.png");
- 	   delButton.setClass("drag");
- 	   delButton.addEventListener("onClick", new DeleteListener(this));
- 	   wnd.appendChild(caption);
- 	   caption.appendChild(delButton);
+        setToobar();
 	}
 	
 	public Port getInputPort(){

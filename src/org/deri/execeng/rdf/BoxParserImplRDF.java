@@ -85,6 +85,11 @@ public class BoxParserImplRDF extends BoxParser{
     		return ConstructBox.loadStream(element);
 		}
     	
+    	//RDF construct
+    	if(element.getTagName().equalsIgnoreCase("select")){    
+    		return SelectBox.loadStream(element);
+		}
+    	
     	//RDF for loop
     	if(element.getTagName().equalsIgnoreCase("for")){    
     		return ForLoopBox.loadStream(element);

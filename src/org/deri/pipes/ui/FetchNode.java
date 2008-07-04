@@ -7,7 +7,10 @@ import org.openrdf.rio.RDFFormat;
 import org.w3c.dom.Element;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
-
+/**
+ * @author Danh Le Phuoc, danh.lephuoc@deri.org
+ *
+ */
 public class FetchNode extends InPipeNode {
 	protected Textbox urlTextbox=null;
 	protected Port urlPort=null;
@@ -61,25 +64,7 @@ public class FetchNode extends InPipeNode {
 	public String getCode(){
 		if(getWorkspace()!=null){
 			String code="<"+tagName+" format=\""+getFormat()+"\">\n<location>";
-			boolean isConnected=false;
-			for(Port p:getWorkspace().getIncomingConnections(urlPort.getUuid())){
-				if(p.getParent() instanceof URLBuilderNode){
-					code+=((URLBuilderNode)p.getParent()).getCode();
-					isConnected=true;
-					break;
-				}
-				if(p.getParent() instanceof ParameterNode){
-					code+=((ParameterNode)p.getParent()).getParameter();
-					isConnected=true;
-					if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-						OutPipeNode.paraList.add((ParameterNode)p.getParent());
-					}
-					break;
-				}
-			}
-			if(!isConnected){
-				code+=urlTextbox.getValue();
-			}
+			code+="<![CDATA["+getConnectedCode(urlTextbox, urlPort)+"]]>";
 			code+="</location>\n</"+tagName+">\n";
 			return code;
 		}
@@ -89,25 +74,7 @@ public class FetchNode extends InPipeNode {
 	public String getConfig(){
 		if(getWorkspace()!=null){
 			String code="<"+tagName+" format=\""+getFormat()+"\" x=\""+getX()+"\" y=\""+getY()+"\">\n<location>";
-			boolean isConnected=false;
-			for(Port p:getWorkspace().getIncomingConnections(urlPort.getUuid())){
-				if(p.getParent() instanceof URLBuilderNode){
-					code+=((URLBuilderNode)p.getParent()).getConfig();
-					isConnected=true;
-					break;
-				}
-				if(p.getParent() instanceof ParameterNode){
-					code+=((ParameterNode)p.getParent()).getParameter();
-					isConnected=true;
-					if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-						OutPipeNode.paraList.add((ParameterNode)p.getParent());
-					}
-					break;
-				}
-			}
-			if(!isConnected){
-				code+=urlTextbox.getValue();
-			}
+			code+=getConnectedConfig(urlTextbox, urlPort);
 			code+="</location>\n</"+tagName+">\n";
 			return code;
 		}

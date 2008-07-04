@@ -61,7 +61,7 @@ public class OutPipeNode extends PipeNode {
 			//System.out.println("get output config"+getUuid()+"<--> "+input.getUuid());
 			for(Port p:getWorkspace().getIncomingConnections(input.getUuid())){
 				if(p.getParent() instanceof PipeNode){
-					System.out.println("come in");
+					//System.out.println("come in");
 					code+="<code x=\""+getX()+"\" y=\""+getY()+"\">\n"+((PipeNode)p.getParent()).getConfig()+"</code>\n";					
 					break;
 				}
@@ -94,5 +94,8 @@ public class OutPipeNode extends PipeNode {
 		    PipeNode nextNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(elm),wsp);
 		    nextNode.connectTo(node.getInputPort());
 			return node;
+		}
+		public void debug(){	   
+			   ((PipeEditor)getWorkspace()).debug(getCode());
 		}
 	}

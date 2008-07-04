@@ -18,6 +18,7 @@ import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Tabpanel;
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.ui.*;
@@ -26,11 +27,13 @@ import org.deri.execeng.endpoints.*;
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.rdf.BoxParserImplRDF;
 import org.deri.execeng.rdf.RDFBox;
+import org.deri.execeng.rdf.SelectBox;
 import org.zkoss.zk.ui.Component;
 import org.deri.execeng.endpoints.PipeManager;
 import org.deri.execeng.endpoints.Pipe;
 public class PipeEditor extends Workspace {
 	private Textbox textDebugPanel,pipeid,pipename,password;
+	private Bandbox bdid;
 	private Tabpanel tabularDebugPanel=null;
 	private OutPipeNode outputNode;
 	public PipeEditor(String w,String h){
@@ -66,10 +69,11 @@ public class PipeEditor extends Workspace {
 		return tabularDebugPanel;
 	}
 	
-	public void setConfigComps(Textbox pipeid,Textbox pipename,Textbox password){
+	public void setConfigComps(Textbox pipeid,Bandbox bdid,Textbox pipename,Textbox password){
 		this.pipeid=pipeid;
 		this.pipename=pipename;
 		this.password=password;
+		this.bdid=bdid;
 	}
 
 	public Textbox getPipeIdTxtBox(){
@@ -117,8 +121,11 @@ public class PipeEditor extends Workspace {
 	          addFigure(outputNode);
 	          
 	     }    
-	     if(figureType.equalsIgnoreCase("fetchop")){
+	     if(figureType.equalsIgnoreCase("rdffetchop")){
 	     	 addFigure(new RDFFetchNode(x,y));
+	     }
+	     else if(figureType.equalsIgnoreCase("htmlfetchop")){
+	     	 addFigure(new HTMLFetchNode(x,y));
 	     }
 	     else if(figureType.equalsIgnoreCase("simplemixop")){
 	     	 addFigure(new SimpleMixNode(x,y));
@@ -128,9 +135,6 @@ public class PipeEditor extends Workspace {
 	     }
 	     else if(figureType.equalsIgnoreCase("constructop")){
 	     	 addFigure(new ConstructNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("fetch")){
-	     	 addFigure(new RDFFetchNode(x,y));
 	     }
 	     else if(figureType.equalsIgnoreCase("selectop")){
 	     	 addFigure(new SelectNode(x,y));
@@ -156,11 +160,15 @@ public class PipeEditor extends Workspace {
 	     else if(figureType.equalsIgnoreCase("parameter")){
 	     	addFigure(new ParameterNode(x,y));
 	     }
+	     else if(figureType.equalsIgnoreCase("variable")){
+		     	addFigure(new VariableNode(x,y));
+		 }
 	}
 	
 	public static Listbox createListbox(TupleQueryResult tuple){
 		   Listbox listbox =new Listbox();
-		   listbox.setWidth("700px");
+		   listbox.setWidth("98%");
+		   listbox.setRows(20);
 		   java.util.List<String> bindingNames = tuple.getBindingNames();
 		   Listhead listhead=new Listhead();
 		   for(int i=0;i<bindingNames.size();i++)
@@ -168,11 +176,12 @@ public class PipeEditor extends Workspace {
 		   listbox.appendChild(listhead);
 		   try{
 			   while (tuple.hasNext()) {
-		    	   Listitem item=new Listitem();	
-		    	   
+		    	   Listitem item=new Listitem();			    	   
 				   BindingSet bindingSet = tuple.next();		   
 				   for(int i=0;i<bindingNames.size();i++){
-					       item.appendChild(new Listcell(bindingSet.getValue(bindingNames.get(i)).toString()));
+					       Listcell cell=new Listcell(bindingSet.getValue(bindingNames.get(i)).toString());
+					       cell.setStyle("font-size: 8px;");
+					       item.appendChild(cell);
 				   }
 				   listbox.appendChild(item);	   
 		       } 
@@ -225,16 +234,60 @@ public class PipeEditor extends Workspace {
 			   }
 			   else if(buff instanceof org.deri.execeng.rdf.SesameTupleBuffer){
 				   tuple=((org.deri.execeng.rdf.SesameTupleBuffer)buff).getTupleQueryResult();
-				   textResult=((org.deri.execeng.rdf.SesameTupleBuffer)buff).toString();
+				   //textResult=((org.deri.execeng.rdf.SesameTupleBuffer)buff).toString();
 			   }
 		   }
 		   reloadTextDebug(textResult);
 		   reloadTabularDebug(tuple);
 	}
 	
-		
+	public void hotDebug(String syntax){
+		InputSource input=new InputSource(new java.io.StringReader(syntax));
+		try {
+           DOMParser parser = new DOMParser();
+           parser.parse(input);
+		   Stream    stream= BoxParserImplRDF.loadStream(parser.getDocument().getDocumentElement());
+		   TupleQueryResult tuple=null;
+		   String textResult=null;
+		   if(stream instanceof RDFBox){
+			   ((RDFBox) stream).execute();
+			   org.deri.execeng.core.ExecBuffer buff=((RDFBox)stream).getExecBuffer();
+			   textResult=buff.toString();
+			   if(buff instanceof org.deri.execeng.rdf.SesameMemoryBuffer){
+				   try{
+					   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
+			    		tuple=((((org.deri.execeng.rdf.SesameMemoryBuffer)buff).
+			    				     getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
+			    	}
+			        catch(MalformedQueryException e){ 
+			      	  
+			        }
+			        catch(QueryEvaluationException e){
+			      	  
+			        }
+			        catch(RepositoryException e){
+			      	  
+			        }
+			   }   
+		   }else if(stream instanceof SelectBox){
+			   ((SelectBox) stream).execute();
+			   org.deri.execeng.core.ExecBuffer buff=((SelectBox)stream).getExecBuffer();
+			   //textResult=buff.toString();
+			   
+			   if(buff instanceof org.deri.execeng.rdf.SesameTupleBuffer){
+				   tuple=((org.deri.execeng.rdf.SesameTupleBuffer)buff).getTupleQueryResult();
+				   textResult=((org.deri.execeng.rdf.SesameTupleBuffer)buff).toString();
+			   }
+			   
+		   }
+		   reloadTextDebug(textResult);
+		   reloadTabularDebug(tuple);		
+		} catch (Exception e) {
+	    	System.out.print(e.toString()+"\n");
+	    }
+	}
+	
 	public void reload(String config){
-		System.out.println(config);
 		Object[] children=getChildren().toArray();
 		for(int i=0;i<children.length;i++){
 			((Component)children[i]).detach();
@@ -246,13 +299,13 @@ public class PipeEditor extends Workspace {
             PipeNode.loadConfig(parser.getDocument().getDocumentElement(),this);
         } catch (Exception e) {
         	System.out.print(e.toString()+"\n");
-        	Stream.log.append(e.toString()+"\n");
         }
 	}
 	
 	public void clone(String pid){
 		reload(PipeManager.getPipeConfig(pid));
 		pipeid.setValue("");
+		bdid.setValue("");
 		pipename.setValue("");
 	}
 	
@@ -260,6 +313,7 @@ public class PipeEditor extends Workspace {
 		Pipe pipe=PipeManager.getPipe(pid);
 		reload(pipe.config);
 		pipeid.setValue(pipe.pipeid);
+		bdid.setValue(pipe.pipeid);
 		pipename.setValue(pipe.pipename);
 	}
 }

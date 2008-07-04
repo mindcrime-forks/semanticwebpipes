@@ -6,12 +6,10 @@
             type="text/javascript"></script>
 <script type="text/javascript">
             var exhibit;
-            function getTextarea() {
-                return document.getElementById("data-textarea");
-            }
+            
             
             function onLoad() {
-                var data = eval("(" + getTextarea().value + ")");
+                var data = eval("("+document.getElementById("data-textarea").value+")");
                 
                 window.database = Exhibit.Database.create();
                 window.database.loadData(data);
@@ -25,7 +23,6 @@
                 window.exhibit = Exhibit.create();
                 window.exhibit.configureFromDOM();
             }
-
         </script>
             
 <style>
@@ -57,7 +54,7 @@
 </head>
 <body onLoad="onLoad();">
 <div class="query_div">
-  <h2>$pipe_name$</h2>
+  <h2> $pipe_name$ pipe</h2>
   <div align="center">$query_form$</div>
   <div class="error_messages_div">$error_messages$</div>
 </div>
@@ -79,7 +76,9 @@
       </td>
     </tr>
   </table>
-  <textarea rows="15" wrap="off" id="data-textarea" name="content">$textarea$</textarea>
+
+  <textarea rows="15" wrap="off" id="data-textarea" name="content" style="display:none">$jsondata$</textarea> 
+
 </div>
 </body>
 </html>

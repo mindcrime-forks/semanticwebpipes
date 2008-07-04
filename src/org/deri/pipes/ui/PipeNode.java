@@ -18,9 +18,11 @@ import org.integratedmodelling.zk.diagram.components.*;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Caption;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Window;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listcell;
@@ -40,8 +42,7 @@ import java.util.ArrayList;
  *
  */
 public class PipeNode extends ZKNode{  
-  
-
+	
 	private static final long serialVersionUID = -1520720934219234911L;
 	protected String tagName=null;	
 	public class DeleteListener implements org.zkoss.zk.ui.event.EventListener {
@@ -54,14 +55,100 @@ public class PipeNode extends ZKNode{
 			    	 this.node.detach();
 		   }
    }
-	
+   
+	public class DebugListener implements org.zkoss.zk.ui.event.EventListener {
+		   PipeNode node;
+		   public DebugListener(PipeNode node){
+			   this.node=node;
+		   }
+		   public void onEvent(Event event) throws UiException {
+			     node.debug();
+		   }
+    }
    protected Window wnd=null;
    
    public PipeNode(int x,int y,int width,int height){
 	   super(x,y,width,height);
 	   wnd =new Window();
-	   appendChild(wnd); 
-	   
+	   appendChild(wnd); 	   
+   }
+   
+   protected Textbox createBox(int w,int h){
+		Textbox box=new Textbox();
+		box.setHeight(h+"px");
+		box.setWidth(w+"px");
+		return box;
+   }
+   
+   protected String getConnectedCode(Textbox txtBox,Port port){
+	    String code=null;
+	    boolean isConnected=false;
+		for(Port p:getWorkspace().getIncomingConnections(port.getUuid())){
+			if(p.getParent() instanceof URLBuilderNode){
+				code=((URLBuilderNode)p.getParent()).getCode();
+				isConnected=true;
+				break;
+			}
+			if(p.getParent() instanceof ParameterNode){
+				code=((ParameterNode)p.getParent()).getParameter();
+				isConnected=true;
+				if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
+					OutPipeNode.paraList.add((ParameterNode)p.getParent());
+				}
+				break;
+			}
+			if(p.getParent() instanceof VariableNode){
+				code=((VariableNode)p.getParent()).getVariable();
+				isConnected=true;
+				break;
+			}
+		}
+		if(!isConnected){
+			code=txtBox.getValue().trim();
+		}
+		return code;
+   }
+   
+   protected String getConnectedConfig(Textbox txtBox,Port port){
+	    String code=null;
+		boolean isConnected=false;
+		for(Port p:getWorkspace().getIncomingConnections(port.getUuid())){
+			if(p.getParent() instanceof URLBuilderNode){
+				code=((URLBuilderNode)p.getParent()).getConfig();
+				isConnected=true;
+				break;
+			}
+			if(p.getParent() instanceof VariableNode){
+				isConnected=true;
+				break;
+			}
+			if(p.getParent() instanceof ParameterNode){
+				code=((ParameterNode)p.getParent()).getParameter();
+				isConnected=true;
+				if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
+					OutPipeNode.paraList.add((ParameterNode)p.getParent());
+				}
+				break;
+			}
+			
+		}
+		if(!isConnected){
+			code+=code+="<![CDATA["+txtBox.getValue().trim()+"]]>";;
+		}
+		return code;
+  }
+   
+   public void setToobar(){
+	   Caption caption =new Caption();
+ 	   Toolbarbutton delButton= new Toolbarbutton("","img/del-16x16.png");
+ 	   delButton.setClass("drag");
+ 	   delButton.addEventListener("onClick", new DeleteListener(this));
+ 	  Toolbarbutton debugButton= new Toolbarbutton("","img/debug.jpg");
+	   debugButton.setClass("drag");
+	   debugButton.addEventListener("onClick", new DebugListener(this));
+ 	   wnd.appendChild(caption);
+ 	  caption.appendChild(debugButton);
+ 	   caption.appendChild(delButton);
    }
    
    public String getCode(){
@@ -139,6 +226,6 @@ public class PipeNode extends ZKNode{
    }
    
    public void debug(){	   
-	   ((PipeEditor)getWorkspace()).debug(getCode());
+	   ((PipeEditor)getWorkspace()).hotDebug(getCode());
    }
 }

@@ -42,7 +42,7 @@ public class ForLoopBox extends RDFBox{
 	    	   String tmp=pipeCode;	
 			   BindingSet bindingSet = sourcelist.next();		   
 			   for(int i=0;i<bindingNames.size();i++){				   
-			       tmp=tmp.replace("$"+bindingNames.get(i)+"$",
+			       tmp=tmp.replace("${{"+bindingNames.get(i)+"}}$",
 			    		          bindingSet.getValue(bindingNames.get(i)).toString());
 			   }
 			   stream = parser.parseCode(tmp);
@@ -88,15 +88,16 @@ public class ForLoopBox extends RDFBox{
     	else{
     		Element tmpSubEle=XMLUtil.getFirstSubElementByName(sourcelistEle, "fetch");
     		if(tmpSubEle!=null){
-    			FetchBox fetch=(FetchBox)FetchBox.loadStream(tmpSubEle);
+    			TupleQueryResultFetchBox fetch=(TupleQueryResultFetchBox)TupleQueryResultFetchBox.loadStream(tmpSubEle);
     			fetch.execute();
     			tmpSourceList=(SesameTupleBuffer)fetch.getExecBuffer();
     		}
     		else{
     			tmpSubEle=XMLUtil.getFirstSubElementByName(sourcelistEle, "select");
     			if(tmpSubEle!=null){
-    				tmpSourceList=new SesameTupleBuffer();
-    	    		tmpSourceList.loadFromSelect(tmpSubEle);
+    				SelectBox select=(SelectBox)SelectBox.loadStream(tmpSubEle);
+        			select.execute();
+        			tmpSourceList=(SesameTupleBuffer)select.getExecBuffer();
         		}
     			else{
     				//syntax error

@@ -31,13 +31,6 @@ public class ParameterNode extends InPipeNode {
 		tagName="parameter";
 	}
 	
-	private Textbox createBox(int w,int h){
-		Textbox box=new Textbox();
-		box.setHeight(h+"px");
-		box.setWidth(w+"px");
-		return box;
-	}
-	
 	public void setName(String name){
 		nameBox.setValue(name);
 	}
@@ -54,14 +47,6 @@ public class ParameterNode extends InPipeNode {
 		return "${"+nameBox.getValue()+"}";
 	}
 	
-	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		ParameterNode node= new ParameterNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
-		wsp.addFigure(node);
-		node.setName(XMLUtil.getTextFromFirstSubEleByName(elm, "id"));
-		node.setLabel(XMLUtil.getTextFromFirstSubEleByName(elm, "label"));
-		node.setLabel(XMLUtil.getTextFromFirstSubEleByName(elm, "default"));
-		return node;
-	}
 	
 	public String getParaId(){
 		return nameBox.getValue();
@@ -69,7 +54,7 @@ public class ParameterNode extends InPipeNode {
 	
 	public String getCode(){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
+			String code="<"+tagName+">\n";
 			code+="<id>"+nameBox.getValue()+"</id>\n";
 			code+="<label>"+labelBox.getValue()+"</label>\n";
 			code+="<default>"+nameBox.getValue()+"</default>\n";
@@ -81,7 +66,7 @@ public class ParameterNode extends InPipeNode {
 	
 	public String getConfig(){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+">\n";
+			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
 			code+="<id>"+nameBox.getValue()+"</id>\n";
 			code+="<label>"+labelBox.getValue()+"</label>\n";
 			code+="<default>"+nameBox.getValue()+"</default>\n";
@@ -89,6 +74,15 @@ public class ParameterNode extends InPipeNode {
 			return code;
 		}
 		return null;
+	}
+	
+	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
+		ParameterNode node= new ParameterNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		wsp.addFigure(node);
+		node.setName(XMLUtil.getTextFromFirstSubEleByName(elm, "id"));
+		node.setLabel(XMLUtil.getTextFromFirstSubEleByName(elm, "label"));
+		node.setLabel(XMLUtil.getTextFromFirstSubEleByName(elm, "default"));
+		return node;
 	}
 	
 	public void debug(){

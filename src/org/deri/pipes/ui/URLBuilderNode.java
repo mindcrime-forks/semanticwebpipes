@@ -295,43 +295,15 @@ public class URLBuilderNode extends InPipeNode{
 	
 	public String getCode(){
 		if(getWorkspace()!=null){
-			String code=null;
-			boolean isConnected;
-			isConnected=false;		
-					
-			for(Port p:getWorkspace().getIncomingConnections(basePort.getUuid())){
-				if(p.getParent() instanceof ParameterNode){
-					code=((ParameterNode)p.getParent()).getParameter();				
-					isConnected=true;
-					if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-						OutPipeNode.paraList.add((ParameterNode)p.getParent());
-					}
-					break;
-				}
-			}
-			
-			if(!isConnected){		
-				code=baseURL.getValue().trim();
-			}
-			
+			String code="";
+			code+=getConnectedCode(baseURL, basePort);
+						
 			String tmp=null;
 			for(int i=1;i<pathVbox.getChildren().size();i++){
-				isConnected=false;
+				
 				Hbox hbox=(Hbox)pathVbox.getChildren().get(i);
-				tmp=null;
-				for(Port p:getWorkspace().getIncomingConnections(pathPorts.get(hbox.getUuid()).getUuid())){
-					if(p.getParent() instanceof ParameterNode){
-						tmp=((ParameterNode)p.getParent()).getParameter();
-						isConnected=true;
-						if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-							OutPipeNode.paraList.add((ParameterNode)p.getParent());
-						}
-						break;
-					}
-				}
-				if(!isConnected){		
-					tmp=((Textbox)hbox.getLastChild()).getValue().trim();
-				}
+				tmp=getConnectedCode(((Textbox)hbox.getLastChild()), pathPorts.get(hbox.getUuid()));
+				
 				if(null!=tmp&&tmp.trim()!=""){
 					if((code.charAt(code.length()-1)=='/')||(tmp.charAt(0)=='/'))
 						code+=tmp;
@@ -346,22 +318,9 @@ public class URLBuilderNode extends InPipeNode{
 				try{
 					Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
 					if(((Textbox)hbox.getFirstChild().getNextSibling()).getValue().trim()!=""){
-						isConnected=false;
-						tmp=null;
-						for(Port p:getWorkspace().getIncomingConnections(paraPorts.get(hbox.getUuid()).getUuid())){
-							if(p.getParent() instanceof ParameterNode){
-								tmp=((ParameterNode)p.getParent()).getParameter();
-								isConnected=true;
-								if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-									OutPipeNode.paraList.add((ParameterNode)p.getParent());
-								}
-								break;
-							}
-						}
-						
-						if(!isConnected){					
-							tmp=URLEncoder.encode(((Textbox)hbox.getLastChild()).getValue().trim(),"UTF-8");
-						}
+						tmp=getConnectedCode(((Textbox)hbox.getLastChild()), paraPorts.get(hbox.getUuid()));											
+						//TODO : encoding url fragments here?
+						tmp=URLEncoder.encode(tmp,"UTF-8");
 						code+=and+URLEncoder.encode(((Textbox)hbox.getFirstChild().getNextSibling()).getValue(),"UTF-8")+"="+tmp;
 						and="&";
 					}
@@ -379,63 +338,17 @@ public class URLBuilderNode extends InPipeNode{
 	public String getConfig(){
 		if(getWorkspace()!=null){
 			String code="<urlbuilder x=\""+getX()+"\" y=\""+getY()+"\">\n";
-			boolean isConnected;
-			isConnected=false;		
-					
-			for(Port p:getWorkspace().getIncomingConnections(basePort.getUuid())){
-				if(p.getParent() instanceof ParameterNode){
-					code+="<base>\n"+OutPipeNode.getParaNode(((ParameterNode)p.getParent()).getParameter()).getConfig()+"</base>\n";				
-					isConnected=true;
-					if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-						OutPipeNode.paraList.add((ParameterNode)p.getParent());
-					}
-					break;
-				}
-			}
-			
-			if(!isConnected){		
-				code+="<base>\n"+baseURL.getValue().trim()+"</base>\n";
-			}
+			code+="<base>\n"+getConnectedConfig(baseURL, basePort)+"</base>\n";
 			
 			for(int i=1;i<pathVbox.getChildren().size();i++){
-				isConnected=false;
 				Hbox hbox=(Hbox)pathVbox.getChildren().get(i);
-				for(Port p:getWorkspace().getIncomingConnections(pathPorts.get(hbox.getUuid()).getUuid())){
-					if(p.getParent() instanceof ParameterNode){
-						code+="<path>\n"+OutPipeNode.getParaNode(((ParameterNode)p.getParent()).getParameter()).getConfig()+"</path>\n";
-						isConnected=true;
-						if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-							OutPipeNode.paraList.add((ParameterNode)p.getParent());
-						}
-						break;
-					}
-				}
-				if(!isConnected){		
-					code+="<path>\n"+((Textbox)hbox.getLastChild()).getValue().trim()+"</path>\n";
-				}								
+				code+="<path>\n"+getConnectedConfig(((Textbox)hbox.getLastChild()),pathPorts.get(hbox.getUuid()))+"</path>\n";							
 			}
 			String tmp=null;
 			for(int i=1;i<paraVbox.getChildren().size();i++){
 				Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
-				if(((Textbox)hbox.getFirstChild().getNextSibling()).getValue().trim()!=""){
-					isConnected=false;
-					tmp=null;
-					for(Port p:getWorkspace().getIncomingConnections(paraPorts.get(hbox.getUuid()).getUuid())){
-						if(p.getParent() instanceof ParameterNode){
-							tmp=OutPipeNode.getParaNode(((ParameterNode)p.getParent()).getParameter()).getConfig();
-							isConnected=true;
-							if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-								OutPipeNode.paraList.add((ParameterNode)p.getParent());
-							}
-							break;
-						}
-					}
-					
-					if(!isConnected){					
-						tmp=((Textbox)hbox.getLastChild()).getValue().trim();
-					}
-					code+="<para name=\""+((Textbox)hbox.getFirstChild().getNextSibling()).getValue()+"\">\n"+tmp+"</para>\n";
-				}
+				tmp=getConnectedConfig(((Textbox)hbox.getFirstChild().getNextSibling()), paraPorts.get(hbox.getUuid()));
+				code+="<para name=\""+((Textbox)hbox.getFirstChild().getNextSibling()).getValue()+"\">\n"+tmp+"</para>\n";			
 			}
 			
 			return code;

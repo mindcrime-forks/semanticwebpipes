@@ -6,7 +6,7 @@ import org.integratedmodelling.zk.diagram.components.*;
 import org.w3c.dom.Element;
 public class SimpleMixNode extends InOutNode {    
 	public SimpleMixNode(int x, int y) {
-		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x, y, 100,25);
+		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x, y, 140,25);
 	
 		wnd.setTitle("Simple Mix");
 		tagName="simplemix";

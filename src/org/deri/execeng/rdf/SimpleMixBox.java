@@ -14,7 +14,7 @@ public class SimpleMixBox extends RDFBox{
 	
 	 private Vector<Stream> inputStreams = new Vector<Stream>();
 	 public SimpleMixBox(){ 
-		 buffer= new SesameMemoryBuffer();
+		
      }
      
      public void addStream(Stream stream){
@@ -22,6 +22,7 @@ public class SimpleMixBox extends RDFBox{
      }
      
      public void execute(){
+    	 buffer= new SesameMemoryBuffer();
     	 for(int i=0;i<inputStreams.size();i++){
     		 Stream stream=(Stream)(inputStreams.elementAt(i));
     		 if(stream instanceof Box) 

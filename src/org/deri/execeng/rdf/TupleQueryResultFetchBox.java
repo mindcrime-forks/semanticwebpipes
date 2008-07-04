@@ -62,26 +62,9 @@ public class TupleQueryResultFetchBox implements Box {
     
     public static Stream loadStream(Element element){    	
     	String tmpStr=XMLUtil.getTextFromFirstSubEleByName(element, "location");
-    	//System.out.println("fetchbox");
     	
     	if(tmpStr!=null)
     		return new TupleQueryResultFetchBox(tmpStr,formatOf(element.getAttribute("format")));
-    	/*Element tmpEle=XMLUtil.getFirstSubElementByName(element, "sparqlendpoint");
-    		//System.out.println("sparqlendpoint");
-    	if(tmpEle!=null){
-    		try{
-    				//System.out.println("try");
-		    		String endpoint=XMLUtil.getTextFromFirstSubEleByName(tmpEle,"endpoint");
-		    		String defaultgraph="default-graph-uri="+URLEncoder.encode(XMLUtil.getTextFromFirstSubEleByName(tmpEle,"defaultgraph"),"UTF-8");
-		    		String query="&query="+URLEncoder.encode(XMLUtil.getTextFromFirstSubEleByName(tmpEle,"query"),"UTF-8");
-		    		TupleQueryResultFormat format=formatOf(element.getAttribute("format"));
-		    		return new TupleQueryResultFetchBox(endpoint+"?"+defaultgraph+query+"&format="+
-		    				 		URLEncoder.encode(format.getDefaultMIMEType(),"UTF-8"),format);
-    		}
-	    	catch(java.io.UnsupportedEncodingException e){	    			
-	    	
-    		}
-    	}*/
     	Stream.log.append("Error in fetchbox\n");
     	Stream.log.append(element.toString()+"\n");
     	return null;

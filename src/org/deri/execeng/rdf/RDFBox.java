@@ -10,7 +10,7 @@ public abstract class RDFBox implements org.deri.execeng.model.Box {
 	   if((buffer!=null)&&(outputBuffer!=null))	
 		   buffer.streamming(outputBuffer);
 	   else{
-		   System.out.println("check"+(buffer==null));
+		   //System.out.println("check"+(buffer==null));
 	   }
     }
 	public void streamming(ExecBuffer outputBuffer,String uri){

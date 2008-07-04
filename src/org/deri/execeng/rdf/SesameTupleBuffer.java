@@ -3,12 +3,12 @@ import java.io.ByteArrayInputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.deri.execeng.core.BoxParser;
 import org.deri.execeng.core.ExecBuffer;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.query.impl.MutableTupleQueryResult;
 import org.openrdf.query.resultio.QueryResultIO;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.repository.RepositoryException;
@@ -17,7 +17,7 @@ import org.deri.execeng.model.Stream;
 import org.deri.execeng.model.Box;
 import org.deri.execeng.utils.XMLUtil;
 public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
-	private TupleQueryResult buffer=null;
+	private MutableTupleQueryResult buffer=null;
 	
 	public SesameTupleBuffer(){		
 	}
@@ -27,11 +27,23 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 	}
 	
 	public SesameTupleBuffer(TupleQueryResult buffer){
-		this.buffer=buffer;
+		copyBuffer(buffer);
+		//System.out.println("SesameTupleBuffer \n"+toString());
 	}
-	
-	public TupleQueryResult getTupleQueryResult(){
-		return buffer;
+	public void copyBuffer(TupleQueryResult buffer){
+		try{
+			this.buffer=new MutableTupleQueryResult(buffer);
+		}
+		catch(org.openrdf.query.QueryEvaluationException  e){							
+		}
+	}
+	public TupleQueryResult getTupleQueryResult(){		
+		try{
+			return buffer.clone();
+		}catch(CloneNotSupportedException e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public void loadFromURL(String url,TupleQueryResultFormat format){
@@ -40,7 +52,7 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 	    	HttpURLConnection urlConn=(HttpURLConnection)((new URL(url.trim())).openConnection());
 			urlConn.setRequestProperty("Accept", format.getDefaultMIMEType());
 			urlConn.connect();
-		    buffer=QueryResultIO.parse(urlConn.getInputStream(), format);
+		    copyBuffer(QueryResultIO.parse(urlConn.getInputStream(), format));
 	    }
     	catch(org.openrdf.query.resultio.QueryResultParseException e){							
 		}
@@ -56,7 +68,7 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 	public void loadFromText(String text){
 		if (text==null) buffer=null;
 		try{
-			buffer=QueryResultIO.parse(new ByteArrayInputStream(text.trim().getBytes()), TupleQueryResultFormat.SPARQL);
+			copyBuffer(QueryResultIO.parse(new ByteArrayInputStream(text.trim().getBytes()), TupleQueryResultFormat.SPARQL));
 		}
 		catch(java.io.IOException e){	
 		}
@@ -90,7 +102,7 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
      	   }
         }
     	try{
-    		buffer=((tmpBuffer.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
+    		copyBuffer((tmpBuffer.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
     	}
          catch(MalformedQueryException e){ 
       	   log.append(e.toString()+"\n");
@@ -113,7 +125,7 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 
 	public void toOutputStream(java.io.OutputStream output){
 		try{
-			QueryResultIO.write(buffer, TupleQueryResultFormat.SPARQL, output);
+			QueryResultIO.write(buffer.clone(), TupleQueryResultFormat.SPARQL, output);
 		}
 		catch(org.openrdf.query.QueryEvaluationException  e){							
 		}
@@ -124,6 +136,10 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 		catch (java.io.IOException e) {
 			ExecBuffer.log.append(e.toString()+"\n");
 		}
+		catch (CloneNotSupportedException e) {
+			ExecBuffer.log.append(e.toString()+"\n");
+		}
+		
 	}
 	
 	public String toString(){

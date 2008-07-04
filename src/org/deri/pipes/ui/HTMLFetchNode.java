@@ -10,7 +10,7 @@ import org.deri.execeng.rdf.HTMLFetchBox;
 public class HTMLFetchNode extends FetchNode{
 	Hashtable<String,Checkbox> checkboxes=new Hashtable<String,Checkbox>();
 	public HTMLFetchNode(int x,int y){
-		super(PipePortType.RDFOUT,x,y,200,100,"HTML Fetch","htmlfetch");
+		super(PipePortType.RDFOUT,x,y,200,110,"HTML Fetch","htmlfetch");
 		Vbox vbox=new Vbox();
 		Enumeration<String> keys=HTMLFetchBox.getFormats().keys();
 		Hbox hbox=new Hbox();
@@ -21,7 +21,7 @@ public class HTMLFetchNode extends FetchNode{
 	    	checkboxes.put(key,checkbox);
 	    	hbox.appendChild(checkbox);
 	    	count++;
-	    	if(count%2==0){
+	    	if(count%3==0){
 	    		vbox.appendChild(hbox);
 	    		hbox=new Hbox();
 	    	}
@@ -34,7 +34,7 @@ public class HTMLFetchNode extends FetchNode{
 		Enumeration<String> keys=HTMLFetchBox.getFormats().keys();
 		while (keys.hasMoreElements()) {
 	    	String key=keys.nextElement();
-	    	if(checkboxes.get(key).isChecked()) format+="|"+key;
+	    	if(checkboxes.get(key).isChecked()) format+=key+"|";
 		}
 		return format;
 	}

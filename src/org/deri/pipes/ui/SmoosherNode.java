@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 
 public class SmoosherNode extends InOutNode {
 	public SmoosherNode(int x,int y){
-		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,100,25);
+		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,130,25);
 		wnd.setTitle("Smoosher");
 		tagName="smoosher";
 	}

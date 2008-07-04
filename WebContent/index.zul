@@ -34,7 +34,7 @@
 		<menu label="File">
 			<menupopup>
 				<menuitem label="New " onClick="newPipe();"/>
-				<menuitem label="Save" onClick="savePipe()"/>
+				<menuitem label="Save" onClick="checkB4Save()"/>
 				<menuseparator/>
 				<menuitem label="Exit" onClick="alert(self.label)"/>
 			</menupopup>
@@ -61,7 +61,7 @@
 				<hbox><label style="font-weight: bold;font-size: 11px;" value="Pipe id"/>
 				<bandbox id="bd" onChange="pipeid.value=bd.value">
 		<bandpopup>
-<vbox>		
+        <vbox>		
 		<hbox>
 		  <label value="Pipe id:" />
 		  <textbox cols="50" id="pipeid"	value="" onChange="hidePassword();bd.value=pipeid.value;" onBlur="hidePassword()" />
@@ -73,7 +73,7 @@
 			<label value="Pipe description:" />
 			<textbox cols="100" id="pipename" value="" />										
 		</hbox>
-</vbox>
+        </vbox>
 		</bandpopup>
 	</bandbox>		
 	</hbox>					
@@ -133,29 +133,7 @@
 		    				
 		    				</tabpanel>
 		    				<tabpanel id="tabularDebugView">
-						<!-- 	<listbox multiple="true" width="700px">
-								<listhead>
-									<listheader label="subject"/>
-									<listheader label="predicate"/>
-									<listheader label="object"/>
-								</listhead>
-								<listitem>
-									<listcell style="font-size: 8px;" label="http://www.w3.org/People/Berners-Lee/card#i"/>
-									<listcell style="font-size: 8px;" label="http://www.w3.org/2000/10/swap/pim/contact#homePage"/>
-									<listcell  style="font-size: 8px;" label="http://www.w3.org/People/Berners-Lee/"/>
-								</listitem>	
-								<listitem>
-									<listcell  style="font-size: 8px;" label="http://www.w3.org/People/Berners-Lee/card#i"/>
-									<listcell  style="font-size: 8px;" label="http://www.w3.org/2000/10/swap/pim/contact#publicHomePage"/>
-									<listcell style="font-size: 8px;" label="http://www.w3.org/People/Berners-Lee/"/>
-								</listitem>
-								<listitem>
-									<listcell style="font-size: 8px;" label="http://www.w3.org/People/Berners-Lee/card#i"/>
-									<listcell style="font-size: 8px;" label="http://www.w3.org/2000/01/rdf-schema#label"/>
-									<listcell style="font-size: 8px;" label="Tim Berners-Lee"/>
-								</listitem>				
-										
-							</listbox>  -->		
+					
 						   </tabpanel>
 						  
 						   </tabpanels>
@@ -182,13 +160,11 @@
      ViewPort viewPort=new ViewPort("99%","93%");
 	 wspPanel.appendChild(viewPort);	 
      PipeEditor workspace =new PipeEditor("1000px","1600px");
-     //workspace.setHeight("1600px");
-     //workspace.setWidth("1000px");
      
 	 workspace.setViewPort(viewPort);
 	 workspace.setTextDebugPanel(debugView);
 	 workspace.setTabularDebugPanel(tabularDebugView);
-	 workspace.setConfigComps(pipeid,pipename,password);
+	 workspace.setConfigComps(pipeid,bd,pipename,password);
 	    public class DropListener implements org.zkoss.zk.ui.event.EventListener {
 				   public void onEvent(Event event) throws UiException {    
 				         createFigure(event.x,event.y,event.dragged.id);   
@@ -223,16 +199,22 @@
 		</treecols>
 		<treechildren>		    
 			
-			<treeitem>
-				<treerow>
-					<treecell label="Operators"/>										
-				</treerow>
+			<treeitem label="Fetch">
 				<treechildren>
 					<treeitem>
 						<treerow>
-							<treecell id="fetchop"  draggable="true"  label="Fetch" />
+							<treecell id="rdffetchop"  draggable="true"  label="RDF Fetch" />
 						</treerow>	
 					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="htmlfetchop"  draggable="true"  label="HTML Fetch" />
+						</treerow>	
+					</treeitem>
+				</treechildren>
+			</treeitem>		
+			<treeitem label="Operators">
+				<treechildren>		
 					<treeitem>
 						<treerow>
 							<treecell id="simplemixop"  draggable="true"  label="Simple Mix" />
@@ -293,57 +275,16 @@
 							<treecell label="Parameter" id="parameter"  draggable="true" />
 						</treerow>
 					</treeitem>
+					<treeitem >
+				       <treerow>
+							<treecell label="Variable" id="variable"  draggable="true" />
+						</treerow>
+					</treeitem>
 				</treechildren>
 			</treeitem>
 		</treechildren>
 	</tree>
-     
-									<!-- 	<grid>
-											<rows>
-											    <row >
-												<hbox  sclass="drag" ><label id="fetchop"  draggable="true"  value="Fetch"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												<row  >
-												<hbox sclass="drag"><label id="simplemixop" draggable="true" value="Simple Mix"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												<row >
-												<hbox sclass="drag"><label id="constructop" value="Construct" draggable="true" /><image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>												
-												<row  >
-												<hbox sclass="drag"><label id="deleteop" draggable="true" value="Delete"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												<row >
-												<hbox sclass="drag"><label id="rdfsmixop" draggable="true" value="RDFS Mix"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												<row >
-												<hbox sclass="drag"><label id="forop" draggable="true" value="For Loop"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												<row >
-												<hbox sclass="drag"><label  id="smoother" draggable="true" value="Smoosher"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												<row >
-												<hbox sclass="drag"><label id="patchexop" draggable="true" value="Patch-Executor"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												<row >
-												<hbox sclass="drag"><label id="patchgenop" draggable="true"  value="Patch-Generator"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												<row >
-												<hbox sclass="drag"><label id="selectop" draggable="true"  value="Select"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												<row >
-												<hbox sclass="drag"><label id="dynamic" draggable="true" value="Dynamic Operator"/> <image src="/img/edit_add-48x48.png" width="16px" height="16px"/></hbox>
-												</row>
-												
-												<row>
-												<hbox><html><![CDATA[
-													<a href="http://pipes.deri.org/documentation.php" target="_blank"><font size="1">Documentation</font></a>
-													]]></html></hbox>
-												</row>
-												
-											</rows>
-										</grid>   -->
-
-									    </vbox>
+       </vbox>
     </tabpanel>
     </tabpanels>
     </tabbox>

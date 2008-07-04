@@ -11,7 +11,7 @@ import org.w3c.dom.Element;
 public class ForNode extends InOutNode{
 	Port loopPort= null;
 	public ForNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.SPARQLRESULTIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,100,25);
+		super(PipePortType.getPType(PipePortType.SPARQLRESULTIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,130,25);
 		wnd.setTitle("FOR loop");
 		loopPort =new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.RDFIN));
 		loopPort.setPosition("left");

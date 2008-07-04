@@ -38,13 +38,11 @@ public class Pipes extends HttpServlet {
 
   public void doGet(HttpServletRequest req, HttpServletResponse res)
                                throws ServletException, IOException {
-	  
-	  String acceptHeaderValue = getMimeHeader(req.getHeader("Accept") + "",req.getParameter("pipe_output_format") + "");	
-	  //System.out.println("acceptHeaderValue: " + acceptHeaderValue);
+	  String format=req.getParameter("format");
+	  String acceptHeaderValue = getMimeHeader(req.getHeader("Accept") + "",format + "");	
 	  
 	  res.setStatus(HttpServletResponse.SC_OK);
 	  	
-	  // choose output format depending on Accept header sent by client. "pipe_output_format=rdfxml" in the GET request forces the output to be RDF/XML, regardless of the Accept header.
 	 RDFFormat rdfFormat=RDFFormat.forMIMEType(acceptHeaderValue); 
 	 if (rdfFormat!=null) {
 		  res.setContentType(acceptHeaderValue); 
@@ -52,20 +50,23 @@ public class Pipes extends HttpServlet {
 		  if(buffer!=null)
 			  buffer.toOutputStream(res.getOutputStream(),rdfFormat);
 			
-	  }
-	 else if(acceptHeaderValue.contains("application/json")||(acceptHeaderValue.contains("application/jsonp"))){
+	 }
+	 else if(acceptHeaderValue.contains("application/json")){
 		    res.setContentType(acceptHeaderValue);
 		    SesameMemoryBuffer buffer=getRDFBuffer(req, res); 
 		    if(buffer!=null){
 				BabelWriter writer;
-				if(acceptHeaderValue.contains("application/json"))
+				if(acceptHeaderValue.equalsIgnoreCase("application/json"))
 					writer =new ExhibitJsonWriter();
 				else
 					writer =new ExhibitJsonpWriter();
 				try{
-					writer.write(res.getOutputStream(),buffer.getSail(),null,null);
+					java.util.Properties prop=new java.util.Properties();
+					String cb=req.getParameter("cb");
+					prop.put("callback",(cb!=null)?cb:"callback");
+					writer.write(res.getWriter(),buffer.getSail(),prop,null);
 				}catch(Exception e){
-					
+					e.printStackTrace();
 				}
 		    }
 	 }
@@ -74,7 +75,7 @@ public class Pipes extends HttpServlet {
 			
 		  	// the URL of the pipe result in RDF/XML format
 		  	//String rdfSourceUrl = new String("http://pipes.deri.org:8080/pipes/Pipes/?pipe_output_format=rdfxml&" + req.getQueryString());
-		    String rdfSourceUrl = new String(req.getRequestURL()+"?pipe_output_format=rdfxml&" + req.getQueryString());
+		    String rdfSourceUrl = new String(req.getRequestURL()+"?format=rdfxml&" + req.getQueryString());
 			
 		  	// read HTML template from file
 		  	FileInputStream file = new FileInputStream (getServletContext().getRealPath("/") + "template/generic_exhibit_result_viewer.html");
@@ -110,7 +111,7 @@ public class Pipes extends HttpServlet {
 			
             // replace $pipe_name$ placeholder in the HTML template with the pipe name.
 			outputString = outputString.replace("$pipe_name$", pipeName);
-			
+			outputString = outputString.replace("$jsondata$", json);
 			String errorMessagesString = new String();
 			String queryFormString = new String();
 			queryFormString = "<form action=\"http://pipes.deri.org:8080/pipes/Pipes/\" method=\"get\" name=\"pipe_query_form\">\n" +
@@ -180,7 +181,7 @@ public class Pipes extends HttpServlet {
 				}
 			}	
 				
-	        outputString.replace("$textarea$", json);
+	        
 			PrintWriter outputWriter = res.getWriter();		
 			outputWriter.write(outputString);
 			
@@ -224,7 +225,7 @@ public class Pipes extends HttpServlet {
     		return RDFFormat.TURTLE.getDefaultMIMEType();
     	if(accept.contains("application/json")||format.equalsIgnoreCase("json")) return "application/json";
     	if(accept.contains("application/jsonp")||format.equalsIgnoreCase("jsonp")) return "application/jsonp";
-    	return null;
+    	return "text/html";
 	}
    
   
