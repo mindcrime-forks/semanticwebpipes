@@ -69,6 +69,7 @@ public class PipeNode extends ZKNode{
    
    public PipeNode(int x,int y,int width,int height){
 	   super(x,y,width,height);
+	   this.canDelete=false;
 	   wnd =new Window();
 	   appendChild(wnd); 	   
    }
@@ -81,24 +82,11 @@ public class PipeNode extends ZKNode{
    }
    
    protected String getConnectedCode(Textbox txtBox,Port port){
-	    String code=null;
+	    String code="";
 	    boolean isConnected=false;
 		for(Port p:getWorkspace().getIncomingConnections(port.getUuid())){
-			if(p.getParent() instanceof URLBuilderNode){
-				code=((URLBuilderNode)p.getParent()).getCode();
-				isConnected=true;
-				break;
-			}
-			if(p.getParent() instanceof ParameterNode){
-				code=((ParameterNode)p.getParent()).getParameter();
-				isConnected=true;
-				if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-					OutPipeNode.paraList.add((ParameterNode)p.getParent());
-				}
-				break;
-			}
-			if(p.getParent() instanceof VariableNode){
-				code=((VariableNode)p.getParent()).getVariable();
+			if(p.getParent() instanceof ConnectingOutputNode){
+				code=((PipeNode)p.getParent()).getCode();
 				isConnected=true;
 				break;
 			}
@@ -110,30 +98,17 @@ public class PipeNode extends ZKNode{
    }
    
    protected String getConnectedConfig(Textbox txtBox,Port port){
-	    String code=null;
+	    String code="";
 		boolean isConnected=false;
 		for(Port p:getWorkspace().getIncomingConnections(port.getUuid())){
-			if(p.getParent() instanceof URLBuilderNode){
-				code=((URLBuilderNode)p.getParent()).getConfig();
+			if(p.getParent() instanceof ConnectingOutputNode){
+				code=((PipeNode)p.getParent()).getConfig();
 				isConnected=true;
 				break;
-			}
-			if(p.getParent() instanceof VariableNode){
-				isConnected=true;
-				break;
-			}
-			if(p.getParent() instanceof ParameterNode){
-				code=((ParameterNode)p.getParent()).getParameter();
-				isConnected=true;
-				if (OutPipeNode.paraList.indexOf((ParameterNode)p.getParent())<0){
-					OutPipeNode.paraList.add((ParameterNode)p.getParent());
-				}
-				break;
-			}
-			
+			}			
 		}
 		if(!isConnected){
-			code+=code+="<![CDATA["+txtBox.getValue().trim()+"]]>";;
+			code+="<![CDATA["+txtBox.getValue().trim()+"]]>";;
 		}
 		return code;
   }
@@ -160,7 +135,7 @@ public class PipeNode extends ZKNode{
    }
    
    public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-	   System.out.println(elm.getTagName());
+	   //System.out.println(elm.getTagName());
 	   if(elm.getTagName().equalsIgnoreCase("pipe")){    
 		   ArrayList<Element>  paraElms=XMLUtil.getSubElementByName(
 				   								XMLUtil.getFirstSubElementByName(elm, "parameters"),"parameter");
@@ -172,9 +147,6 @@ public class PipeNode extends ZKNode{
 	   
 	   if(elm.getTagName().equalsIgnoreCase("code"))
 		   return OutPipeNode.loadConfig(elm,wsp);
-	   
-	   if(elm.getTagName().equalsIgnoreCase("parameter"))    
-   		   return OutPipeNode.loadConfig(elm,wsp);
 	   
 	   if(elm.getTagName().equalsIgnoreCase("rdffetch"))    
    		   return RDFFetchNode.loadConfig(elm,wsp);
@@ -188,32 +160,47 @@ public class PipeNode extends ZKNode{
 	   if(elm.getTagName().equalsIgnoreCase("for"))    
 	   		return ForNode.loadConfig(elm,wsp);
 	   
+	   if(elm.getTagName().equalsIgnoreCase("xslt"))    
+	   		return XSLTNode.loadConfig(elm,wsp);
+	   
 	   if(elm.getTagName().equalsIgnoreCase("htmlfetch"))    
-	   		return ConstructNode.loadConfig(elm,wsp);
+	   		return HTMLFetchNode.loadConfig(elm,wsp);
+	  
+	   if(elm.getTagName().equalsIgnoreCase("xmlfetch"))    
+	   		return XMLFetchNode.loadConfig(elm,wsp);
+	   
+	   if(elm.getTagName().equalsIgnoreCase("xslfetch"))    
+	   		return XSLFetchNode.loadConfig(elm,wsp);
 	   
 	   if(elm.getTagName().equalsIgnoreCase("parameter"))    
-	   		return ConstructNode.loadConfig(elm,wsp);
+	   		return ParameterNode.loadConfig(elm,wsp);
 	   
 	   if(elm.getTagName().equalsIgnoreCase("patch-executor"))    
-	   		return ConstructNode.loadConfig(elm,wsp);
+	   		return PatchExecutorNode.loadConfig(elm,wsp);
 	   
 	   if(elm.getTagName().equalsIgnoreCase("patch-generator"))    
-	   		return ConstructNode.loadConfig(elm,wsp);
+	   		return PatchGeneratorNode.loadConfig(elm,wsp);
 	   
 	   if(elm.getTagName().equalsIgnoreCase("smoosher"))    
-	   		return ConstructNode.loadConfig(elm,wsp);
+	   		return SmoosherNode.loadConfig(elm,wsp);
 	   
 	   if(elm.getTagName().equalsIgnoreCase("rdfs"))    
-	   		return ConstructNode.loadConfig(elm,wsp);
+	   		return RDFSMixNode.loadConfig(elm,wsp);
 	   
 	   if(elm.getTagName().equalsIgnoreCase("select"))    
-	   		return ConstructNode.loadConfig(elm,wsp);
+	   		return SelectNode.loadConfig(elm,wsp);
 	   
 	   if(elm.getTagName().equalsIgnoreCase("tuplefetch"))    
-	   		return ConstructNode.loadConfig(elm,wsp);
+	   		return TupleQueryResultFetchNode.loadConfig(elm,wsp);
 	   
 	   if(elm.getTagName().equalsIgnoreCase("urlbuilder"))    
-	   		return ConstructNode.loadConfig(elm,wsp);
+	   		return URLBuilderNode.loadConfig(elm,wsp);
+	   
+	   if(elm.getTagName().equalsIgnoreCase("variable"))    
+	   		return VariableNode.loadConfig(elm,wsp);
+	   
+	   if(elm.getTagName().equalsIgnoreCase("sparqlendpoint"))    
+	   		return SPARQLEndpointNode.loadConfig(elm,wsp);
 	   
 	   return null;
    }

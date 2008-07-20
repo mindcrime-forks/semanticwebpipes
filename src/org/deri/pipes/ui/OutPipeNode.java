@@ -47,11 +47,12 @@ public class OutPipeNode extends PipeNode {
 			}
 			pipe+="<parameters>\n";
 			for(int i=0;i<paraList.size();i++){
-				pipe+=paraList.get(i).getCode();
+				pipe+=paraList.get(i).getParaCode();
 			}
 			pipe+="</parameters>\n";
 			pipe+=code;
 			pipe+="</pipe>\n";
+			//System.out.println(pipe);
 			return pipe;
 		}
 		
@@ -69,7 +70,7 @@ public class OutPipeNode extends PipeNode {
 			
 			pipe+="<parameters>\n";
 			for(int i=0;i<paraList.size();i++){
-				pipe+=paraList.get(i).getCode();
+				pipe+=paraList.get(i).getParaConfig();
 			}
 			pipe+="</parameters>\n";
 			pipe+=code;

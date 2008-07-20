@@ -15,14 +15,14 @@ import org.deri.execeng.utils.XMLUtil;
 import org.w3c.dom.Element;
 import java.util.ArrayList;
 
-public class URLBuilderNode extends InPipeNode{
+public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,ConnectingOutputNode{
 	Hashtable<String,Port> pathPorts= new Hashtable<String,Port>();
 	Hashtable<String,Port> paraPorts= new Hashtable<String,Port>();
 	
 	Textbox baseURL=null;
 	Port basePort=null;
 	Vbox vbox,pathVbox,paraVbox;
-	int _rs=23;
+	static int _rs=23;
 	public static final String ADD_ICON="img/edit_add-48x48.png";
 	public static final String REMOVE_ICON="img/edit_remove-48x48.png";
 	
@@ -36,11 +36,11 @@ public class URLBuilderNode extends InPipeNode{
 				}
 				if(((Image)event.getTarget()).getSrc().equals(REMOVE_ICON)){
 					if(event.getTarget().getParent().getParent()==pathVbox){
-						System.out.println("remove "+event.getTarget().getParent().getUuid());
+						//System.out.println("remove "+event.getTarget().getParent().getUuid());
 						if(pathPorts.get(event.getTarget().getParent().getUuid())!=null)
 							pathPorts.get(event.getTarget().getParent().getUuid()).detach();
-						else
-							System.out.println(event.getTarget().getParent().getUuid()+"--> null");
+						//else
+							//System.out.println(event.getTarget().getParent().getUuid()+"--> null");
 						pathPorts.remove(event.getTarget().getParent().getUuid());
 						event.getTarget().getParent().detach();
 						relayoutPathPorts(1);
@@ -79,52 +79,101 @@ public class URLBuilderNode extends InPipeNode{
 	    vbox.appendChild(paraVbox);
 	    addLabel("Path elements",pathVbox);
 	    addPath();
-	    addLabel("Query paramters",paraVbox);
+	    addLabel("Query parameters",paraVbox);
 		addParameter();
 	}
 	
 	public URLBuilderNode(int x,int y,Element elm){
-		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,220,138);
+		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,220,getHeight(elm));
 		wnd.setTitle("URL builder");
 		vbox=new Vbox();
 		wnd.appendChild(vbox);
 		paraVbox =new Vbox();
 		pathVbox =new Vbox();
-	}
-	
-	public void loadContent(Element elm){
+		
 		Hbox hbox= new Hbox();
 	    hbox.appendChild(new Label("Base:"));
-		basePort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
+	    hbox.appendChild(baseURL=createParaBox(160,16));
+	    vbox.appendChild(hbox);
+	    basePort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
 		basePort.setPosition("none");
 		basePort.setPortType("custom");
         addPort(basePort,205,35);
         
+		vbox.appendChild(pathVbox);
+		addLabel("Path elements",pathVbox);
+	    vbox.appendChild(paraVbox);
+	    addLabel("Query parameters",paraVbox);
+	}
+	
+	public void onConnected(Port port){
+		if(basePort==port){
+			baseURL.setValue("text [wired]");
+			baseURL.setReadonly(true);
+			return;
+		}
+		for(int i=1;i<pathVbox.getChildren().size();i++){
+			if(pathPorts.get(((Hbox)pathVbox.getChildren().get(i)).getUuid())==port){
+				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setValue("text [wired]");
+				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setReadonly(true);
+				return;
+			}
+		}
+		for(int i=1;i<paraVbox.getChildren().size();i++){
+			if(paraPorts.get(((Hbox)paraVbox.getChildren().get(i)).getUuid())==port){
+				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setValue("text [wired]");
+				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setReadonly(true);
+				return;
+			}
+		}
+	}
+	
+	public void onDisconnected(Port port){
+		if(basePort==port){
+			baseURL.setValue("");
+			baseURL.setReadonly(false);
+			return;
+		}
+		for(int i=1;i<pathVbox.getChildren().size();i++){
+			if(pathPorts.get(((Vbox)pathVbox.getChildren().get(i)).getUuid())==port){
+				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setValue("");
+				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setReadonly(false);
+				return;
+			}
+		}
+		for(int i=1;i<paraVbox.getChildren().size();i++){
+			if(paraPorts.get(((Vbox)paraVbox.getChildren().get(i)).getUuid())==port){
+				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setValue("false");
+				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setReadonly(false);
+				return;
+			}
+		}
+	}
+	
+	public void loadContent(Element elm){
+	        
 	    Element baseElm=XMLUtil.getFirstSubElementByName(elm,"base");
 	    Element baseChildElm=XMLUtil.getFirstSubElement(baseElm);
 	    if(baseChildElm!=null){
-	    	hbox.appendChild(baseURL=createParaBox(160,16));
 	    	PipeNode.loadConfig(baseChildElm,(PipeEditor)getWorkspace()).connectTo(basePort);
 	    	baseURL.setValue("[text wired]");
 	    	baseURL.setReadonly(true);
 	    }
 	    else{
-	    	hbox.appendChild(baseURL=createParaBox(160,16,XMLUtil.getTextData(baseElm)));
-	    }
-	    vbox.appendChild(hbox);
-	    		
-	    vbox.appendChild(pathVbox);
-	    vbox.appendChild(paraVbox);
-	    addLabel("Path elements",pathVbox);
+	    	baseURL.setValue(XMLUtil.getTextData(baseElm));
+	    }	    		
+	   
 	    ArrayList<Element> pathElms=XMLUtil.getSubElementByName(elm, "path");
 	    for(int i=0;i<pathElms.size();i++)
 	    	addPath(pathElms.get(i));
-	    	
-	    addLabel("Query paramters",paraVbox);	    
+	    		    
 	    ArrayList<Element> paraElms=XMLUtil.getSubElementByName(elm, "para");
 	    for(int i=0;i<paraElms.size();i++)
 	    	addParameter(paraElms.get(i));
-	    relayout();
+	}
+	
+	public static int getHeight(Element elm){
+	    return 94+(XMLUtil.getSubElementByName(elm, "path").size()+XMLUtil.getSubElementByName(elm, "para").size())*_rs;
 	}
 	
 	public Image addImage(String src){
@@ -160,7 +209,7 @@ public class URLBuilderNode extends InPipeNode{
 		Port nPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
 		nPort.setPosition("none");
 		nPort.setPortType("custom");
-        addPort(nPort,175,57+(pathVbox.getChildren().size()-1)*_rs);
+        addPort(nPort,175,57+(pathVbox.getChildren().size())*_rs);
 		pathPorts.put(hbox.getUuid(), nPort);
 		
 		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
@@ -195,7 +244,7 @@ public class URLBuilderNode extends InPipeNode{
 		Port nPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
 		nPort.setPosition("none");
 		nPort.setPortType("custom");
-        addPort(nPort,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size()-1)*_rs);
+        addPort(nPort,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
 		paraPorts.put(hbox.getUuid(), nPort);
 		
 		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
@@ -247,52 +296,7 @@ public class URLBuilderNode extends InPipeNode{
 		box.setWidth(w+"px");
 		return box;
 	}
-	
-	public void disableTextbox(Port port){
-		if(basePort==port){
-			baseURL.setValue("text [wired]");
-			baseURL.setReadonly(true);
-			return;
-		}
-		for(int i=1;i<pathVbox.getChildren().size();i++){
-			if(pathPorts.get(((Hbox)pathVbox.getChildren().get(i)).getUuid())==port){
-				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setValue("text [wired]");
-				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setReadonly(true);
-				return;
-			}
-		}
-		for(int i=1;i<paraVbox.getChildren().size();i++){
-			if(paraPorts.get(((Hbox)paraVbox.getChildren().get(i)).getUuid())==port){
-				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setValue("text [wired]");
-				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setReadonly(true);
-				return;
-			}
-		}
-	}
-	
-	public void enableTextbox(Port port){
-		if(basePort==port){
-			baseURL.setValue("");
-			baseURL.setReadonly(false);
-			return;
-		}
-		for(int i=1;i<pathVbox.getChildren().size();i++){
-			if(pathPorts.get(((Vbox)pathVbox.getChildren().get(i)).getUuid())==port){
-				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setValue("");
-				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setReadonly(false);
-				return;
-			}
-		}
-		for(int i=1;i<paraVbox.getChildren().size();i++){
-			if(paraPorts.get(((Vbox)paraVbox.getChildren().get(i)).getUuid())==port){
-				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setValue("false");
-				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setReadonly(false);
-				return;
-			}
-		}
-	}
-	
-	
+		
 	public String getCode(){
 		if(getWorkspace()!=null){
 			String code="";
@@ -347,10 +351,10 @@ public class URLBuilderNode extends InPipeNode{
 			String tmp=null;
 			for(int i=1;i<paraVbox.getChildren().size();i++){
 				Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
-				tmp=getConnectedConfig(((Textbox)hbox.getFirstChild().getNextSibling()), paraPorts.get(hbox.getUuid()));
+				tmp=getConnectedConfig(((Textbox)hbox.getLastChild()), paraPorts.get(hbox.getUuid()));
 				code+="<para name=\""+((Textbox)hbox.getFirstChild().getNextSibling()).getValue()+"\">\n"+tmp+"</para>\n";			
 			}
-			
+			code+="</urlbuilder>";
 			return code;
 		}
 		return null;

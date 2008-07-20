@@ -13,6 +13,10 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.zkoss.zk.ui.Execution;
+import org.zkoss.zk.ui.Executions;
+import org.deri.execeng.endpoints.*;
 public class XSLTUtil {
 	
 	public static String transform(String xmlURL,String xsltURL){
@@ -45,6 +49,14 @@ public class XSLTUtil {
 			throw new RuntimeException(e);
 		}
 
+	}
+	public static String getBaseURL(){
+		Execution exec=Executions.getCurrent();
+		if(exec!=null)
+			return "http://"+exec.getServerName()+":"+exec.getServerPort()+exec.getContextPath();
+		if(Pipes.REQ!=null)
+			return "http://"+Pipes.REQ.getServerName()+":"+Pipes.REQ.getServerPort()+Pipes.REQ.getContextPath();
+		return "";	
 	}
 }
 

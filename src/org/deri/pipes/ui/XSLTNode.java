@@ -8,23 +8,20 @@ import org.w3c.dom.Element;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
-public class ForNode extends InOutNode{
-	Port loopPort= null;
-	public ForNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.SPARQLRESULTIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,130,25);
-		wnd.setTitle("FOR loop");
-		loopPort =new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.RDFIN));
-		loopPort.setPosition("left");
-		loopPort.setPortType("custom");
-		((CustomPort)loopPort).setMaxFanIn(1);
-        addPort(loopPort,0,0);	
-        
-        ((CustomPort)getInputPort()).setMaxFanIn(1);
-        tagName="for";
+public class XSLTNode extends InOutNode{
+	Port xslPort= null;
+	public XSLTNode(int x,int y){		
+		super(PipePortType.getPType(PipePortType.XMLIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
+		wnd.setTitle("XSL Transformation");
+		xslPort =new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.XSLIN));
+		xslPort.setPosition("left");
+		xslPort.setPortType("custom");
+        addPort(xslPort,0,0);	
+        tagName="xslt";
 	}
 	
-	public Port getLoopPort(){
-		return loopPort;
+	public Port getXSLPort(){
+		return xslPort;
 	}
 	
 	public String getCode(){
@@ -32,16 +29,16 @@ public class ForNode extends InOutNode{
 	    	String code="<"+tagName+">\n";
 	    	
 	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<sourcelist>\n";
+	    		code+="<xmlsource>\n";
 	    		code+=((PipeNode)port.getParent()).getCode();
-	    		code+="</sourcelist>\n";
+	    		code+="</xmlsource>\n";
 	    		break;
 	    	}
 	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(loopPort.getUuid())){
-	    		code+="<forloop>\n";
+	    	for(Port port:getWorkspace().getIncomingConnections(xslPort.getUuid())){
+	    		code+="<xslsource>\n";
 	    		code+=((PipeNode)port.getParent()).getCode();
-	    		code+="</forloop>\n";
+	    		code+="</xslsource>\n";
 	    		break;
 	    	}
 	    	code+="</"+tagName+">\n";
@@ -55,16 +52,16 @@ public class ForNode extends InOutNode{
 	    	String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
 	    	
 	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<sourcelist>\n";
+	    		code+="<xmlsource>\n";
 	    		code+=((PipeNode)port.getParent()).getConfig();
-	    		code+="</sourcelist>\n";
+	    		code+="</xmlsource>\n";
 	    		break;
 	    	}
 	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(loopPort.getUuid())){
-	    		code+="<forloop>\n";
+	    	for(Port port:getWorkspace().getIncomingConnections(xslPort.getUuid())){
+	    		code+="<xslsource>\n";
 	    		code+=((PipeNode)port.getParent()).getConfig();
-	    		code+="</forloop>\n";
+	    		code+="</xslsource>\n";
 	    		break;
 	    	}
 	    	code+="</"+tagName+">\n";
@@ -74,16 +71,16 @@ public class ForNode extends InOutNode{
     }
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		ForNode node= new ForNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		XSLTNode node= new XSLTNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
 		
-		Element slElm=XMLUtil.getFirstSubElementByName(elm, "sourcelist");
+		Element slElm=XMLUtil.getFirstSubElementByName(elm, "xmlsource");
 		PipeNode slNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(slElm),wsp);
 		slNode.connectTo(node.getInputPort());
 		
-		Element loopElm=XMLUtil.getFirstSubElementByName(elm, "forloop");
+		Element loopElm=XMLUtil.getFirstSubElementByName(elm, "xslsource");
 		PipeNode loopNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(loopElm),wsp);
-		loopNode.connectTo(node.getLoopPort());
+		loopNode.connectTo(node.getXSLPort());
 		return node;
     }
 }

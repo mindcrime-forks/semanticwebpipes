@@ -11,12 +11,7 @@ import org.zkoss.zk.ui.event.*;
 import org.zkoss.zul.*;
 public class QueryNode extends InOutNode{
 	org.zkoss.zul.Label label;
-	QueryBox queryBox=null;
-	
-	public void setQuery(String query){
-		queryBox.setQuery(query);
-	}
-	
+	QueryBox queryBox=null;	
 	public QueryNode(PortType outPType,int x,int y,String title){
     	super(PipePortType.getPType(PipePortType.RDFIN),outPType,x,y,230,50);
     	label=new org.zkoss.zul.Label("Query:");
@@ -33,6 +28,9 @@ public class QueryNode extends InOutNode{
 		wnd.setTitle(title);
 	}
 	
+	public void setQuery(String query){
+		queryBox.setQuery(query);
+	}
 	public String getCode(){
 		if(getWorkspace()!=null){
 	    	String code="<"+tagName+">\n";

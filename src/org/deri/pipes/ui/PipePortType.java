@@ -3,7 +3,7 @@ package org.deri.pipes.ui;
 import org.integratedmodelling.zk.diagram.components.PortType;
 
 public class PipePortType implements PortType {	
-	private static PipePortType typeList[]= new PipePortType[7];
+	private static PipePortType typeList[]= new PipePortType[11];
 	public static final byte NONE=0;
 	public static final byte RDFIN=1;
 	public static final byte RDFOUT=2;
@@ -11,7 +11,10 @@ public class PipePortType implements PortType {
 	public static final byte TEXTOUT=4;
 	public static final byte SPARQLRESULTIN=5;
 	public static final byte SPARQLRESULTOUT=6;
-	
+	public static final byte XMLIN=7;
+	public static final byte XMLOUT=8;
+	public static final byte XSLIN=9;
+	public static final byte XSLOUT=10;
 	byte idx;
     public PipePortType(byte idx){
     	this.idx=idx;    	
@@ -29,6 +32,8 @@ public class PipePortType implements PortType {
 		if((pType.getIdx()==RDFOUT)&&(idx==RDFIN))return true;
 		if((pType.getIdx()==TEXTOUT)&&(idx==TEXTIN))return true;
 		if((pType.getIdx()==SPARQLRESULTOUT)&&(idx==SPARQLRESULTIN))return true;
+		if((pType.getIdx()==XMLOUT)&&(idx==XMLIN))return true;
+		if((pType.getIdx()==XSLOUT)&&(idx==XSLIN))return true;
 		return false;
 	}
 	

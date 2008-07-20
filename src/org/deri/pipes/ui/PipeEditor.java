@@ -93,6 +93,7 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public String getCode(){
+		//System.out.println("check output"+(outputNode==null));
 		if(outputNode==null) return "";
 		return outputNode.getCode();
 	}
@@ -127,6 +128,9 @@ public class PipeEditor extends Workspace {
 	     else if(figureType.equalsIgnoreCase("htmlfetchop")){
 	     	 addFigure(new HTMLFetchNode(x,y));
 	     }
+	     else if(figureType.equalsIgnoreCase("sparqlresultfetchop")){
+	     	 addFigure(new SPARQLResultFetchNode(x,y));
+	     }
 	     else if(figureType.equalsIgnoreCase("simplemixop")){
 	     	 addFigure(new SimpleMixNode(x,y));
 	     }
@@ -154,6 +158,15 @@ public class PipeEditor extends Workspace {
 	     else if(figureType.equalsIgnoreCase("forop")){
 	     	addFigure(new ForNode(x,y));
 	     }
+	     else if(figureType.equalsIgnoreCase("xsltop")){
+		     	addFigure(new XSLTNode(x,y));
+		 }
+	     else if(figureType.equalsIgnoreCase("xmlfetchop")){
+		     	addFigure(new XMLFetchNode(x,y));
+		 }
+	     else if(figureType.equalsIgnoreCase("xslfetchop")){
+		     	addFigure(new XSLFetchNode(x,y));
+		 }
 	     else if(figureType.equalsIgnoreCase("urlbuilder")){
 	     	addFigure(new URLBuilderNode(x,y));
 	     }
@@ -162,6 +175,9 @@ public class PipeEditor extends Workspace {
 	     }
 	     else if(figureType.equalsIgnoreCase("variable")){
 		     	addFigure(new VariableNode(x,y));
+		 }
+	     else if(figureType.equalsIgnoreCase("sparqlendpoint")){
+		     	addFigure(new SPARQLEndpointNode(x,y));
 		 }
 	}
 	
@@ -292,6 +308,7 @@ public class PipeEditor extends Workspace {
 		for(int i=0;i<children.length;i++){
 			((Component)children[i]).detach();
 		}		
+		if((null==config)||(config.trim()=="")) return;
 		InputSource input=new InputSource(new java.io.StringReader(config));
 		try {
             DOMParser parser = new DOMParser();
@@ -304,6 +321,14 @@ public class PipeEditor extends Workspace {
 	
 	public void clone(String pid){
 		reload(PipeManager.getPipeConfig(pid));
+		pipeid.setValue("");
+		bdid.setValue("");
+		pipename.setValue("");
+	}
+	
+	public void newPipe(){
+		outputNode=null;
+		reload(null);
 		pipeid.setValue("");
 		bdid.setValue("");
 		pipename.setValue("");

@@ -7,7 +7,7 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
 
-public class VariableNode extends InPipeNode {
+public class VariableNode extends InPipeNode implements ConnectingOutputNode{
 	Textbox nameBox;
 	public VariableNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,200,50);
@@ -25,19 +25,16 @@ public class VariableNode extends InPipeNode {
 	public void setName(String name){
 		nameBox.setValue(name);
 	}
-			
-	public String getVariable(){
-		return "${{"+nameBox.getValue()+"}}";
-	}
 	
 	public String getCode(){
-		if(getWorkspace()!=null){
+		return "${{"+nameBox.getValue()+"}}";
+		/*if(getWorkspace()!=null){
 			String code="<"+tagName+">";
 			code+=nameBox.getValue();			
 			code+="</"+tagName+">\n";
 			return code;
 		}
-		return null;
+		return null;*/
 	}
 	
 	public String getConfig(){

@@ -42,13 +42,13 @@
 		<menu label="Debug">
 			<menupopup>
 				<menuitem label="Run " onClick="debugPipe();"/>
-				<menu label="Preview">
+				<!-- <menu label="Preview">
 					<menupopup>
 						<menuitem label="Exhibit" onClick="alert(self.label)"/>
 						<menuitem label="Disco" onClick="alert(self.label)"/>
 						<menuitem label="Openlinked Browser" onClick="alert(self.label)"/>
 					</menupopup>
-				</menu>				
+				</menu>  -->				
 			</menupopup>
 		</menu>
 		<menu label="Help">
@@ -129,7 +129,7 @@
 						   <tabpanels>
 						     <tabpanel> 
 						    
-		    				<textbox id="debugView" rows="50" height="100%" width="100%" style="font-size:11px; background-image:url(img/output_background.gif); background-repeat:no-repeat; background-position: right top; background-color:white;" readonly="true" />
+		    				<textbox id="debugView" rows="30" height="100%" width="100%" style="font-size:11px; background-image:url(img/output_background.gif); background-repeat:no-repeat; background-position: right top; background-color:white;" readonly="true" />
 		    				
 		    				</tabpanel>
 		    				<tabpanel id="tabularDebugView">
@@ -193,7 +193,7 @@
     </tabpanel>
     <tabpanel>
     <vbox>
-     	<tree id="tree" width="100%" rows="20">
+     	<tree id="tree" width="100%" rows="25">
 		<treecols sizable="true">
 			<treecol label="Operators"/>
 		</treecols>
@@ -209,6 +209,21 @@
 					<treeitem>
 						<treerow>
 							<treecell id="htmlfetchop"  draggable="true"  label="HTML Fetch" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="sparqlresultfetchop"  draggable="true"  label="Sparql Result Fetch" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="xmlfetchop"  draggable="true"  label="XML Fetch" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="xslfetchop"  draggable="true"  label="XSL Fetch" />
 						</treerow>	
 					</treeitem>
 				</treechildren>
@@ -255,6 +270,11 @@
 							<treecell id="forop"  draggable="true"  label="FOR loop" />
 						</treerow>	
 					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="xsltop"  draggable="true"  label="XSLT" />
+						</treerow>	
+					</treeitem>
 				</treechildren>
 			</treeitem>	
 		    <treeitem label="Url">
@@ -264,7 +284,11 @@
 							<treecell label="URL builder" id="urlbuilder"  draggable="true" />
 						</treerow>
 					</treeitem>	
-					<treeitem label="SPARQL endpoint"/>
+					<treeitem >
+					   <treerow>
+							<treecell label="SPARQL Endpoint" id="sparqlendpoint"  draggable="true" />
+						</treerow>
+					</treeitem>	
 				</treechildren>
 			</treeitem>
 	
@@ -277,7 +301,7 @@
 					</treeitem>
 					<treeitem >
 				       <treerow>
-							<treecell label="Variable" id="variable"  draggable="true" />
+							<treecell label="For-Variable" id="variable"  draggable="true" />
 						</treerow>
 					</treeitem>
 				</treechildren>
@@ -347,8 +371,9 @@
          }
     }
     void newPipe(){	    
-	    debugView.value="";
-	    pipesyntax.setValue("");	
+	    /*debugView.value="";
+	    pipesyntax.setValue("");*/
+	    workspace.newPipe();	
 	}
 	
 	void savePipe(){
@@ -368,8 +393,7 @@
 	}
 	
 	void updateCode(){
-	    if(outputNode!=null)
-	    	pipesyntax.setValue(workspace.getCode());
+	    pipesyntax.setValue(workspace.getCode());
 	    pipesyntax.invalidate();
 	}
 	

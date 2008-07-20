@@ -11,24 +11,24 @@ import org.deri.execeng.utils.*;
 public class HTMLFetchBox extends RDFBox {
 	private static Hashtable<String,StreamSource> xsltFile=new Hashtable<String,StreamSource>();
 	private static Hashtable<String,String> formats=new Hashtable<String,String>();
-	private static String xsltPath="./xslt/";
+	private static String xsltPath=XSLTUtil.getBaseURL()+"/xslt/";
 	static{		
-		xsltFile.put("DC", new StreamSource(new File(xsltPath+"dc-extract.xsl")));
+		xsltFile.put("DC", new StreamSource(xsltPath+"dc-extract.xsl"));
 		formats.put("DC", "Dublin Core");
 	
-		xsltFile.put("hCal", new StreamSource(new File(xsltPath+"glean-hcal.xsl")));
+		xsltFile.put("hCal", new StreamSource(xsltPath+"glean-hcal.xsl"));
 		formats.put("hCal", "hCalendar");
 		
-		xsltFile.put("XFN", new StreamSource(new File(xsltPath+"grokXFN.xsl")));
+		xsltFile.put("XFN", new StreamSource(xsltPath+"grokXFN.xsl"));
 		formats.put("XFN", "XHTML Friends Network");
 		
-		xsltFile.put("hCard", new StreamSource(new File(xsltPath+"hcard2rdf.xsl")));
+		xsltFile.put("hCard", new StreamSource(xsltPath+"hcard2rdf.xsl"));
 		formats.put("hCard", "hCard");
 		
-		xsltFile.put("hReview", new StreamSource(new File(xsltPath+"hreview2rdfxml.xsl")));
+		xsltFile.put("hReview", new StreamSource(xsltPath+"hreview2rdfxml.xsl"));
 		formats.put("hReview", "hReview");
 		
-		xsltFile.put("RDFa",new StreamSource(new File(xsltPath+"RDFa2RDFXML.xsl")));
+		xsltFile.put("RDFa",new StreamSource(xsltPath+"RDFa2RDFXML.xsl"));
 		formats.put("RDFa", "RDFa");
 	}
 	

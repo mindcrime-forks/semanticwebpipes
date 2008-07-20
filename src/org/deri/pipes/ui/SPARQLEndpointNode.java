@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
 
+import java.net.URLEncoder;
+
 import org.deri.execeng.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
@@ -14,7 +16,7 @@ import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Bandpopup;
 import org.zkoss.zul.Vbox;
 
-public class SPARQLEndpointNode extends InPipeNode {
+public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNode,ConnectingOutputNode {
 	Textbox endpoint,defaulturi;
 	QueryBox queryBox;
 	Port endpointPort,defaulturiPort=null;
@@ -22,7 +24,7 @@ public class SPARQLEndpointNode extends InPipeNode {
 	protected Listbox listbox;
 	
 	public SPARQLEndpointNode(int x,int y){
-		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,220,100);
+		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,260,100);
 		wnd.setTitle("SPARQL Endpoint builder");
 		
         Vbox vbox=new Vbox();
@@ -34,33 +36,51 @@ public class SPARQLEndpointNode extends InPipeNode {
 		endpointPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
 		endpointPort.setPosition("none");
 		endpointPort.setPortType("custom");
-	    addPort(endpointPort,205,35);
+	    addPort(endpointPort,190,35);
 		
 	    hbox= new Hbox();
-		hbox.appendChild(new Label("Default graph URI:"));
+		hbox.appendChild(new Label("Default-graph-URI:"));
 		hbox.appendChild(defaulturi=createBox(120,16));
 		vbox.appendChild(hbox);
 		
 		defaulturiPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
 		defaulturiPort.setPosition("none");
 		defaulturiPort.setPortType("custom");
-	    addPort(defaulturiPort,205,57);
+	    addPort(defaulturiPort,250,59);
 	    
 	    hbox= new Hbox();
 		hbox.appendChild(new Label("Query:"));
 		hbox.appendChild(queryBox=new QueryBox());
 		vbox.appendChild(hbox);
-		
-	    listbox =new Listbox();
-        listbox.setMold("select");
-        listbox.appendItem(RDFFormat.RDFXML.getName(), RDFFormat.RDFXML.getName());
-        listbox.appendItem(RDFFormat.N3.getName(), RDFFormat.N3.getName());
-        listbox.appendItem(RDFFormat.NTRIPLES.getName(), RDFFormat.NTRIPLES.getName());
-        listbox.appendItem(RDFFormat.TRIG.getName(), RDFFormat.TRIG.getName());
-        listbox.appendItem(RDFFormat.TRIX.getName(), RDFFormat.TRIX.getName());
-        listbox.appendItem(RDFFormat.TURTLE.getName(), RDFFormat.TURTLE.getName());
-        wnd.appendChild(listbox);
+		        
+        wnd.appendChild(vbox);
 		tagName="sparqlendpoint";
+	}
+	
+	public void onConnected(Port port){
+		if(endpointPort==port){
+			endpoint.setValue("text [wired]");
+			endpoint.setReadonly(true);
+			return;
+		}
+		if(defaulturiPort==port){
+			defaulturi.setValue("text [wired]");
+			defaulturi.setReadonly(true);
+			return;
+		}
+	}
+	
+	public void onDisconnected(Port port){
+		if(endpointPort==port){
+			endpoint.setValue("");
+			endpoint.setReadonly(false);
+			return;
+		}
+		if(defaulturiPort==port){
+			defaulturi.setValue("");
+			defaulturi.setReadonly(false);
+			return;
+		}
 	}
 	
 	public String getFormat(){
@@ -79,11 +99,27 @@ public class SPARQLEndpointNode extends InPipeNode {
 		endpoint.setValue(url);
 	}
 			
+	public void setDefaultURI(String uri){
+		defaulturi.setValue(uri);
+	}
+	
+	public void setQuery(String query){
+		queryBox.setQuery(query);
+	}
 	
 	public String getCode(){
 		if(getWorkspace()!=null){
 			String code="";
 			code+=getConnectedCode(endpoint, endpointPort);
+			String uri=getConnectedCode(defaulturi, defaulturiPort);
+			try{
+				code+="?query="+URLEncoder.encode(queryBox.getValue(),"UTF-8");
+				if((null!=uri)&&(uri.indexOf("://")>0))					
+						code+="&default-graph-uri="+URLEncoder.encode(uri.trim(),"UTF-8");
+			}
+			catch(java.io.UnsupportedEncodingException e){
+				e.printStackTrace();
+			}
 			return code;
 		}
 		return null;
@@ -92,10 +128,10 @@ public class SPARQLEndpointNode extends InPipeNode {
 	public String getConfig(){
 		if(getWorkspace()!=null){
 			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-			code+="<base>\n"+getConnectedConfig(endpoint, endpointPort)+"</base>\n";
-			code+="<default-graph-uri>\n"+getConnectedConfig(endpoint, endpointPort)+"</default-graph-uri>\n";
-			code+="<![CDATA[\n"+queryBox.getQuery()+"\n]]>";
-			code+="<format>\n"+getFormat()+"</format>\n";
+			code+="<endpoint>\n"+getConnectedConfig(endpoint, endpointPort)+"</endpoint>\n";
+			code+="<default-graph-uri>\n"+getConnectedConfig(defaulturi, defaulturiPort)+"</default-graph-uri>\n";
+			code+="<query><![CDATA[\n"+queryBox.getQuery()+"\n]]></query>";
+			//code+="<format>\n"+getFormat()+"</format>\n";
 			code+="</"+tagName+">\n";
 			return code;
 		}
@@ -105,10 +141,15 @@ public class SPARQLEndpointNode extends InPipeNode {
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		SPARQLEndpointNode node= new SPARQLEndpointNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
-		node.setEndpoint(XMLUtil.getTextData(elm));
+		node.setEndpoint(XMLUtil.getTextFromFirstSubEleByName(elm, "endpoint"));
+		node.setDefaultURI(XMLUtil.getTextFromFirstSubEleByName(elm, "default-graph-uri"));
+		node.setQuery(XMLUtil.getTextFromFirstSubEleByName(elm, "query"));
 		return node;
 	}
+	
 	public void debug(){
+		((PipeEditor)getWorkspace()).reloadTextDebug(getCode()) ;
+		((PipeEditor)getWorkspace()).reloadTabularDebug(null);
 		
 	}
 }

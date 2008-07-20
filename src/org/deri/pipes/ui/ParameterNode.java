@@ -7,7 +7,7 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
 
-public class ParameterNode extends InPipeNode {
+public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	Textbox nameBox,labelBox,defaultBox;
 	public ParameterNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,200,100);
@@ -43,21 +43,39 @@ public class ParameterNode extends InPipeNode {
 		defaultBox.setValue(value);
 	}
 	
-	public String getParameter(){
+	/*public String getParameter(){
 		return "${"+nameBox.getValue()+"}";
-	}
+	}*/
 	
 	
 	public String getParaId(){
 		return nameBox.getValue();
 	}
 	
-	public String getCode(){
+	public String getParaCode(){
 		if(getWorkspace()!=null){
 			String code="<"+tagName+">\n";
 			code+="<id>"+nameBox.getValue()+"</id>\n";
 			code+="<label>"+labelBox.getValue()+"</label>\n";
-			code+="<default>"+nameBox.getValue()+"</default>\n";
+			code+="<default>"+defaultBox.getValue()+"</default>\n";
+			code+="</"+tagName+">\n";
+			return code;
+		}
+		return null;
+	}
+	public String getCode(){
+		if (OutPipeNode.paraList.indexOf(this)<0){
+			OutPipeNode.paraList.add(this);
+		}
+		return "${"+nameBox.getValue()+"}";
+	}
+	
+	public String getParaConfig(){
+		if(getWorkspace()!=null){
+			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
+			code+="<id>"+nameBox.getValue()+"</id>\n";
+			code+="<label>"+labelBox.getValue()+"</label>\n";
+			code+="<default>"+defaultBox.getValue()+"</default>\n";
 			code+="</"+tagName+">\n";
 			return code;
 		}
@@ -66,12 +84,10 @@ public class ParameterNode extends InPipeNode {
 	
 	public String getConfig(){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-			code+="<id>"+nameBox.getValue()+"</id>\n";
-			code+="<label>"+labelBox.getValue()+"</label>\n";
-			code+="<default>"+nameBox.getValue()+"</default>\n";
-			code+="</"+tagName+">\n";
-			return code;
+			if (OutPipeNode.paraList.indexOf(this)<0){
+				OutPipeNode.paraList.add(this);
+			}
+			return "${"+nameBox.getValue()+"}";
 		}
 		return null;
 	}

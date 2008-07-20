@@ -11,37 +11,24 @@ import org.zkoss.zul.Textbox;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
-public class FetchNode extends InPipeNode implements ConnectingInputNode{
+public class SimpleFetchNode extends InPipeNode implements ConnectingInputNode{
 	protected Textbox urlTextbox=null;
 	protected Port urlPort=null;
 
-	public FetchNode(byte outType,int x,int y,int width,int height,String title,String tagName){
-		super(PipePortType.getPType(outType),x,y,width,height);
+	public SimpleFetchNode(byte portType,int x,int y,String title,String tagName){
+		super(PipePortType.getPType(portType),x,y,200,80);
 		this.tagName=tagName;
 		
 		urlPort =new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
 		urlPort.setPosition("none");
 		urlPort.setPortType("custom");
-		((CustomPort)urlPort).setMaxFanIn(1);
         addPort(urlPort,35,36);
         
 		wnd.setTitle(title);
 		org.zkoss.zul.Label label=new org.zkoss.zul.Label(" URL: ");
         wnd.appendChild(label);
         urlTextbox =new Textbox();
-		label=new org.zkoss.zul.Label("Format :");
 		wnd.appendChild(urlTextbox);
-		//urlTextbox.setReadonly(true);
-        wnd.appendChild(label);
-        
-	}
-	
-	public String getFormat(){
-		return null;
-	}
-	
-	public void setFormat(String format){
-		
 	}
 	
 	public void onConnected(Port port){
@@ -64,7 +51,7 @@ public class FetchNode extends InPipeNode implements ConnectingInputNode{
 	
 	public String getCode(){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+" format=\""+getFormat()+"\">\n<location>";
+			String code="<"+tagName+">\n<location>";
 			code+="<![CDATA["+getConnectedCode(urlTextbox, urlPort)+"]]>";
 			code+="</location>\n</"+tagName+">\n";
 			return code;
@@ -74,7 +61,7 @@ public class FetchNode extends InPipeNode implements ConnectingInputNode{
 	
 	public String getConfig(){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+" format=\""+getFormat()+"\" x=\""+getX()+"\" y=\""+getY()+"\">\n<location>";
+			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n<location>";
 			code+=getConnectedConfig(urlTextbox, urlPort);
 			code+="</location>\n</"+tagName+">\n";
 			return code;
@@ -83,7 +70,6 @@ public class FetchNode extends InPipeNode implements ConnectingInputNode{
 	}
 	
 	public void _loadConfig(Element elm){		
-		setFormat(elm.getAttribute("format"));
 		Element locElm=XMLUtil.getFirstSubElementByName(elm, "location");
 		Element linkedElm=XMLUtil.getFirstSubElement(locElm);
 		String url;

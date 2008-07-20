@@ -54,7 +54,7 @@ public class BoxParserImplRDF extends BoxParser{
     
     //Danh Le :new Syntax for pipes (5th,Dec,2007)
     public static Stream loadStream(Element element){
-    	//System.out.println("element"+element.toString());
+    	System.out.println("element"+element.toString());
     	//patch generator box
     	if(element.getTagName().equalsIgnoreCase("smoosher")){    
     		return SameAsBox.loadStream(element);
@@ -100,8 +100,30 @@ public class BoxParserImplRDF extends BoxParser{
     		return RDFFetchBox.loadStream(element);
 		}
     	
+    	//HTMLFetch 
+    	if(element.getTagName().equalsIgnoreCase("htmlfetch")){    
+    		return HTMLFetchBox.loadStream(element);
+		}
+    	
+    	//XSLT 
+    	if(element.getTagName().equalsIgnoreCase("xslt")){    
+    		return XSLTBox.loadStream(element);
+		}
+    	
+    	//XMLFetch 
+    	if(element.getTagName().equalsIgnoreCase("xmlfetch")){    
+    		return XMLFetchBox.loadStream(element);
+		}
+    	
+    	
+    	//XMLFetch 
+    	if(element.getTagName().equalsIgnoreCase("xslfetch")){    
+    		return XMLFetchBox.loadStream(element);
+		}
+    	
+    	
     	//Tuple Fetch 
-    	if(element.getTagName().equalsIgnoreCase("tuplefetch")){    
+    	if(element.getTagName().equalsIgnoreCase("sparqlresultfetch")){    
     		return TupleQueryResultFetchBox.loadStream(element);
 		}
     	

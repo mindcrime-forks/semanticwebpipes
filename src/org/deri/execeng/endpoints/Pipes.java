@@ -14,35 +14,26 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.net.*;
-import java.util.Enumeration;
-import java.util.Hashtable;
 
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
-import org.w3c.dom.CDATASection;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.apache.xerces.parsers.DOMParser;
-import org.w3c.dom.xpath.*;
-import edu.mit.simile.babel.exhibit.BibtexExhibitJsonWriter;
-import edu.mit.simile.babel.exhibit.BibtexExhibitJsonpWriter;
+
+
 import edu.mit.simile.babel.exhibit.ExhibitJsonWriter;
 import edu.mit.simile.babel.exhibit.ExhibitJsonpWriter;
 import edu.mit.simile.babel.BabelWriter;
-import org.openrdf.sail.Sail;
-
+import org.deri.execeng.utils.XSLTUtil;
+import org.deri.execeng.utils.XMLUtil;
 import org.openrdf.rio.RDFFormat;
+import org.w3c.dom.Element;
 public class Pipes extends HttpServlet {
-
+  public static HttpServletRequest  REQ=null;
   public void doGet(HttpServletRequest req, HttpServletResponse res)
                                throws ServletException, IOException {
 	  String format=req.getParameter("format");
 	  String acceptHeaderValue = getMimeHeader(req.getHeader("Accept") + "",format + "");	
 	  
 	  res.setStatus(HttpServletResponse.SC_OK);
-	  	
+	  REQ=req; 	
 	 RDFFormat rdfFormat=RDFFormat.forMIMEType(acceptHeaderValue); 
 	 if (rdfFormat!=null) {
 		  res.setContentType(acceptHeaderValue); 
@@ -73,8 +64,6 @@ public class Pipes extends HttpServlet {
 	  else{
 			res.setContentType("text/html");
 			
-		  	// the URL of the pipe result in RDF/XML format
-		  	//String rdfSourceUrl = new String("http://pipes.deri.org:8080/pipes/Pipes/?pipe_output_format=rdfxml&" + req.getQueryString());
 		    String rdfSourceUrl = new String(req.getRequestURL()+"?format=rdfxml&" + req.getQueryString());
 			
 		  	// read HTML template from file
@@ -89,7 +78,6 @@ public class Pipes extends HttpServlet {
             // replace $rdf_source$ placeholder in the HTML template with the URL of the requested pipe.
 	        outputString = outputString.replace("$rdf_source$", rdfSourceUrl); // this links to the absolute path of pipes.deri.org for now. It does not work with local resources.
 			    
-	        // TODO: Implement HTML template substitution for query form, based on pipe parameters and default values
 	        // get pipe code 
 	        SesameMemoryBuffer buffer=getRDFBuffer(req, res);
 	        String json="";
@@ -104,8 +92,8 @@ public class Pipes extends HttpServlet {
 	        		
 	        	}
 	        }
-		    String pipeid = req.getParameter("id");
-			DOMParser myDOMParser = new DOMParser();
+	        
+		    String pipeid = req.getParameter("id");			
 			String syntax = PipeManager.getPipeSyntax(pipeid);
 			String pipeName = PipeManager.getPipe(pipeid).pipename;
 			
@@ -114,55 +102,32 @@ public class Pipes extends HttpServlet {
 			outputString = outputString.replace("$jsondata$", json);
 			String errorMessagesString = new String();
 			String queryFormString = new String();
-			queryFormString = "<form action=\"http://pipes.deri.org:8080/pipes/Pipes/\" method=\"get\" name=\"pipe_query_form\">\n" +
+			queryFormString = "<form action=\""+XSLTUtil.getBaseURL()+"/pipes/\" method=\"get\" name=\"pipe_query_form\">\n" +
 	        	"<input name=\"id\" type=\"hidden\" value=\"" + pipeid + "\">\n";
 			
 	        if (syntax != null) {
 	        	try {
-					myDOMParser.parse(new InputSource(new java.io.StringReader(syntax)));
-					NodeList pipeParameterXMLElements = ((Element)myDOMParser.getDocument().getDocumentElement().getElementsByTagName("parameters").item(0)).getElementsByTagName("parameter");
-		            
+	        		DOMParser parser = new DOMParser();
+        			
+    	            parser.parse(new InputSource(new java.io.StringReader(syntax)));  
+    	    
+    		        Element rootElm=parser.getDocument().getDocumentElement();
+    				java.util.ArrayList<Element> paraElms=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(rootElm,"parameters"), "parameter");
 		            // iterate through pipe parameter descriptions, construct query form
-					String parameterLabel;
-	            	String defaultParameterValue;
-	            	String parameterId;
-	            	String parameterComment;
-					for(int i=0; i<pipeParameterXMLElements.getLength(); i++){
-		            	//System.out.println(((Element)pipeParameterXMLElements.item(i)).getTagName());
-		            	parameterLabel = "unnamed parameter";
-		            	defaultParameterValue = "";
-		            	parameterId = "";
-		            	parameterComment = "";
+					String paraLbl,paraVal,paraId;
+
+	           		for(int i=0;i<paraElms.size();i++){		
+		     
+	           			paraLbl = XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i), "label");
+	           			paraLbl = ((null==paraLbl)||(paraLbl.trim()==""))?"unnamed parameter":paraLbl;
+		            	paraId=XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i), "id");
+		            	paraVal=req.getParameter(paraId);
+		            	paraVal = ((null==paraVal)||(paraVal.trim()==""))?XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i), "default"):paraVal;
 		            	
-		            	try {
-							parameterLabel = ((Element)((Element)pipeParameterXMLElements.item(i)).getElementsByTagName("label").item(0)).getTextContent().toString();
-						} catch (Exception e) {
-							//e.printStackTrace();
-						}
-		            	try {
-							parameterId = ((Element)((Element)pipeParameterXMLElements.item(i)).getElementsByTagName("id").item(0)).getTextContent().toString();
-						} catch (Exception e) {
-							//e.printStackTrace();
-						}
-		            	try {
-							// defaultParameterValue = ((Element)((Element)pipeParameterXMLElements.item(i)).getElementsByTagName("default_value").item(0)).getTextContent().toString();
-		            		// use the URL parameter value as default value
-		            		defaultParameterValue = req.getParameter(parameterId);
-		            		if (defaultParameterValue == null) {
-		            			defaultParameterValue = "";
-		            			errorMessagesString += "Value for parameter <i>" + parameterLabel + "</i> (" + parameterId + ") is missing. <br />\n";
-		            		}
-		            	} catch (Exception e) {
-							//e.printStackTrace();
-						}
-						try {
-							parameterComment = ((Element)((Element)pipeParameterXMLElements.item(i)).getElementsByTagName("comment").item(0)).getTextContent().toString();
-						} catch (Exception e) {
-							//e.printStackTrace();
-						}
-						
-						// add parameter field to queryFormString
-						queryFormString += "<div class=\"query_textinput_row\"><label>" + parameterLabel + "</label>: <input name=\"" + parameterId + "\" type=\"text\" value=\"" + defaultParameterValue + "\" size=\"60\"></div> \n";
+		            	if((null==paraVal)||(paraVal.trim()==""))							
+		            	  errorMessagesString += "Value for parameter <i>" + paraLbl + "</i> (" + paraId + ") is missing. <br />\n";
+		            	
+		            	queryFormString += "<div class=\"query_textinput_row\"><label>" + paraLbl + "</label>: <input name=\"" + paraId + "\" type=\"text\" value=\"" + paraVal + "\" size=\"60\"></div> \n";
 		            }
 		            
 		            queryFormString += "<br /><input type=\"submit\" name=\"button\" id=\"button\" /></form>";
@@ -187,29 +152,48 @@ public class Pipes extends HttpServlet {
 			
 		}
 	}
+  
   	public SesameMemoryBuffer getRDFBuffer(HttpServletRequest req, HttpServletResponse res){
   		String pipeid = req.getParameter("id");
-		BoxParserImplRDF parser = new BoxParserImplRDF();
-		Stream stream = null;
-		String syntax = PipeManager.getPipeSyntax(pipeid);
-		
-		for (Enumeration parameterIds = req.getParameterNames(); parameterIds.hasMoreElements();) {
-			String parameterId = parameterIds.nextElement().toString();
-			String parameterValue = (String) req.getParameter(parameterId);
-			syntax = syntax.replace("${" + parameterId + "}", parameterValue);
-		}
+  		String syntax = PipeManager.getPipeSyntax(pipeid);
 		if (syntax != null) {
-			stream = parser.parse(syntax);
-			if (stream instanceof RDFBox) {
-				((RDFBox) stream).execute();
-				return (SesameMemoryBuffer)((RDFBox) stream).getExecBuffer();
-		
-			} else {
-				System.out.println("parsing error");
+			DOMParser parser = new DOMParser();
+			try{
+	            parser.parse(new InputSource(new java.io.StringReader(syntax)));  
+	            Element rootElm=parser.getDocument().getDocumentElement();
+				java.util.ArrayList<Element> paraElms=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(rootElm,"parameters"), "parameter");
+		  		for(int i=0;i<paraElms.size();i++){		
+					String paraId = XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i),"id").trim();
+					String paraVal = (String) req.getParameter(paraId);
+					paraVal=(paraVal!=null)?paraVal:XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i),"default");
+					syntax = syntax.replace("${" + paraId + "}", paraVal);
+					try{
+						syntax=syntax.replace(URLEncoder.encode("${" + paraId + "}","UTF-8"),
+												URLEncoder.encode(paraVal,"UTF-8"));
+					}
+					catch(java.io.UnsupportedEncodingException e){
+						e.printStackTrace();
+					}
+				}
+		  		//System.out.println(syntax);
+		  		BoxParserImplRDF pipeParser= new BoxParserImplRDF();
+				Stream stream = pipeParser.parse(syntax);
+				if (stream instanceof RDFBox) {
+					((RDFBox) stream).execute();
+					return (SesameMemoryBuffer)((RDFBox) stream).getExecBuffer();
+			
+				} else {
+					System.out.println("parsing error");
+				}
+			}
+			catch (IOException e) {				
+			}
+			catch (SAXException e) {				
 			}
 		}
   		return null;
   	}
+  	
     private String getMimeHeader(String accept,String format){
     	if(accept.contains(RDFFormat.RDFXML.getDefaultMIMEType())||format.equalsIgnoreCase("rdfxml")) 
     		return RDFFormat.RDFXML.getDefaultMIMEType();

@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import java.net.URLEncoder;
+
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.model.Box;
 import org.openrdf.query.QueryEvaluationException;
@@ -33,18 +35,28 @@ public class ForLoopBox extends RDFBox{
     }
     
     public void execute(){
+    	//System.out.println("For execute\n"+pipeCode);
     	if ((sourcelist==null)||(pipeCode==null)) return;
     	java.util.List<String> bindingNames = sourcelist.getBindingNames();
     	Stream stream;
     	BoxParserImplRDF parser = new BoxParserImplRDF();
     	try{
 	    	while (sourcelist.hasNext()) {
-	    	   String tmp=pipeCode;	
+	    	   String tmp=pipeCode;
+	    	   
 			   BindingSet bindingSet = sourcelist.next();		   
 			   for(int i=0;i<bindingNames.size();i++){				   
-			       tmp=tmp.replace("${{"+bindingNames.get(i)+"}}$",
+			       tmp=tmp.replace("${{"+bindingNames.get(i)+"}}",
 			    		          bindingSet.getValue(bindingNames.get(i)).toString());
+			       try{
+						tmp=tmp.replace(URLEncoder.encode("${" + bindingNames.get(i) + "}","UTF-8"),
+												URLEncoder.encode(bindingSet.getValue(bindingNames.get(i)).toString(),"UTF-8"));
+					}
+					catch(java.io.UnsupportedEncodingException e){
+						e.printStackTrace();
+					}
 			   }
+			   //System.out.println("For loop\n"+bindingNames.get(0)+"\n"+tmp);
 			   stream = parser.parseCode(tmp);
 			   if (stream instanceof Box) 
 				   if(!((Box)stream).isExecuted()) ((Box)stream).execute();					
@@ -86,7 +98,7 @@ public class ForLoopBox extends RDFBox{
     		tmpSourceList.loadFromText(tmpStr);
     	}
     	else{
-    		Element tmpSubEle=XMLUtil.getFirstSubElementByName(sourcelistEle, "fetch");
+    		Element tmpSubEle=XMLUtil.getFirstSubElementByName(sourcelistEle, "sparqlresultfetch");
     		if(tmpSubEle!=null){
     			TupleQueryResultFetchBox fetch=(TupleQueryResultFetchBox)TupleQueryResultFetchBox.loadStream(tmpSubEle);
     			fetch.execute();
