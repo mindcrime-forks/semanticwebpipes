@@ -24,7 +24,6 @@ public class SPARQLResultFetchNode extends SelectFetchNode{
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		SPARQLResultFetchNode node= new SPARQLResultFetchNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
-		//System.out.println("load rdf fetch "+node.getUuid()+"<--> ");
 		node._loadConfig(elm);
 		return node;
 	}

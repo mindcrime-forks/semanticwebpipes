@@ -16,7 +16,6 @@ public class SimpleMixNode extends InOutNode {
 		
 		SimpleMixNode node= new SimpleMixNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
-		//System.out.println("load simplemix "+node.getUuid()+"<--> "+node.getInputPort().getUuid());
 		node.connectSource(elm);
 		return node;
 	}

@@ -18,22 +18,20 @@ public class FetchNode extends InPipeNode implements ConnectingInputNode{
 	public FetchNode(byte outType,int x,int y,int width,int height,String title,String tagName){
 		super(PipePortType.getPType(outType),x,y,width,height);
 		this.tagName=tagName;
-		
-		urlPort =new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
-		urlPort.setPosition("none");
-		urlPort.setPortType("custom");
-		((CustomPort)urlPort).setMaxFanIn(1);
-        addPort(urlPort,35,36);
-        
 		wnd.setTitle(title);
 		org.zkoss.zul.Label label=new org.zkoss.zul.Label(" URL: ");
         wnd.appendChild(label);
         urlTextbox =new Textbox();
 		label=new org.zkoss.zul.Label("Format :");
 		wnd.appendChild(urlTextbox);
-		//urlTextbox.setReadonly(true);
         wnd.appendChild(label);
         
+	}
+	
+	protected void initialize(){
+		super.initialize();
+		urlPort =createPort(PipePortType.TEXTIN,35,36);
+		((CustomPort)urlPort).setMaxFanIn(1);
 	}
 	
 	public String getFormat(){
@@ -82,25 +80,9 @@ public class FetchNode extends InPipeNode implements ConnectingInputNode{
 		return null;
 	}
 	
-	public void _loadConfig(Element elm){		
+	public void _loadConfig(Element elm){	
 		setFormat(elm.getAttribute("format"));
 		Element locElm=XMLUtil.getFirstSubElementByName(elm, "location");
-		Element linkedElm=XMLUtil.getFirstSubElement(locElm);
-		String url;
-		if(linkedElm!=null){
-			PipeNode linkedNode=PipeNode.loadConfig(linkedElm,(PipeEditor)getWorkspace());
-			linkedNode.connectTo(urlPort);
-			onConnected(null);
-		}else if((url=XMLUtil.getTextData(locElm))!=null){
-			if(url.indexOf("${")>=0){
-				ParameterNode paraNode=OutPipeNode.getParaNode(url);
-				paraNode.connectTo(urlPort);
-				onConnected(null);
-			}
-			else{
-				setURL(url);
-			}
-		}
-
+		loadConnectedConfig(locElm, urlPort, urlTextbox);
 	}
 }

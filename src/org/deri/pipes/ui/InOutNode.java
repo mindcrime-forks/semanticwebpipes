@@ -19,17 +19,11 @@ public class InOutNode extends PipeNode{
 	 */
 	private static final long serialVersionUID = 2684001403256691428L;
 	protected Port input =null,output=null;
-	
+	PortType inPType,outPType;
 	public InOutNode(PortType inPType,PortType outPType,int x,int y,int width,int height){
 		super(x,y,width,height);
-		input =new CustomPort(OutPipeNode.getPTypeMag(),inPType);
-    	input.setPosition("top");
-        input.setPortType("custom");
-        addPort(input,0,0);
-        output =new CustomPort(OutPipeNode.getPTypeMag(),outPType);
-     	output.setPosition("bottom");
-        output.setPortType("custom");
-        addPort(output,0,0);
+		this.inPType=inPType;
+		this.outPType=outPType;
         setToobar();
 	}
 	
@@ -42,8 +36,12 @@ public class InOutNode extends PipeNode{
 	}
 	
 	public void connectTo(Port port){
-		System.out.println(output.getUuid()+"-->"+port.getUuid());
 		getWorkspace().connect(output,port,false);
+	}
+	
+	protected void initialize(){
+		input =createPort(inPType,"top");
+        output =createPort(outPType,"bottom");
 	}
 	
 	public String getCode(){

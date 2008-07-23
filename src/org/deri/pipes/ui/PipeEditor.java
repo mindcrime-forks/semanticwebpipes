@@ -1,5 +1,8 @@
 package org.deri.pipes.ui;
 
+import java.util.ArrayList;
+
+import org.integratedmodelling.zk.diagram.components.PortTypeManager;
 import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.integratedmodelling.zk.diagram.components.Shape;
 import org.openrdf.query.BindingSet;
@@ -36,27 +39,37 @@ public class PipeEditor extends Workspace {
 	private Bandbox bdid;
 	private Tabpanel tabularDebugPanel=null;
 	private OutPipeNode outputNode;
+	private PortTypeManager pTypeMag;
+	private ArrayList<ParameterNode> paraList =new ArrayList();
 	public PipeEditor(String w,String h){
 		super();
 		setWidth(w);
 		setHeight(h);
+		pTypeMag=new PortTypeManager(this);
 	}
+	
 	public void setTextDebugPanel(Textbox txtBox){
 		textDebugPanel=txtBox;
 	}
+	
 	public void addFigure(Shape shape){
-		if((outputNode==null)&&(!(shape instanceof OutPipeNode))){
-			outputNode = new OutPipeNode(500,400);
-			outputNode.setWorkspace(this);
-			addFigure(outputNode);
-		}
 		super.addFigure(shape);
+		if(shape instanceof PipeNode)
+			((PipeNode)shape).initialize();
 	}
 	
-	public void addOutput(OutPipeNode outputNode){
-		this.outputNode=outputNode;
-		super.addFigure(outputNode);
+	public PortTypeManager getPTManager(){
+		return pTypeMag;
 	}
+	
+	public OutPipeNode getOutput(){
+		return outputNode;
+	}
+	
+	public void setOutput(OutPipeNode outputNode){
+		this.outputNode=outputNode;
+	}
+	
 	public void setTabularDebugPanel(Tabpanel tabpanel){
 		tabularDebugPanel=tabpanel;
 	}
@@ -93,7 +106,6 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public String getCode(){
-		//System.out.println("check output"+(outputNode==null));
 		if(outputNode==null) return "";
 		return outputNode.getCode();
 	}
@@ -110,18 +122,36 @@ public class PipeEditor extends Workspace {
 	public String getPipeName(){
 		return pipename.getValue();
 	}
+	
 	public String getPassword(){
 		return password.getValue();
 	}
+	
+	public void addParameter(ParameterNode paraNode){
+		if (paraList.indexOf(paraNode)<0)
+			paraList.add(paraNode);
+	}
+	
+	public ParameterNode getParameter(String nodeId){
+		for(int i=0;i<paraList.size();i++){
+			if((nodeId.equals("${"+paraList.get(i).getParaId()+"}"))&&(paraList.get(i).getWorkspace()!=null)){
+			   return paraList.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public ArrayList<ParameterNode> getParameters(){
+		return paraList;
+	}
+	
+	public void removeParameters(){
+		paraList.removeAll(paraList);
+	}
+	
 	public void createFigure(int x,int y,String figureType){
 	     x-=180;
 	     y-=30;             
-	     if(outputNode==null){
-	          outputNode=new OutPipeNode(500,400);
-	          outputNode.setWorkspace(this);
-	          addFigure(outputNode);
-	          
-	     }    
 	     if(figureType.equalsIgnoreCase("rdffetchop")){
 	     	 addFigure(new RDFFetchNode(x,y));
 	     }
@@ -133,9 +163,6 @@ public class PipeEditor extends Workspace {
 	     }
 	     else if(figureType.equalsIgnoreCase("simplemixop")){
 	     	 addFigure(new SimpleMixNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("deleteop")){
-	     	 addFigure(new RDFDeleteNode(x,y));
 	     }
 	     else if(figureType.equalsIgnoreCase("constructop")){
 	     	 addFigure(new ConstructNode(x,y));
@@ -327,8 +354,8 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void newPipe(){
-		outputNode=null;
 		reload(null);
+		outputNode=new OutPipeNode(500,400);
 		pipeid.setValue("");
 		bdid.setValue("");
 		pipename.setValue("");

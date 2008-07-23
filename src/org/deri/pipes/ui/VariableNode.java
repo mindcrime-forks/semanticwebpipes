@@ -28,13 +28,6 @@ public class VariableNode extends InPipeNode implements ConnectingOutputNode{
 	
 	public String getCode(){
 		return "${{"+nameBox.getValue()+"}}";
-		/*if(getWorkspace()!=null){
-			String code="<"+tagName+">";
-			code+=nameBox.getValue();			
-			code+="</"+tagName+">\n";
-			return code;
-		}
-		return null;*/
 	}
 	
 	public String getConfig(){

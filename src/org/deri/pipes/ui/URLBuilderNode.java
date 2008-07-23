@@ -25,6 +25,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	static int _rs=23;
 	public static final String ADD_ICON="img/edit_add-48x48.png";
 	public static final String REMOVE_ICON="img/edit_remove-48x48.png";
+	Element content=null;
 	
 	class AddRemoveListener implements org.zkoss.zk.ui.event.EventListener {
 		   public void onEvent(Event event) throws  org.zkoss.zk.ui.UiException {	
@@ -70,17 +71,23 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	    hbox.appendChild(new Label("Base:"));
 	    hbox.appendChild(baseURL=createParaBox(160,16));
 	    vbox.appendChild(hbox);
-	    basePort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
-		basePort.setPosition("none");
-		basePort.setPortType("custom");
-        addPort(basePort,205,35);
-		
+	    
 	    vbox.appendChild(pathVbox);
 	    vbox.appendChild(paraVbox);
-	    addLabel("Path elements",pathVbox);
-	    addPath();
+	    addLabel("Path elements",pathVbox);	    
 	    addLabel("Query parameters",paraVbox);
-		addParameter();
+		
+	}
+	
+	protected void initialize(){
+		super.initialize();
+		basePort=createPort(PipePortType.TEXTIN,205,35);
+		if(content==null){
+			addPath();
+			addParameter();
+		}
+		else
+			loadContent(content);
 	}
 	
 	public URLBuilderNode(int x,int y,Element elm){
@@ -95,15 +102,12 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	    hbox.appendChild(new Label("Base:"));
 	    hbox.appendChild(baseURL=createParaBox(160,16));
 	    vbox.appendChild(hbox);
-	    basePort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
-		basePort.setPosition("none");
-		basePort.setPortType("custom");
-        addPort(basePort,205,35);
         
 		vbox.appendChild(pathVbox);
 		addLabel("Path elements",pathVbox);
 	    vbox.appendChild(paraVbox);
 	    addLabel("Query parameters",paraVbox);
+	    content=elm;
 	}
 	
 	public void onConnected(Port port){
@@ -150,23 +154,12 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		}
 	}
 	
-	public void loadContent(Element elm){
-	        
+	public void loadContent(Element elm){   
 	    Element baseElm=XMLUtil.getFirstSubElementByName(elm,"base");
-	    Element baseChildElm=XMLUtil.getFirstSubElement(baseElm);
-	    if(baseChildElm!=null){
-	    	PipeNode.loadConfig(baseChildElm,(PipeEditor)getWorkspace()).connectTo(basePort);
-	    	baseURL.setValue("[text wired]");
-	    	baseURL.setReadonly(true);
-	    }
-	    else{
-	    	baseURL.setValue(XMLUtil.getTextData(baseElm));
-	    }	    		
-	   
+	    loadConnectedConfig(baseElm, basePort, baseURL);		
 	    ArrayList<Element> pathElms=XMLUtil.getSubElementByName(elm, "path");
 	    for(int i=0;i<pathElms.size();i++)
-	    	addPath(pathElms.get(i));
-	    		    
+	    	addPath(pathElms.get(i));		    
 	    ArrayList<Element> paraElms=XMLUtil.getSubElementByName(elm, "para");
 	    for(int i=0;i<paraElms.size();i++)
 	    	addParameter(paraElms.get(i));
@@ -194,74 +187,50 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	public void addPath(){
 		Hbox hbox= new Hbox();
 		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
-		hbox.appendChild(createParaBox(150,16));
-		pathVbox.appendChild(hbox);
-		Port nPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
-		nPort.setPosition("none");
-		nPort.setPortType("custom");
-        addPort(nPort,175,57+(pathVbox.getChildren().size()-1)*_rs);
+		hbox.appendChild(createParaBox(150,16));		
+		Port nPort=createPort(PipePortType.TEXTIN,175,57+(pathVbox.getChildren().size()-1)*_rs);
 		pathPorts.put(hbox.getUuid(), nPort);
+		pathVbox.appendChild(hbox);
 		relayoutParaPorts(1);
 	}
 	
 	public void addPath(Element pathElm){
 		Hbox hbox= new Hbox();
-		Port nPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
-		nPort.setPosition("none");
-		nPort.setPortType("custom");
-        addPort(nPort,175,57+(pathVbox.getChildren().size())*_rs);
-		pathPorts.put(hbox.getUuid(), nPort);
-		
 		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
-		if(XMLUtil.getFirstSubElement(pathElm)!=null){
-			Textbox txtBox=createParaBox(150,16);
-			hbox.appendChild(txtBox);
-			txtBox.setValue("[text wired]");
-			txtBox.setReadonly(true);
-			PipeNode.loadConfig(XMLUtil.getFirstSubElement(pathElm),(PipeEditor)getWorkspace()).connectTo(nPort);
-		}
-		else		
-			hbox.appendChild(createParaBox(150,16,XMLUtil.getTextData(pathElm)));
+		Port nPort=createPort(PipePortType.TEXTIN,175,57+(pathVbox.getChildren().size())*_rs);
+		pathPorts.put(hbox.getUuid(), nPort);		
+		
+		Textbox txtBox=createParaBox(150,16);
+		hbox.appendChild(txtBox);		
 		pathVbox.appendChild(hbox);
+		loadConnectedConfig(pathElm, nPort, txtBox);
 	}
 	
 	public void addParameter(){
 		Hbox hbox= new Hbox();
 		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
+		
 		hbox.appendChild(createParaBox(80,16));
 		hbox.appendChild(new Label(" = "));
 		hbox.appendChild(createParaBox(80,16));
-		paraVbox.appendChild(hbox);
-		Port nPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
-		nPort.setPosition("none");
-		nPort.setPortType("custom");
-        addPort(nPort,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size()-1)*_rs);
-		paraPorts.put(hbox.getUuid(), nPort);
+		Port nPort=createPort(PipePortType.TEXTIN,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size()-1)*_rs);
+		paraPorts.put(hbox.getUuid(), nPort);		
+		paraVbox.appendChild(hbox);		
 	}
 	
 	public void addParameter(Element paraElm){
 		Hbox hbox= new Hbox();
-		Port nPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
-		nPort.setPosition("none");
-		nPort.setPortType("custom");
-        addPort(nPort,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
-		paraPorts.put(hbox.getUuid(), nPort);
+		hbox.appendChild(addImage("img/edit_remove-48x48.png"));		
 		
-		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
 		hbox.appendChild(createParaBox(80,16,paraElm.getAttribute("name")));
 		hbox.appendChild(new Label(" = "));
+		Textbox txtBox=createParaBox(80,16);
+		hbox.appendChild(txtBox);
 		
-		if(XMLUtil.getFirstSubElement(paraElm)!=null){
-			Textbox txtBox=createParaBox(80,16);
-			hbox.appendChild(txtBox);
-			txtBox.setValue("[text wired]");
-			txtBox.setReadonly(true);
-			PipeNode.loadConfig(XMLUtil.getFirstSubElement(paraElm),(PipeEditor)getWorkspace()).connectTo(nPort);
-		}else			
-			hbox.appendChild(createParaBox(80,16,XMLUtil.getTextData(paraElm)));
-		
+		Port nPort=createPort(PipePortType.TEXTIN,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
+		paraPorts.put(hbox.getUuid(), nPort);
 		paraVbox.appendChild(hbox);
-		
+		loadConnectedConfig(paraElm, nPort, txtBox);	
 	}
 	
 	public void relayout(){
@@ -272,7 +241,6 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		for(int i=from;i<paraVbox.getChildren().size();i++){
 			paraPorts.get(((Hbox)paraVbox.getChildren().get(i)).getUuid())
 			           .setPosition(203,57+(pathVbox.getChildren().size()+i)*_rs);
-			//System.out.println("relayout id"+((Hbox)paraVbox.getChildren().get(i)).getUuid());
 		}
 	}
 	
@@ -363,7 +331,6 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		URLBuilderNode node= new URLBuilderNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")),elm);
 		wsp.addFigure(node);
-		node.loadContent(elm);
 		return node;
 	}
 	

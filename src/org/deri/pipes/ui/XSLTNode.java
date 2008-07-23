@@ -13,11 +13,12 @@ public class XSLTNode extends InOutNode{
 	public XSLTNode(int x,int y){		
 		super(PipePortType.getPType(PipePortType.XMLIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
 		wnd.setTitle("XSL Transformation");
-		xslPort =new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.XSLIN));
-		xslPort.setPosition("left");
-		xslPort.setPortType("custom");
-        addPort(xslPort,0,0);	
         tagName="xslt";
+	}
+	
+	protected void initialize(){
+		super.initialize();
+		xslPort =createPort(PipePortType.XSLIN,"left");
 	}
 	
 	public Port getXSLPort(){
@@ -74,13 +75,13 @@ public class XSLTNode extends InOutNode{
 		XSLTNode node= new XSLTNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
 		
-		Element slElm=XMLUtil.getFirstSubElementByName(elm, "xmlsource");
-		PipeNode slNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(slElm),wsp);
-		slNode.connectTo(node.getInputPort());
+		Element xmlElm=XMLUtil.getFirstSubElementByName(elm, "xmlsource");
+		PipeNode xmlNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(xmlElm),wsp);
+		xmlNode.connectTo(node.getInputPort());
 		
-		Element loopElm=XMLUtil.getFirstSubElementByName(elm, "xslsource");
-		PipeNode loopNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(loopElm),wsp);
-		loopNode.connectTo(node.getXSLPort());
+		Element xslElm=XMLUtil.getFirstSubElementByName(elm, "xslsource");
+		PipeNode xslNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(xslElm),wsp);
+		xslNode.connectTo(node.getXSLPort());
 		return node;
     }
 }

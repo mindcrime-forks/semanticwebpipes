@@ -36,6 +36,7 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.query.BindingSet;
 import org.deri.execeng.utils.*;
+
 import java.util.ArrayList;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
@@ -72,6 +73,34 @@ public class PipeNode extends ZKNode{
 	   this.canDelete=false;
 	   wnd =new Window();
 	   appendChild(wnd); 	   
+   }
+   
+   protected void initialize(){
+	   
+   }
+   
+   public CustomPort createPort(PortType pType,String position){
+	   CustomPort port=new CustomPort(((PipeEditor)getWorkspace()).getPTManager(),pType);
+	   port.setPosition(position);
+	   port.setPortType("custom");
+       addPort(port,0,0);
+	   return port;
+   }
+   
+   public CustomPort createPort(PortType pType,int x,int y){
+	   CustomPort port=new CustomPort(((PipeEditor)getWorkspace()).getPTManager(),pType);
+	   port.setPosition("none");
+	   port.setPortType("custom");
+       addPort(port,x,y);
+	   return port;
+   }
+   
+   public CustomPort createPort(byte pType,String position){
+	   return createPort(PipePortType.getPType(pType),position);
+   }
+   
+   public CustomPort createPort(byte pType,int x,int y){
+	   return createPort(PipePortType.getPType(pType),x,y);
    }
    
    protected Textbox createBox(int w,int h){
@@ -113,16 +142,33 @@ public class PipeNode extends ZKNode{
 		return code;
   }
    
-   public void setToobar(){
+  protected void loadConnectedConfig(Element elm,Port port,Textbox txtbox){	  
+		Element linkedElm=XMLUtil.getFirstSubElement(elm);
+		String txt;
+		if(linkedElm!=null){
+			PipeNode linkedNode=PipeNode.loadConfig(linkedElm,(PipeEditor)getWorkspace());
+			linkedNode.connectTo(port);
+		}else if((txt=XMLUtil.getTextData(elm))!=null){
+			if(txt.indexOf("${")>=0){				
+				ParameterNode paraNode=((PipeEditor)getWorkspace()).getParameter(txt);
+				paraNode.connectTo(port);
+			}
+			else{
+				txtbox.setValue(txt);
+			}
+		}
+  }
+  
+  public void setToobar(){
 	   Caption caption =new Caption();
  	   Toolbarbutton delButton= new Toolbarbutton("","img/del-16x16.png");
  	   delButton.setClass("drag");
  	   delButton.addEventListener("onClick", new DeleteListener(this));
- 	  Toolbarbutton debugButton= new Toolbarbutton("","img/debug.jpg");
+ 	   Toolbarbutton debugButton= new Toolbarbutton("","img/debug.jpg");
 	   debugButton.setClass("drag");
 	   debugButton.addEventListener("onClick", new DebugListener(this));
  	   wnd.appendChild(caption);
- 	  caption.appendChild(debugButton);
+ 	   caption.appendChild(debugButton);
  	   caption.appendChild(delButton);
    }
    
@@ -140,7 +186,7 @@ public class PipeNode extends ZKNode{
 		   ArrayList<Element>  paraElms=XMLUtil.getSubElementByName(
 				   								XMLUtil.getFirstSubElementByName(elm, "parameters"),"parameter");
 		   for(int i=0;i<paraElms.size();i++){
-			   PipeNode.loadConfig(paraElms.get(i),wsp);
+			   wsp.addParameter((ParameterNode)PipeNode.loadConfig(paraElms.get(i),wsp));
 		   }
    		   return PipeNode.loadConfig(XMLUtil.getFirstSubElementByName(elm, "code"),wsp);
 	   }

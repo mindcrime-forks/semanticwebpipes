@@ -33,20 +33,14 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 		hbox.appendChild(endpoint=createBox(120,16));
 		vbox.appendChild(hbox);
 		
-		endpointPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
-		endpointPort.setPosition("none");
-		endpointPort.setPortType("custom");
-	    addPort(endpointPort,190,35);
+		
 		
 	    hbox= new Hbox();
 		hbox.appendChild(new Label("Default-graph-URI:"));
 		hbox.appendChild(defaulturi=createBox(120,16));
 		vbox.appendChild(hbox);
 		
-		defaulturiPort=new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.TEXTIN));
-		defaulturiPort.setPosition("none");
-		defaulturiPort.setPortType("custom");
-	    addPort(defaulturiPort,250,59);
+		
 	    
 	    hbox= new Hbox();
 		hbox.appendChild(new Label("Query:"));
@@ -55,6 +49,11 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 		        
         wnd.appendChild(vbox);
 		tagName="sparqlendpoint";
+	}
+	
+	protected void initialize(){
+		endpointPort=createPort(PipePortType.TEXTIN,190,35);
+	    defaulturiPort=createPort(PipePortType.TEXTIN,250,59);
 	}
 	
 	public void onConnected(Port port){
@@ -131,7 +130,6 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 			code+="<endpoint>\n"+getConnectedConfig(endpoint, endpointPort)+"</endpoint>\n";
 			code+="<default-graph-uri>\n"+getConnectedConfig(defaulturi, defaulturiPort)+"</default-graph-uri>\n";
 			code+="<query><![CDATA[\n"+queryBox.getQuery()+"\n]]></query>";
-			//code+="<format>\n"+getFormat()+"</format>\n";
 			code+="</"+tagName+">\n";
 			return code;
 		}

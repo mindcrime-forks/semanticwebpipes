@@ -13,14 +13,14 @@ public class ForNode extends InOutNode{
 	public ForNode(int x,int y){		
 		super(PipePortType.getPType(PipePortType.SPARQLRESULTIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,130,25);
 		wnd.setTitle("FOR loop");
-		loopPort =new CustomPort(OutPipeNode.getPTypeMag(),PipePortType.getPType(PipePortType.RDFIN));
-		loopPort.setPosition("left");
-		loopPort.setPortType("custom");
-		((CustomPort)loopPort).setMaxFanIn(1);
-        addPort(loopPort,0,0);	
-        
-        ((CustomPort)getInputPort()).setMaxFanIn(1);
         tagName="for";
+	}
+	
+	protected void initialize(){
+		super.initialize();
+		loopPort =createPort(PipePortType.RDFIN,"left");
+		((CustomPort)loopPort).setMaxFanIn(1);
+        ((CustomPort)getInputPort()).setMaxFanIn(1);
 	}
 	
 	public Port getLoopPort(){
@@ -80,7 +80,6 @@ public class ForNode extends InOutNode{
 		Element slElm=XMLUtil.getFirstSubElementByName(elm, "sourcelist");
 		PipeNode slNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(slElm),wsp);
 		slNode.connectTo(node.getInputPort());
-		
 		Element loopElm=XMLUtil.getFirstSubElementByName(elm, "forloop");
 		PipeNode loopNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(loopElm),wsp);
 		loopNode.connectTo(node.getLoopPort());

@@ -43,11 +43,6 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 		defaultBox.setValue(value);
 	}
 	
-	/*public String getParameter(){
-		return "${"+nameBox.getValue()+"}";
-	}*/
-	
-	
 	public String getParaId(){
 		return nameBox.getValue();
 	}
@@ -63,10 +58,9 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 		}
 		return null;
 	}
+	
 	public String getCode(){
-		if (OutPipeNode.paraList.indexOf(this)<0){
-			OutPipeNode.paraList.add(this);
-		}
+		((PipeEditor)getWorkspace()).addParameter(this);
 		return "${"+nameBox.getValue()+"}";
 	}
 	
@@ -84,9 +78,7 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	
 	public String getConfig(){
 		if(getWorkspace()!=null){
-			if (OutPipeNode.paraList.indexOf(this)<0){
-				OutPipeNode.paraList.add(this);
-			}
+			((PipeEditor)getWorkspace()).addParameter(this);
 			return "${"+nameBox.getValue()+"}";
 		}
 		return null;
@@ -94,10 +86,10 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		ParameterNode node= new ParameterNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
-		wsp.addFigure(node);
+		wsp.addFigure(node);	
 		node.setName(XMLUtil.getTextFromFirstSubEleByName(elm, "id"));
 		node.setLabel(XMLUtil.getTextFromFirstSubEleByName(elm, "label"));
-		node.setLabel(XMLUtil.getTextFromFirstSubEleByName(elm, "default"));
+		node.setDefaultValue(XMLUtil.getTextFromFirstSubEleByName(elm, "default"));
 		return node;
 	}
 	

@@ -20,13 +20,12 @@ public class RDFFetchNode extends SelectFetchNode{
          listbox.appendItem(RDFFormat.TRIG.getName(), RDFFormat.TRIG.getName());
          listbox.appendItem(RDFFormat.TRIX.getName(), RDFFormat.TRIX.getName());
          listbox.appendItem(RDFFormat.TURTLE.getName(), RDFFormat.TURTLE.getName());
-        wnd.appendChild(listbox);
+         wnd.appendChild(listbox);
     }
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		RDFFetchNode node= new RDFFetchNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
-		//System.out.println("load rdf fetch "+node.getUuid()+"<--> ");
 		node._loadConfig(elm);
 		return node;
 	}

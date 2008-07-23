@@ -12,19 +12,21 @@ import org.zkoss.zul.Toolbarbutton;
 public class InPipeNode extends PipeNode{
 	
     protected Port output =null;
+	PortType pType;
 	
 	public InPipeNode(PortType pType,int x,int y,int width,int height){
 		super(x,y,width,height);
-		        
-        output =new CustomPort(OutPipeNode.getPTypeMag(),pType);
-     	output.setPosition("bottom");
-        output.setPortType("custom");
-        addPort(output,0,0);
-        
+		this.pType=pType;   
         setToobar();
+	}
+	
+	protected void initialize(){
+		output =createPort(pType,"bottom");
 	}
 	
 	public void connectTo(Port port){
 		getWorkspace().connect(output,port,false);
+		if(port.getParent() instanceof ConnectingInputNode)
+			((ConnectingInputNode)port.getParent()).onConnected(port);
 	}
 }
