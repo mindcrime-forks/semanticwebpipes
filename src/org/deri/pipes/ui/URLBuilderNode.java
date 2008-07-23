@@ -29,7 +29,6 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	
 	class AddRemoveListener implements org.zkoss.zk.ui.event.EventListener {
 		   public void onEvent(Event event) throws  org.zkoss.zk.ui.UiException {	
-			    //System.out.println(((Image)event.getTarget()).getSrc()+"->"+event.getTarget().getParent().getClass());
 				if(((Image)event.getTarget()).getSrc().equals(ADD_ICON)){
 					if (event.getTarget().getParent().getParent()==pathVbox) addPath();
 					else 
@@ -37,11 +36,8 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 				}
 				if(((Image)event.getTarget()).getSrc().equals(REMOVE_ICON)){
 					if(event.getTarget().getParent().getParent()==pathVbox){
-						//System.out.println("remove "+event.getTarget().getParent().getUuid());
 						if(pathPorts.get(event.getTarget().getParent().getUuid())!=null)
 							pathPorts.get(event.getTarget().getParent().getUuid()).detach();
-						//else
-							//System.out.println(event.getTarget().getParent().getUuid()+"--> null");
 						pathPorts.remove(event.getTarget().getParent().getUuid());
 						event.getTarget().getParent().detach();
 						relayoutPathPorts(1);
@@ -188,7 +184,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		Hbox hbox= new Hbox();
 		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
 		hbox.appendChild(createParaBox(150,16));		
-		Port nPort=createPort(PipePortType.TEXTIN,175,57+(pathVbox.getChildren().size()-1)*_rs);
+		Port nPort=createPort(PipePortType.TEXTIN,175,57+(pathVbox.getChildren().size())*_rs);
 		pathPorts.put(hbox.getUuid(), nPort);
 		pathVbox.appendChild(hbox);
 		relayoutParaPorts(1);
@@ -213,7 +209,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		hbox.appendChild(createParaBox(80,16));
 		hbox.appendChild(new Label(" = "));
 		hbox.appendChild(createParaBox(80,16));
-		Port nPort=createPort(PipePortType.TEXTIN,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size()-1)*_rs);
+		Port nPort=createPort(PipePortType.TEXTIN,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
 		paraPorts.put(hbox.getUuid(), nPort);		
 		paraVbox.appendChild(hbox);		
 	}

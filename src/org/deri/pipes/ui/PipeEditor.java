@@ -46,6 +46,7 @@ public class PipeEditor extends Workspace {
 		setWidth(w);
 		setHeight(h);
 		pTypeMag=new PortTypeManager(this);
+		PipePortType.generateAllPortTypes(this);
 	}
 	
 	public void setTextDebugPanel(Textbox txtBox){
@@ -150,6 +151,10 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void createFigure(int x,int y,String figureType){
+		 if(outputNode==null){
+			 outputNode=new  OutPipeNode(500,400);
+			 addFigure(outputNode);
+		 }
 	     x-=180;
 	     y-=30;             
 	     if(figureType.equalsIgnoreCase("rdffetchop")){
@@ -277,7 +282,6 @@ public class PipeEditor extends Workspace {
 			   }
 			   else if(buff instanceof org.deri.execeng.rdf.SesameTupleBuffer){
 				   tuple=((org.deri.execeng.rdf.SesameTupleBuffer)buff).getTupleQueryResult();
-				   //textResult=((org.deri.execeng.rdf.SesameTupleBuffer)buff).toString();
 			   }
 		   }
 		   reloadTextDebug(textResult);
@@ -334,7 +338,8 @@ public class PipeEditor extends Workspace {
 		Object[] children=getChildren().toArray();
 		for(int i=0;i<children.length;i++){
 			((Component)children[i]).detach();
-		}		
+		}
+		outputNode=null;
 		if((null==config)||(config.trim()=="")) return;
 		InputSource input=new InputSource(new java.io.StringReader(config));
 		try {
@@ -355,7 +360,6 @@ public class PipeEditor extends Workspace {
 	
 	public void newPipe(){
 		reload(null);
-		outputNode=new OutPipeNode(500,400);
 		pipeid.setValue("");
 		bdid.setValue("");
 		pipename.setValue("");

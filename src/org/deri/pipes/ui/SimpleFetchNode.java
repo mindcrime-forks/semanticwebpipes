@@ -16,7 +16,7 @@ public class SimpleFetchNode extends InPipeNode implements ConnectingInputNode{
 	protected Port urlPort=null;
 
 	public SimpleFetchNode(byte portType,int x,int y,String title,String tagName){
-		super(PipePortType.getPType(portType),x,y,200,80);
+		super(PipePortType.getPType(portType),x,y,200,50);
 		this.tagName=tagName;
 		wnd.setTitle(title);
 		org.zkoss.zul.Label label=new org.zkoss.zul.Label(" URL: ");

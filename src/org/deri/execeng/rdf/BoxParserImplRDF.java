@@ -54,7 +54,7 @@ public class BoxParserImplRDF extends BoxParser{
     
     //Danh Le :new Syntax for pipes (5th,Dec,2007)
     public static Stream loadStream(Element element){
-    	System.out.println("element"+element.toString());
+    	//System.out.println("element"+element.toString());
     	//patch generator box
     	if(element.getTagName().equalsIgnoreCase("smoosher")){    
     		return SameAsBox.loadStream(element);

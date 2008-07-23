@@ -57,12 +57,10 @@ public class SelectBox implements Box {
     }
     
     public void execute(){
-       System.out.println("before Select exectute");	
        SesameMemoryBuffer tmp= new SesameMemoryBuffer();
        for(int i=0;i<baseStreams.size();i++){
     	   if(baseStreams.get(i) instanceof Box) 
 			 if(!((Box)baseStreams.get(i)).isExecuted()) ((Box)baseStreams.get(i)).execute();
-    	  // System.out.println("stream result"+((Box)baseStreams.get(i)).getExecBuffer().toString());
     	   if(graphNames.get(i)==null)
     		   baseStreams.get(i).streamming(tmp);
     	   else
@@ -71,10 +69,7 @@ public class SelectBox implements Box {
     		   else baseStreams.get(i).streamming(tmp);
        }
        try{   
-    	   System.out.println("query :\n" +selectQuery);
     	   buffer=new SesameTupleBuffer(((tmp.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, selectQuery)).evaluate()));
-    	 //  System.out.println("query result:" +buffer.toString());
-    	   System.out.println("query successful!");
        }
        catch(MalformedQueryException e){ 
       	   log.append(e.toString()+"\n");
@@ -85,7 +80,6 @@ public class SelectBox implements Box {
          catch(RepositoryException e){
       	   log.append(e.toString()+"\n");
        }
-         System.out.println("query log:" +log.toString());
    	   isExecuted=true;
     }
     

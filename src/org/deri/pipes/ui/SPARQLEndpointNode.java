@@ -52,6 +52,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 	}
 	
 	protected void initialize(){
+		super.initialize();
 		endpointPort=createPort(PipePortType.TEXTIN,190,35);
 	    defaulturiPort=createPort(PipePortType.TEXTIN,250,59);
 	}
@@ -136,12 +137,16 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 		return null;
 	}
 	
+	public void _loadConfig(Element elm){	
+		loadConnectedConfig(XMLUtil.getFirstSubElementByName(elm, "endpoint"), endpointPort, endpoint);
+		loadConnectedConfig(XMLUtil.getFirstSubElementByName(elm, "default-graph-uri"), defaulturiPort, defaulturi);
+		setQuery(XMLUtil.getTextFromFirstSubEleByName(elm, "query"));
+	}
+	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		SPARQLEndpointNode node= new SPARQLEndpointNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
-		node.setEndpoint(XMLUtil.getTextFromFirstSubEleByName(elm, "endpoint"));
-		node.setDefaultURI(XMLUtil.getTextFromFirstSubEleByName(elm, "default-graph-uri"));
-		node.setQuery(XMLUtil.getTextFromFirstSubEleByName(elm, "query"));
+		node._loadConfig(elm);
 		return node;
 	}
 	
