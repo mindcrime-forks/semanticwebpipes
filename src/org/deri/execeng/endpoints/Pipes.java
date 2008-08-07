@@ -49,13 +49,19 @@ public class Pipes extends HttpServlet {
 				BabelWriter writer;
 				if(acceptHeaderValue.equalsIgnoreCase("application/json"))
 					writer =new ExhibitJsonWriter();
-				else
+				else{
 					writer =new ExhibitJsonpWriter();
+					System.out.println("Jsonp");
+				}
 				try{
 					java.util.Properties prop=new java.util.Properties();
 					String cb=req.getParameter("cb");
 					prop.put("callback",(cb!=null)?cb:"callback");
-					writer.write(res.getWriter(),buffer.getSail(),prop,null);
+					StringWriter sw=new StringWriter();
+					//writer.write(res.getWriter(),buffer.getSail(),prop,null);
+					writer.write(sw,buffer.getSail(),prop,null);
+					//System.out.println(sw.getBuffer().toString());
+					res.getWriter().write(sw.getBuffer().toString());
 				}catch(Exception e){
 					e.printStackTrace();
 				}
@@ -207,8 +213,9 @@ public class Pipes extends HttpServlet {
     		return RDFFormat.TRIX.getDefaultMIMEType();
     	if(accept.contains(RDFFormat.TURTLE.getDefaultMIMEType())||format.equalsIgnoreCase("turtle")) 
     		return RDFFormat.TURTLE.getDefaultMIMEType();
-    	if(accept.contains("application/json")||format.equalsIgnoreCase("json")) return "application/json";
     	if(accept.contains("application/jsonp")||format.equalsIgnoreCase("jsonp")) return "application/jsonp";
+    	if(accept.contains("application/json")||format.equalsIgnoreCase("json")) return "application/json";
+    	
     	return "text/html";
 	}
    

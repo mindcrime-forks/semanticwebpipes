@@ -6,6 +6,7 @@ import org.integratedmodelling.zk.diagram.components.*;
 public class ConnectionDeletedListener implements EventListener {	
 	   
 	   public void onEvent(Event event) throws org.zkoss.zk.ui.UiException {    
+		     System.out.println("deleted");
 	         ConnectionCreatedEvent e=(ConnectionCreatedEvent)event;
 	         Node src=(Node)e.getSource().getParent();
 	         Node tag=(Node)e.getDestination().getParent();
