@@ -1,9 +1,11 @@
 package org.deri.pipes.ui;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
 import org.integratedmodelling.zk.diagram.components.Workspace;
+import org.integratedmodelling.zk.diagram.components.PortTypeMask;
 import org.integratedmodelling.zk.diagram.components.Shape;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
@@ -152,11 +154,11 @@ public class PipeEditor extends Workspace {
 	
 	public void createFigure(int x,int y,String figureType){
 		 if(outputNode==null){
-			 outputNode=new  OutPipeNode(500,400);
+			 outputNode=new  OutPipeNode(400,400);
 			 addFigure(outputNode);
 		 }
-	     x-=180;
-	     y-=30;             
+	     x-=350;
+	     y-=70;             
 	     if(figureType.equalsIgnoreCase("rdffetchop")){
 	     	 addFigure(new RDFFetchNode(x,y));
 	     }
@@ -254,8 +256,23 @@ public class PipeEditor extends Workspace {
 	public void debug(){
 		debug(getCode());
 	}
-	
+	public String populatePara(String syntax){
+		for(int i=0;i<paraList.size();i++){
+			syntax = syntax.replace("${" + paraList.get(i).getParaId() + "}", paraList.get(i).getDefaultVal());
+			try{
+				syntax=syntax.replace(URLEncoder.encode("${" + paraList.get(i).getParaId()  + "}","UTF-8"),
+										URLEncoder.encode(paraList.get(i).getDefaultVal(),"UTF-8"));
+			}
+			catch(java.io.UnsupportedEncodingException e){
+				e.printStackTrace();
+			}
+		}
+		
+		return syntax;
+	}
 	public void debug(String syntax){
+		   syntax=populatePara(syntax);	
+		   //System.out.println(syntax);
 		   BoxParserImplRDF parser= new BoxParserImplRDF();	   
 		   Stream    stream= parser.parse(syntax);
 		   TupleQueryResult tuple=null;
@@ -289,6 +306,8 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void hotDebug(String syntax){
+		syntax=populatePara(syntax);
+		 //System.out.println(syntax);
 		InputSource input=new InputSource(new java.io.StringReader(syntax));
 		try {
            DOMParser parser = new DOMParser();
@@ -337,7 +356,8 @@ public class PipeEditor extends Workspace {
 	public void reload(String config){
 		Object[] children=getChildren().toArray();
 		for(int i=0;i<children.length;i++){
-			((Component)children[i]).detach();
+			if(!(children[i] instanceof PortTypeMask))
+				((Component)children[i]).detach();
 		}
 		outputNode=null;
 		if((null==config)||(config.trim()=="")) return;

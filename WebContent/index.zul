@@ -53,25 +53,25 @@
 		</menu>
 		<menu label="Help">
 			<menupopup>
-				<menuitem label="Documentation" onClick="alert(self.label)"/>
-				<menuitem label="About"/>					
+				<menuitem label="Documentation"  href='http://pipes.deri.org/index.php/document'/>
+				<menuitem label="About" href="http://pipes.deri.org"/>					
 			</menupopup>
 		</menu>
 	</menubar>
 				<hbox><label style="font-weight: bold;font-size: 11px;" value="Pipe id"/>
-				<bandbox id="bd" onChange="pipeid.value=bd.value">
+				<bandbox id="bd" onChange="pipeid.value=bd.value" onBlur="pipeid.value=bd.value">
 		<bandpopup>
         <vbox>		
 		<hbox>
 		  <label value="Pipe id:" />
-		  <textbox cols="50" id="pipeid"	value="" onChange="hidePassword();bd.value=pipeid.value;" onBlur="hidePassword()" />
+		  <textbox cols="30" id="pipeid"	value="" onChange="hidePassword();bd.value=pipeid.value;" onBlur="hidePassword()" />
 		  <label id="idwarnning" pre="true" value="" />
 		  <label 	value="Optional password:" />
-		  <textbox cols="40" id="password"	type="text" value="" />		
+		  <textbox cols="30" id="password"	type="text" value="" />		
 		 </hbox> 						
 		<hbox>
 			<label value="Pipe description:" />
-			<textbox cols="100" id="pipename" value="" />										
+			<textbox cols="80" id="pipename" value="" />										
 		</hbox>
         </vbox>
 		</bandpopup>
@@ -357,10 +357,11 @@
     void hidePassword(){
          tmpPass=PipeManager.getPassword(pipeid.value);
          if(tmpPass!=null){
-             password.value=tmpPass;
+             //password.value=tmpPass;
+             password.value="";
              passwordrow.visible=false;
              confirmpasswordrow.visible=false;
-             idwarnning.value="(must have password to overwrite)";
+             idwarnning.value="(must have password\n to overwrite)";
              idwarnning.setStyle("color:red");
          }
          else{

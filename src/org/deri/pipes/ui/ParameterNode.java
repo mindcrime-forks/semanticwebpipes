@@ -47,6 +47,9 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 		return nameBox.getValue();
 	}
 	
+	public String getDefaultVal(){
+		return defaultBox.getValue();
+	}
 	public String getParaCode(){
 		if(getWorkspace()!=null){
 			String code="<"+tagName+">\n";
