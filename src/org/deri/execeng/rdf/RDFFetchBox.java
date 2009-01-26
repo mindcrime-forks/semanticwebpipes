@@ -1,13 +1,9 @@
 package org.deri.execeng.rdf;
 
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.model.Stream;
-import org.deri.execeng.core.BoxParser;
+import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.utils.XMLUtil;
 import org.w3c.dom.Element;
-import java.net.URLEncoder;
-import info.aduna.lang.FileFormat;
-import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.rio.RDFFormat;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
@@ -16,15 +12,12 @@ import org.openrdf.rio.RDFFormat;
 public class RDFFetchBox extends RDFBox {
 	private boolean isExecuted=false;
 	private String url=null;
-	private RDFFormat format=null;	
-	public RDFFetchBox(String url){
-		this.format=RDFFormat.RDFXML;
-		this.url=url;
-	}
+	private RDFFormat format=null;
+	private PipeParser parser;
 	
-	public RDFFetchBox(String url,String format){
-		this.format=RDFFormat.valueOf(format);
-		this.url=url;
+	public RDFFetchBox(PipeParser parser,Element element){
+		this.parser=parser;
+		initialize(element);
 	}	
 	
 	public ExecBuffer getExecBuffer(){
@@ -36,7 +29,7 @@ public class RDFFetchBox extends RDFBox {
 	}
 	
 	public void execute(){
-		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
+		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer(parser);
 		rdfBuffer.loadFromURL(url,(RDFFormat)format);			
 		buffer=rdfBuffer;
 		isExecuted=true;
@@ -46,15 +39,17 @@ public class RDFFetchBox extends RDFBox {
     	return buffer.toString(); 
     }
     
-    public static Stream loadStream(Element element){
-    	String tmpStr=XMLUtil.getTextFromFirstSubEleByName(element, "location");
-    	//System.out.println("fetchbox");
+    private void initialize(Element element){
+    	url=XMLUtil.getTextFromFirstSubEleByName(element, "location");
     	
-    	if(tmpStr!=null)
-    		return new RDFFetchBox(tmpStr,element.getAttribute("format"));
+    	if((null!=url)&&(url.trim().length()>0)){    		
+    		if(null==element.getAttribute("format"))
+    			format=RDFFormat.RDFXML;
+    		else	
+    			format=RDFFormat.valueOf(element.getAttribute("format"));    		
+    	}
     	
-    	Stream.log.append("Error in fetchbox\n");
-    	Stream.log.append(element.toString()+"\n");
-    	return null;
+    	parser.log("Error in RDF fetchbox");
+    	parser.log(element.toString());    	
     }
 }

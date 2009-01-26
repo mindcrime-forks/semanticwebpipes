@@ -12,7 +12,7 @@ href="http://dublincore.org/documents/dcq-html/">Expressing Dublin
 Core in HTML/XHTML meta and link elements</a></cite>.</p>
 
 <address>
-$Id: dc-extract.xsl,v 1.1 2008/06/28 21:32:24 danhlp Exp $
+$Id: dc-extract.xsl,v 1.2 2009/01/26 14:17:06 fuller Exp $
 </address>
 </div>
 

@@ -1,13 +1,12 @@
 package org.deri.execeng.rdf;
 
-import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.model.Stream;
+import org.deri.execeng.core.PipeParser;
 import org.w3c.dom.Element;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
 import org.deri.execeng.utils.*;
+
 public class HTMLFetchBox extends RDFBox {
 	private static Hashtable<String,StreamSource> xsltFile=new Hashtable<String,StreamSource>();
 	private static Hashtable<String,String> formats=new Hashtable<String,String>();
@@ -34,39 +33,39 @@ public class HTMLFetchBox extends RDFBox {
 	
 	String url,format;
 	private boolean isExecuted=false;
-	public HTMLFetchBox(String url,String format){
-		this.format=format;
-		this.url=url;
+	PipeParser parser;
+	public HTMLFetchBox(PipeParser parser, Element element){
+		this.parser=parser;
+		initialize(element);
 	}
-	
+		
 	public static Hashtable<String,String >getFormats(){
 		return formats;
 	}
 	@Override
 	public void execute() {
-		buffer=new SesameMemoryBuffer();
+		buffer=new SesameMemoryBuffer(parser);
 		if(!isExecuted){
 			Enumeration<String> k = xsltFile.keys();
 			StreamSource stream=new StreamSource(url);
 		    while (k.hasMoreElements()) {
 		    	String key=k.nextElement();
 		    	if(format.indexOf(key)>=0){
-		    		String text=XSLTUtil.transform(stream, xsltFile.get(key));
-		    		buffer.loadFromText(text, url);
+		    		StringBuffer textBuff=XSLTUtil.transform(stream, xsltFile.get(key));
+		    		buffer.loadFromText(textBuff.toString(), url);
 		    	}
 		    }
 			isExecuted=true;
 		}
 	}
 	
-	public static Stream loadStream(Element element){
-    	String tmpStr=XMLUtil.getTextFromFirstSubEleByName(element, "location");
+	private void  initialize(Element element){
+    	url=XMLUtil.getTextFromFirstSubEleByName(element, "location");
     	
-    	if(tmpStr!=null)
-    		return new HTMLFetchBox(tmpStr,element.getAttribute("format"));
+    	if((null!=url)&&(url.trim().length()>0))
+    		format=element.getAttribute("format");
     	
-    	Stream.log.append("Error in fetchbox\n");
-    	Stream.log.append(element.toString()+"\n");
-    	return null;
+    	parser.log("Error in fetchbox");
+    	parser.log(element.toString());
     }	
 }

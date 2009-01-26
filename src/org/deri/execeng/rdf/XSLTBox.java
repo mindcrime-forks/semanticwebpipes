@@ -1,48 +1,91 @@
 package org.deri.execeng.rdf;
 
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.model.Stream;
+import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.model.Operator;
 import org.w3c.dom.Element;
-import java.util.Hashtable;
-import java.util.Enumeration;
 
-import java.io.File;
+import javax.xml.transform.stream.StreamSource;
+
 import org.deri.execeng.utils.*;
-public class XSLTBox extends RDFBox {
-	XMLFetchBox xmlStream,xslStream;
-	String baseURI;
+public class XSLTBox implements Operator {
+	String xmlStrID,xslStrID;
 	private boolean isExecuted=false;
-	public XSLTBox(XMLFetchBox xmlStream,XMLFetchBox xslStream){
-		System.out.println("new XSLT");
-		this.xmlStream=xmlStream;
-		baseURI=xmlStream.getURL();
-		this.xslStream=xslStream;
+	PipeParser parser;
+	XMLStreamBuffer buffer;
+	public XSLTBox(PipeParser parser,Element element){
+		this.parser=parser;
+		initialize(element);
 	}
-	
 	
 	@Override
 	public void execute() {
-		buffer=new SesameMemoryBuffer();
-		if(!isExecuted){
-			System.out.println("execute XSLT");
-			String text=XSLTUtil.transform(((XMLStreamBuffer)xmlStream.getExecBuffer()).getStreamSource(), 
-												((XMLStreamBuffer)xslStream.getExecBuffer()).getStreamSource());
-			buffer.loadFromText(text, baseURI);
-			isExecuted=true;
-		}
+		if((null!=xmlStrID)&&(null!=xslStrID)){			
+			StreamSource xmlSrc=executeXMLOp(xmlStrID);
+			StreamSource xslSrc=executeXMLOp(xslStrID);
+			if((xmlSrc!=null)&&(xslSrc!=null)){
+				buffer=new XMLStreamBuffer(parser);	
+			    buffer.setStreamSource(XSLTUtil.transform(xmlSrc,xslSrc));				
+			}
+	    }
+		isExecuted=true;
 	}
 	
-	public static Stream loadStream(Element element){
-    	XMLFetchBox xmlStr=(XMLFetchBox)BoxParserImplRDF.loadStream(XMLUtil.getFirstSubElement(
-    												XMLUtil.getFirstSubElementByName(element, "xmlsource")));
-    	XMLFetchBox xslStr=(XMLFetchBox)BoxParserImplRDF.loadStream(XMLUtil.getFirstSubElement(
-    												XMLUtil.getFirstSubElementByName(element, "xslsource")));
+    private StreamSource executeXMLOp(String strID){
     	
-    	if((xmlStr!=null)&&(xslStr!=null))
-    		return new XSLTBox(xmlStr,xslStr);
-    	
-    	Stream.log.append("Error in fetchbox\n");
-    	Stream.log.append(element.toString()+"\n");
-    	return null;
-    }	
+    	Operator xmlOp=parser.getOpByID(strID);
+		if(!xmlOp.isExecuted())   xmlOp.execute();
+		ExecBuffer xmlBuff=xmlOp.getExecBuffer();
+		
+		StreamSource xmlSrc=null;
+		if(xmlBuff instanceof XMLStreamBuffer) 
+			xmlSrc=((XMLStreamBuffer)xmlBuff).getStreamSource();
+		if((xmlBuff instanceof SesameTupleBuffer)||(xmlBuff instanceof SesameTupleBuffer)){ 
+			XMLStreamBuffer tmpBuff= new XMLStreamBuffer(parser);
+			xmlBuff.stream(tmpBuff);
+			xmlSrc=tmpBuff.getStreamSource();
+		}
+		
+		return xmlSrc;
+    }
+    
+	public void initialize(Element element){
+		xmlStrID=parser.getSource(XMLUtil.getFirstSubElement(
+						XMLUtil.getFirstSubElementByName(element, "xmlsource")));
+    	xslStrID=parser.getSource(XMLUtil.getFirstSubElement(
+    					XMLUtil.getFirstSubElementByName(element, "xslsource")));
+    	if (null==xmlStrID){
+      		parser.log("<sourcelist> element must be set !!!");
+      		//TODO : Handling error of lacking xml source for XSLT transformation 	
+      	}
+    	if (null==xslStrID){
+      		parser.log("<sourcelist> element must be set !!!");
+      		//TODO : Handling error of lacking xml source for XSLT transformation 	
+      	}
+    }
+
+	@Override
+	public ExecBuffer getExecBuffer() {
+		// TODO Auto-generated method stub
+		return buffer;
+	}
+
+
+
+	@Override
+	public boolean isExecuted() {
+		return isExecuted;
+	}
+
+	@Override
+	public void stream(ExecBuffer buffer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void stream(ExecBuffer buffer, String context) {
+		// TODO Auto-generated method stub
+		
+	}	
 }

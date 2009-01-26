@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk>
+<style src="/CSS/recycling.css"/>
+	<window id="passwordchecking" border="normal" width="350px" visible="false" sizable="false" >
+        <caption label="Confirm password for editing Pipe"/>
+		<separator bar="true"/>
+		Please enter the password for overwriting the current pipe
+		<separator/> 
+		<textbox id="oldpassword" value=""  type="text"></textbox>
+		<button label="Enter" onClick="checkPassword()"/>
+		<button label="Cancel" onClick="passwordchecking.visible= false"/>		
+    </window>
+    <window id="deleteWin" border="normal" width="350px" visible="false" sizable="false" >
+        <caption label="Confirm password for deleting Pipe"/>
+        Please enter the password for deleting this pipe
+		<separator bar="true"/>				
+    </window>
+    <window id="confirmation" border="normal" width="350px" visible="false" sizable="false" >
+        <caption label="Confirm to overwrite current pipe"/>
+		<separator bar="true"/>
+		Are you sure you want to overwrite the existing Pipe?
+		<separator/> 
+		<button label="Yes" onClick="savePipe()"/>
+		<button label="No" onClick="confirmation.visible= false"/>		
+    </window>
+	<borderlayout>
+	  
+	<center border="none" flex="true">
+   	  <borderlayout>					
+			<north>
+						<vbox>
+						<menubar id="menubar">
+		<menu label="File">
+			<menupopup>
+				<menuitem label="New " onClick="newPipe();"/>
+				<menuitem label="Save" onClick="checkB4Save()"/>
+				<menuseparator/>
+				<menuitem label="Exit" onClick="alert(self.label)"/>
+			</menupopup>
+		</menu>
+		<menu label="Debug">
+			<menupopup>
+				<menuitem label="Run " onClick="debugPipe();"/>
+				<!-- <menu label="Preview">
+					<menupopup>
+						<menuitem label="Exhibit" onClick="alert(self.label)"/>
+						<menuitem label="Disco" onClick="alert(self.label)"/>
+						<menuitem label="Openlinked Browser" onClick="alert(self.label)"/>
+					</menupopup>
+				</menu>  -->				
+			</menupopup>
+		</menu>
+		<menu label="Help">
+			<menupopup>
+				<menuitem label="Documentation"  href='http://pipes.deri.org/index.php/document'/>
+				<menuitem label="About" href="http://pipes.deri.org"/>					
+			</menupopup>
+		</menu>
+	</menubar>
+				<hbox><label style="font-weight: bold;font-size: 11px;" value="Pipe id"/>
+				<bandbox id="bd" onChange="pipeid.value=bd.value" onBlur="pipeid.value=bd.value">
+		<bandpopup>
+        <vbox>		
+		<hbox>
+		  <label value="Pipe id:" />
+		  <textbox cols="30" id="pipeid"	value="" onChange="hidePassword();bd.value=pipeid.value;" onBlur="hidePassword()" />
+		  <label id="idwarnning" pre="true" value="" />
+		  <label 	value="Optional password:" />
+		  <textbox cols="30" id="password"	type="text" value="" />		
+		 </hbox> 						
+		<hbox>
+			<label value="Pipe description:" />
+			<textbox cols="80" id="pipename" value="" />										
+		</hbox>
+        </vbox>
+		</bandpopup>
+	</bandbox>		
+	</hbox>					
+						</vbox>
+						</north>			
+    		
+						<center>
+					       <tabbox>
+									    
+									    <tabs>
+									    <tab label="Designer"/>
+									    <tab label="source code" onSelect="updateCode();"/>
+									    
+									    </tabs>
+									    <tabpanels>
+											<tabpanel id="wspPanel">
+											<!-- <workspace width="1600px" height="1000px" router="bezier" id="workspace">
+												
+											 </workspace>  -->
+										
+											</tabpanel>
+											<tabpanel >
+											    <vbox > 
+												
+												
+												<codepress id="pipesyntax" language="swp"
+													style="width:800px; height:450px" readonly="true">
+													<attribute name="value"><![CDATA[<pipe><code>Enter pipe code here</code></pipe>]]></attribute>
+												</codepress>
+												</vbox>
+												<!--
+												<zscript>
+												</zscript> -->
+									            <!-- <button label="Edit code" onClick="pipesyntax.invalidate();" /> -->
+										</tabpanel>
+											
+										
+										</tabpanels>
+									    </tabbox>
+										
+							
+						</center>
+						<south id="debugViewArea" size="10%" splittable="true" minsize="80"  >
+						   <tabbox> 
+						   <tabs>
+						    <tab label="text view"/>
+						   <tab label="table view"/>
+						  
+						   </tabs>
+						   <tabpanels>
+						     <tabpanel> 
+						    
+		    				<textbox id="debugView" rows="30" height="100%" width="100%" style="font-size:11px; background-image:url(img/output_background.gif); background-repeat:no-repeat; background-position: right top; background-color:white;" readonly="true" />
+		    				
+		    				</tabpanel>
+		    				<tabpanel id="tabularDebugView">
+					
+						   </tabpanel>
+						  
+						   </tabpanels>
+						   </tabbox>
+						</south>
+					</borderlayout>
+				</center>
+	<west  flex="true" border="none" collapsible="true" splittable="true">   
+	 <tabbox>
+     <tabs>
+     <tab label ="Published pipes"></tab>
+     <tab label ="Operators"></tab>
+     </tabs>
+     <tabpanels>
+     <tabpanel>
+      <vbox align="center">
+      <zscript>
+      import org.zkoss.zk.ui.event.*;
+           import org.zkoss.zul.*;
+           import org.integratedmodelling.zk.diagram.components.*;
+           
+           import org.deri.pipes.ui.*;
+     import org.deri.pipes.ui.events.*;     
+     ViewPort viewPort=new ViewPort("99%","93%");
+	 wspPanel.appendChild(viewPort);	 
+     PipeEditor workspace =new PipeEditor("1000px","1600px");
+     
+	 workspace.setViewPort(viewPort);
+	 workspace.setTextDebugPanel(debugView);
+	 workspace.setTabularDebugPanel(tabularDebugView);
+	 workspace.setConfigComps(pipeid,bd,pipename,password);
+	    public class DropListener implements org.zkoss.zk.ui.event.EventListener {
+				   public void onEvent(Event event) throws UiException {    
+				         createFigure(event.x,event.y,event.dragged.id);   
+				   }    
+	    }
+    
+    workspace.setDroppable("true");
+    workspace.addEventListener("onDrop",new DropListener());
+    workspace.addEventListener("onConnectionCreated",new ConnectionCreatedListener());
+    workspace.addEventListener("onConnectionDeleted",new ConnectionDeletedListener());
+    
+    void createFigure(int x,int y,figureType){         
+	     workspace.createFigure(x,y,figureType);
+    }
+    
+    ListModel model = new SimpleListModel(org.deri.execeng.endpoints.PipeManager.getPipeList().toArray());
+    Object[] items=org.deri.execeng.endpoints.PipeManager.getPipeList().toArray();
+    RowRenderer rowRenderer = new org.deri.execeng.endpoints.PipeListRenderer(workspace,deleteWin);
+     /* ListModel model = new SimpleListModel(org.deri.execeng.endpoints.PipeManager.getPipeList().toArray());
+    Object[] items=org.deri.execeng.endpoints.PipeManager.getPipeList().toArray();
+    RowRenderer rowRenderer = new org.deri.execeng.endpoints.PipeListRenderer(pipeid,pipename,pipesyntax,debugView,debugViewArea,deleteWin);*/
+    </zscript>
+     	      	
+	      	<separator bar="false"/>
+			<grid model="${model}" rowRenderer="${rowRenderer}" mold="paging" pageSize="10" align="left"/>
+      </vbox>
+    </tabpanel>
+    <tabpanel>
+    <vbox>
+     	<tree id="tree" width="100%" rows="25">
+		<treecols sizable="true">
+			<treecol label="Operators"/>
+		</treecols>
+		<treechildren>		    
+			
+			<treeitem label="Fetch">
+				<treechildren>
+					<treeitem>
+						<treerow>
+							<treecell id="rdffetchop"  draggable="true"  label="RDF Fetch" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="htmlfetchop"  draggable="true"  label="HTML Fetch" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="sparqlresultfetchop"  draggable="true"  label="Sparql Result Fetch" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="xmlfetchop"  draggable="true"  label="XML Fetch" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="xslfetchop"  draggable="true"  label="XSL Fetch" />
+						</treerow>	
+					</treeitem>
+				</treechildren>
+			</treeitem>		
+			<treeitem label="Operators">
+				<treechildren>		
+					<treeitem>
+						<treerow>
+							<treecell id="simplemixop"  draggable="true"  label="Simple Mix" />
+						</treerow>	
+					</treeitem>				
+					<treeitem>
+						<treerow>
+							<treecell id="rdfsmixop"  draggable="true"  label="RDFS Mix" />
+						</treerow>	
+					</treeitem>	
+					<treeitem>
+						<treerow>
+							<treecell id="constructop"  draggable="true"  label="Construct" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="selectop"  draggable="true"  label="Select" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="patch-gen"  draggable="true"  label="Patch Generator" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="patch-exec"  draggable="true"  label="Patch Executor" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="smoosherop"  draggable="true"  label="Smoosher" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="forop"  draggable="true"  label="FOR loop" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="xsltop"  draggable="true"  label="XSLT" />
+						</treerow>	
+					</treeitem>
+				</treechildren>
+			</treeitem>	
+		    <treeitem label="Url">
+				<treechildren>
+					<treeitem >
+					   <treerow>
+							<treecell label="URL builder" id="urlbuilder"  draggable="true" />
+						</treerow>
+					</treeitem>	
+					<treeitem >
+					   <treerow>
+							<treecell label="SPARQL Endpoint" id="sparqlendpoint"  draggable="true" />
+						</treerow>
+					</treeitem>	
+				</treechildren>
+			</treeitem>
+	
+			<treeitem label="Inputs">
+				<treechildren>
+				    <treeitem >
+				       <treerow>
+							<treecell label="Parameter" id="parameter"  draggable="true" />
+						</treerow>
+					</treeitem>
+					<treeitem >
+				       <treerow>
+							<treecell label="For-Variable" id="variable"  draggable="true" />
+						</treerow>
+					</treeitem>
+				</treechildren>
+			</treeitem>
+		</treechildren>
+	</tree>
+       </vbox>
+    </tabpanel>
+    </tabpanels>
+    </tabbox>
+    			
+	</west>
+	</borderlayout>
+ <zscript>
+<![CDATA[
+     import org.zkoss.zk.ui.event.*;
+     import org.zkoss.zul.*;
+     import org.integratedmodelling.zk.diagram.components.*;    
+     
+     ]]>
+    </zscript> 	
+<zscript>
+<![CDATA[
+    import org.deri.execeng.endpoints.PipeManager;	
+    String tmpPass;
+    void checkB4Save(){
+       if(PipeManager.isExist(pipeid.value))
+         {
+             if(tmpPass==null)
+                 tmpPass=PipeManager.getPassword(pipeid.value);
+             if(tmpPass!=null){
+                 passwordchecking.doModal();
+             }
+             else{
+                 confirmation.doModal();
+             }
+         }
+       else{
+           savePipe();
+	   }   	
+    }
+    void checkPassword(){
+         if(tmpPass!=null){
+	         if(tmpPass.matches(oldpassword.value)){
+	            passwordchecking.visible=false;
+	            confirmation.doModal();
+	            return;
+	         }
+         }
+         alert("Password is incorrect, please re-enter the password for overwriting the Pipe");
+    }
+    void hidePassword(){
+         tmpPass=PipeManager.getPassword(pipeid.value);
+         if(tmpPass!=null){
+             //password.value=tmpPass;
+             password.value="";
+             passwordrow.visible=false;
+             confirmpasswordrow.visible=false;
+             idwarnning.value="(must have password\n to overwrite)";
+             idwarnning.setStyle("color:red");
+         }
+         else{
+             password.value=null;
+             passwordrow.visible=true;
+             confirmpasswordrow.visible=true;
+             idwarnning.value="";
+             idwarnning.setStyle("color:black");
+         }
+    }
+    void newPipe(){	    
+	    /*debugView.value="";
+	    pipesyntax.setValue("");*/
+	    workspace.newPipe();	
+	}
+	
+	void savePipe(){
+	    updateCode();	    
+	    if(!PipeManager.savePipe(workspace))
+	       alert("There are some errors in your pipe, please check it again and make sure that all required fields are filled out");
+	    else{
+	     alert("Your pipe was successfully saved");
+	     Executions.sendRedirect(".");
+	    }  	
+	}
+	
+	void debugPipe(){
+	    updateCode();
+	    debugView.value="";	
+	    workspace.debug();
+	}
+	
+	void updateCode(){
+	    pipesyntax.setValue(workspace.getCode());
+	    pipesyntax.invalidate();
+	}
+	
+	 ]]>
+	</zscript>
+</zk>

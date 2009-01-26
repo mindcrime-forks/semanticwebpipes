@@ -1,9 +1,11 @@
 package org.deri.execeng.rdf;
 import java.io.ByteArrayInputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.deri.execeng.core.ExecBuffer;
+import org.deri.execeng.core.PipeParser;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -14,22 +16,26 @@ import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.repository.RepositoryException;
 import org.w3c.dom.Element;
 import org.deri.execeng.model.Stream;
-import org.deri.execeng.model.Box;
+import org.deri.execeng.model.Operator;
 import org.deri.execeng.utils.XMLUtil;
 public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 	private MutableTupleQueryResult buffer=null;
+	private PipeParser parser;
 	
-	public SesameTupleBuffer(){		
+	public SesameTupleBuffer(PipeParser parser){
+		this.parser=parser;
 	}
 	
-	public SesameTupleBuffer(String url,TupleQueryResultFormat format){
+	public SesameTupleBuffer(PipeParser parser,String url,TupleQueryResultFormat format){
+		this.parser=parser;
 		loadFromURL(url,format);
 	}
 	
-	public SesameTupleBuffer(TupleQueryResult buffer){
+	public SesameTupleBuffer(PipeParser parser,TupleQueryResult buffer){
+		this.parser=parser;
 		copyBuffer(buffer);
-		//System.out.println("SesameTupleBuffer \n"+toString());
 	}
+	
 	public void copyBuffer(TupleQueryResult buffer){
 		try{
 			this.buffer=new MutableTupleQueryResult(buffer);
@@ -37,6 +43,7 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 		catch(org.openrdf.query.QueryEvaluationException  e){							
 		}
 	}
+	
 	public TupleQueryResult getTupleQueryResult(){		
 		try{
 			return buffer.clone();
@@ -54,14 +61,17 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 			urlConn.connect();
 		    copyBuffer(QueryResultIO.parse(urlConn.getInputStream(), format));
 	    }
-    	catch(org.openrdf.query.resultio.QueryResultParseException e){							
+    	catch(org.openrdf.query.resultio.QueryResultParseException e){
+    		parser.log(e);
 		}
-		catch(org.openrdf.query.TupleQueryResultHandlerException e){							
+		catch(org.openrdf.query.TupleQueryResultHandlerException e){
+			parser.log(e);
 		}
-		catch(org.openrdf.query.resultio.UnsupportedQueryResultFormatException e){							
+		catch(org.openrdf.query.resultio.UnsupportedQueryResultFormatException e){
+			parser.log(e);
 		}
 		catch (java.io.IOException e) {
-			ExecBuffer.log.append(e.toString()+"\n");
+			parser.log(e);
 		}
 	}
 	
@@ -70,60 +80,41 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 		try{
 			copyBuffer(QueryResultIO.parse(new ByteArrayInputStream(text.trim().getBytes()), TupleQueryResultFormat.SPARQL));
 		}
-		catch(java.io.IOException e){	
+		catch(org.openrdf.query.resultio.QueryResultParseException e){
+    		parser.log(e);
 		}
-		catch(org.openrdf.query.resultio.QueryResultParseException e){							
+		catch(org.openrdf.query.TupleQueryResultHandlerException e){
+			parser.log(e);
 		}
-		catch(org.openrdf.query.TupleQueryResultHandlerException e){							
+		catch(org.openrdf.query.resultio.UnsupportedQueryResultFormatException e){
+			parser.log(e);
 		}
-		catch(org.openrdf.query.resultio.UnsupportedQueryResultFormatException e){							
+		catch (java.io.IOException e) {
+			parser.log(e);
 		}
 	}
-	
-	public void loadFromSelect(Element element){	
-		SesameMemoryBuffer tmpBuffer=new SesameMemoryBuffer();
-		java.util.ArrayList<Element> sources=XMLUtil.getSubElementByName(element, "source");
-    	String query=XMLUtil.getTextFromFirstSubEleByName(element, "query");
-    	for(int i=0;i<sources.size();i++){
-    		Element tmpEle=XMLUtil.getFirstSubElement((Element)(sources.get(i)));
-    		Stream tmpStream=null;
- 			if(tmpEle==null)
- 				tmpStream= new TextBox(XMLUtil.getTextData(sources.get(i)));
- 			else
- 				tmpStream=BoxParserImplRDF.loadStream(tmpEle);  	
-     	   if(tmpStream instanceof Box) 
- 			 if(!((Box)tmpStream).isExecuted()) ((Box)tmpStream).execute();
-     	   if(sources.get(i).getAttribute("uri")==null)
-     		   tmpStream.streamming(tmpBuffer);
-     	   else{
-     		   if(sources.get(i).getAttribute("uri").trim().length()>0)
-     		   ((Box)tmpStream).streamming(tmpBuffer,sources.get(i).getAttribute("uri"));
-     		   else tmpStream.streamming(tmpBuffer);
-     	   }
-        }
-    	try{
-    		copyBuffer((tmpBuffer.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
-    	}
-         catch(MalformedQueryException e){ 
-      	   log.append(e.toString()+"\n");
-         }
-         catch(QueryEvaluationException e){
-      	   log.append(e.toString()+"\n");
-         }
-         catch(RepositoryException e){
-      	   log.append(e.toString()+"\n");
-         }
-	}
-	
-	public void streamming(org.deri.execeng.core.ExecBuffer outputBuffer){
 		
-	}
-	
-	public void streamming(org.deri.execeng.core.ExecBuffer outputBuffer,String context){
-		
+	public String toString(){
+		java.io.ByteArrayOutputStream strOut=new java.io.ByteArrayOutputStream();
+		stream(strOut);		
+		return strOut.toString();		
 	}
 
-	public void toOutputStream(java.io.OutputStream output){
+	@Override
+	public void stream(ExecBuffer outputBuffer) {
+		// TODO Auto-generated method stub
+		if(outputBuffer instanceof XMLStreamBuffer){
+			((XMLStreamBuffer)outputBuffer).setStreamSource(new StringBuffer(toString()));
+		}
+	}
+
+	@Override
+	public void stream(ExecBuffer outputBuffer, String context) {
+		stream(outputBuffer);
+	}
+
+	@Override
+	public void stream(OutputStream output) {
 		try{
 			QueryResultIO.write(buffer.clone(), TupleQueryResultFormat.SPARQL, output);
 		}
@@ -139,12 +130,5 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 		catch (CloneNotSupportedException e) {
 			ExecBuffer.log.append(e.toString()+"\n");
 		}
-		
-	}
-	
-	public String toString(){
-		java.io.ByteArrayOutputStream strOut=new java.io.ByteArrayOutputStream();
-		toOutputStream(strOut);		
-		return strOut.toString();		
 	}
 }

@@ -1,29 +1,30 @@
 package org.deri.execeng.rdf;
 
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.model.Box;
-import org.deri.execeng.model.Stream;
+import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.model.Operator;
 import org.deri.execeng.utils.XMLUtil;
-import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Element;
 
-public class XMLFetchBox implements Box {
+public class XMLFetchBox implements Operator {
 
 	String url;
 	boolean isExecuted=false;
-	public XMLFetchBox(String url){
-		this.url=url;
+	PipeParser parser;
+	XMLStreamBuffer buffer;
+	public XMLFetchBox(PipeParser parser,Element element){
+		this.parser=parser;
+		initialize(element);
 	}
 	@Override
 	public void execute() {
-		// TODO Auto-generated method stub
-
+		buffer = new XMLStreamBuffer(parser,url);
+		isExecuted=true;
 	}
 
 	@Override
 	public ExecBuffer getExecBuffer() {
-		// TODO Auto-generated method stub
-		return new XMLStreamBuffer(url);
+		return buffer;
 	}
 
 	@Override
@@ -33,29 +34,21 @@ public class XMLFetchBox implements Box {
 	}
 
 	@Override
-	public void streamming(ExecBuffer buffer) {
-		// TODO Auto-generated method stub
-
+	public void stream(ExecBuffer buffer) {
+		buffer.stream(buffer);
 	}
 
 	@Override
-	public void streamming(ExecBuffer buffer, String context) {
-		// TODO Auto-generated method stub
-
+	public void stream(ExecBuffer buffer, String context) {
+		if(buffer!=null)
+			buffer.stream(buffer);
 	}
 	
-	public String getURL(){
-		return url;
-	}
-	
-	public static Stream loadStream(Element element){
-	    	String tmpStr=XMLUtil.getTextFromFirstSubEleByName(element, "location");
-	    	
-	    	if(tmpStr!=null)
-	    		return new XMLFetchBox(tmpStr);
-	    	
-	    	Stream.log.append("Error in xml fetchbox\n");
-	    	Stream.log.append(element.toString()+"\n");
-	    	return null;
+	public void initialize(Element element){
+    	url=XMLUtil.getTextFromFirstSubEleByName(element, "location");	    	
+    	if(null==url){
+    		parser.log("Error in xml fetchbox");
+    		parser.log(element.toString());
+    	}
 	}
 }

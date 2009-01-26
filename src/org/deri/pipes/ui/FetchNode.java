@@ -4,7 +4,9 @@ import org.deri.execeng.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.openrdf.rio.RDFFormat;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 /**
@@ -60,24 +62,27 @@ public class FetchNode extends InPipeNode implements ConnectingInputNode{
 		return urlPort;
 	}
 	
-	public String getCode(){
+	@Override
+	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+" format=\""+getFormat()+"\">\n<location>";
-			code+="<![CDATA["+getConnectedCode(urlTextbox, urlPort)+"]]>";
-			code+="</location>\n</"+tagName+">\n";
-			return code;
+			if(srcCode!=null) return srcCode;
+			srcCode = doc.createElement(tagName);
+			if(config) setPosition((Element)srcCode);
+			((Element)srcCode).setAttribute("format", getFormat());
+			
+			Element locElm =doc.createElement("location");
+			locElm.appendChild(getConnectedCode(doc, urlTextbox, urlPort, config));
+			srcCode.appendChild(locElm);
+			return srcCode;
 		}
 		return null;
 	}
 	
-	public String getConfig(){
-		if(getWorkspace()!=null){
-			String code="<"+tagName+" format=\""+getFormat()+"\" x=\""+getX()+"\" y=\""+getY()+"\">\n<location>";
-			code+=getConnectedConfig(urlTextbox, urlPort);
-			code+="</location>\n</"+tagName+">\n";
-			return code;
-		}
-		return null;
+	@Override
+	public void reset(boolean recursive){
+		srcCode=null;
+		if(recursive)
+			reset(urlPort,recursive);
 	}
 	
 	public void _loadConfig(Element elm){	

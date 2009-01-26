@@ -104,12 +104,9 @@
 													<attribute name="value"><![CDATA[<pipe><code>Enter pipe code here</code></pipe>]]></attribute>
 												</codepress>
 												</vbox>
+												<!--
 												<zscript>
-											
-													changeLanguage(){ codepress.language =
-													languageSelector.selectedItem.label; codepress.invalidate(); }
-											
-												</zscript>
+												</zscript> -->
 									            <!-- <button label="Edit code" onClick="pipesyntax.invalidate();" /> -->
 										</tabpanel>
 											
@@ -395,7 +392,7 @@
 	}
 	
 	void updateCode(){
-	    pipesyntax.setValue(workspace.getCode());
+	    pipesyntax.setValue(workspace.getSrcCode(false));
 	    pipesyntax.invalidate();
 	}
 	

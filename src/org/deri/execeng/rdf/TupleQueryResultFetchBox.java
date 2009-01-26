@@ -1,20 +1,25 @@
 package org.deri.execeng.rdf;
 
-import org.deri.execeng.model.Box;
+import org.deri.execeng.model.Operator;
 import org.deri.execeng.core.ExecBuffer;
+import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.utils.XMLUtil;
 import org.w3c.dom.Element;
 import java.net.URLEncoder;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 
-public class TupleQueryResultFetchBox implements Box {
+public class TupleQueryResultFetchBox implements Operator {
 	private ExecBuffer buffer=null;
 	private boolean isExecuted=false;
 	private String url=null;
 	private TupleQueryResultFormat format=null;
+	private PipeParser parser;
 	
-	
+	public TupleQueryResultFetchBox(PipeParser parser,Element element){
+		this.parser=parser;
+		initialize(element);
+	}
 	public TupleQueryResultFetchBox(String url){
 		this.format=TupleQueryResultFormat.SPARQL;
 		this.url=url;
@@ -30,12 +35,12 @@ public class TupleQueryResultFetchBox implements Box {
 		return buffer;
 	}
 	
-	public void streamming(ExecBuffer outputBuffer){
-   	   buffer.streamming(outputBuffer);
+	public void stream(ExecBuffer outputBuffer){
+   	   buffer.stream(outputBuffer);
     }
 	
-	public void streamming(ExecBuffer outputBuffer,String context){
-	   	   buffer.streamming(outputBuffer,context);
+	public void stream(ExecBuffer outputBuffer,String context){
+	   	   buffer.stream(outputBuffer,context);
 	}
 	
 	public boolean isExecuted(){
@@ -43,7 +48,7 @@ public class TupleQueryResultFetchBox implements Box {
 	}
 	
 	public void execute(){				
-		buffer=new SesameTupleBuffer(url,format);			
+		buffer=new SesameTupleBuffer(parser,url,format);			
 		isExecuted=true;
 	}
 	public static TupleQueryResultFormat formatOf(String format){
@@ -60,13 +65,16 @@ public class TupleQueryResultFetchBox implements Box {
     	return buffer.toString(); 
     }
     
-    public static Stream loadStream(Element element){    	
-    	String tmpStr=XMLUtil.getTextFromFirstSubEleByName(element, "location");
+    private void initialize(Element element){    	
+    	url=XMLUtil.getTextFromFirstSubEleByName(element, "location");
     	
-    	if(tmpStr!=null)
-    		return new TupleQueryResultFetchBox(tmpStr,formatOf(element.getAttribute("format")));
-    	Stream.log.append("Error in fetchbox\n");
-    	Stream.log.append(element.toString()+"\n");
-    	return null;
+    	if((null!=url)&&url.trim().length()>0){
+    		if(element.getAttribute("format")!=null)
+    			format=formatOf(element.getAttribute("format"));
+    		else	
+    			format=TupleQueryResultFormat.SPARQL;    		
+    	}
+    	parser.log("Error in Fetching SPARQL Result");
+    	parser.log(element.toString());    	
     }
 }

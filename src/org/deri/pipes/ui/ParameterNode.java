@@ -1,7 +1,9 @@
 package org.deri.pipes.ui;
 
 import org.deri.execeng.utils.XMLUtil;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
@@ -50,36 +52,21 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	public String getDefaultVal(){
 		return defaultBox.getValue();
 	}
-	public String getParaCode(){
+	
+	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+">\n";
-			code+="<id>"+nameBox.getValue()+"</id>\n";
-			code+="<label>"+labelBox.getValue()+"</label>\n";
-			code+="<default>"+defaultBox.getValue()+"</default>\n";
-			code+="</"+tagName+">\n";
-			return code;
+			if(srcCode!=null) return srcCode;
+			srcCode =doc.createElement(tagName);
+			if(config) setPosition((Element)srcCode);
+			srcCode.appendChild(XMLUtil.createElmWithText(doc, "id", nameBox.getValue()));
+			srcCode.appendChild(XMLUtil.createElmWithText(doc, "label", labelBox.getValue()));
+			srcCode.appendChild(XMLUtil.createElmWithText(doc, "default", defaultBox.getValue()));			
+			return srcCode;
 		}
 		return null;
 	}
 	
-	public String getCode(){
-		((PipeEditor)getWorkspace()).addParameter(this);
-		return "${"+nameBox.getValue()+"}";
-	}
-	
-	public String getParaConfig(){
-		if(getWorkspace()!=null){
-			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-			code+="<id>"+nameBox.getValue()+"</id>\n";
-			code+="<label>"+labelBox.getValue()+"</label>\n";
-			code+="<default>"+defaultBox.getValue()+"</default>\n";
-			code+="</"+tagName+">\n";
-			return code;
-		}
-		return null;
-	}
-	
-	public String getConfig(){
+	public String getSrcCode(boolean config){	
 		if(getWorkspace()!=null){
 			((PipeEditor)getWorkspace()).addParameter(this);
 			return "${"+nameBox.getValue()+"}";

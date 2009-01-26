@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Context>
+   <Resource name="jdbc/pipes" auth="Container"
+       type="javax.sql.DataSource" 
+       username="root" password="pipe"
+       driverClassName="com.mysql.jdbc.Driver"
+       url="jdbc:mysql://localhost/pipes" 
+       maxActive="100"    /> 
+</Context>

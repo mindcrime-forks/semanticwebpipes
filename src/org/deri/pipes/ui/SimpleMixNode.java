@@ -1,8 +1,4 @@
 package org.deri.pipes.ui;
-import org.deri.execeng.rdf.BoxParserImplRDF;
-import org.deri.execeng.rdf.TextBox;
-import org.deri.execeng.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.*;
 import org.w3c.dom.Element;
 public class SimpleMixNode extends InOutNode {    
 	public SimpleMixNode(int x, int y) {

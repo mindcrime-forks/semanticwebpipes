@@ -3,7 +3,9 @@ import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.deri.execeng.utils.XMLUtil;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -11,8 +13,8 @@ import org.w3c.dom.Element;
 public class XSLTNode extends InOutNode{
 	Port xslPort= null;
 	public XSLTNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.XMLIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
-		wnd.setTitle("XSL Transformation");
+		super(PipePortType.getPType(PipePortType.XMLIN),PipePortType.getPType(PipePortType.XMLOUT),x,y,200,25);
+		wnd.setTitle("XSLT Transformation");
         tagName="xslt";
 	}
 	
@@ -25,48 +27,14 @@ public class XSLTNode extends InOutNode{
 		return xslPort;
 	}
 	
-	public String getCode(){
+	@Override
+	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-	    	String code="<"+tagName+">\n";
-	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<xmlsource>\n";
-	    		code+=((PipeNode)port.getParent()).getCode();
-	    		code+="</xmlsource>\n";
-	    		break;
-	    	}
-	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(xslPort.getUuid())){
-	    		code+="<xslsource>\n";
-	    		code+=((PipeNode)port.getParent()).getCode();
-	    		code+="</xslsource>\n";
-	    		break;
-	    	}
-	    	code+="</"+tagName+">\n";
-	    	return code;
-		}
-		return null;
-    }
-	
-	public String getConfig(){
-		if(getWorkspace()!=null){
-	    	String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<xmlsource>\n";
-	    		code+=((PipeNode)port.getParent()).getConfig();
-	    		code+="</xmlsource>\n";
-	    		break;
-	    	}
-	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(xslPort.getUuid())){
-	    		code+="<xslsource>\n";
-	    		code+=((PipeNode)port.getParent()).getConfig();
-	    		code+="</xslsource>\n";
-	    		break;
-	    	}
-	    	code+="</"+tagName+">\n";
-	    	return code;
+			if (srcCode!=null) return srcCode;
+			if(config) setPosition((Element)srcCode);
+	    	srcCode.appendChild(getConnectedCode(doc,"xmlsource",input,config));
+	    	srcCode.appendChild(getConnectedCode(doc,"xslsource",xslPort,config));
+	    	return srcCode;
 		}
 		return null;
     }

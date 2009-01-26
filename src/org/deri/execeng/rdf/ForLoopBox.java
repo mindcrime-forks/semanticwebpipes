@@ -1,67 +1,63 @@
 package org.deri.execeng.rdf;
 
 import java.net.URLEncoder;
+import java.util.List;
 
-import org.deri.execeng.model.Stream;
-import org.deri.execeng.model.Box;
+import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.model.Operator;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.TupleQueryResult;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-//import org.apache.xml.serialize.XMLSerializer;
-//import org.apache.xml.serialize.OutputFormat;
 import org.deri.execeng.utils.XMLUtil;
 
 public class ForLoopBox extends RDFBox{
    
-    private TupleQueryResult sourcelist=null;
+    private String srcListID;
     private String pipeCode=null;
-	
-    public ForLoopBox(){  
-    	buffer= new SesameMemoryBuffer();
+	private PipeParser parser;
+    public ForLoopBox(PipeParser parser,Element element){
+		 this.parser=parser;
+		 initialize(element);		 
     }
-    
-    public void setSourceList(TupleQueryResult sourcelist){
-   	    this.sourcelist=sourcelist;
-    }
-    
-    public void setPipeCode(String pipeCode){
-   	    this.pipeCode=pipeCode;
-    }
-    
+        
     public org.deri.execeng.core.ExecBuffer getExecBuffer(){
    	    return buffer;
     }
     
     public void execute(){
-    	//System.out.println("For execute\n"+pipeCode);
-    	if ((sourcelist==null)||(pipeCode==null)) return;
-    	java.util.List<String> bindingNames = sourcelist.getBindingNames();
-    	Stream stream;
-    	BoxParserImplRDF parser = new BoxParserImplRDF();
+    	if (!parser.getOpByID(srcListID).isExecuted()) parser.getOpByID(srcListID).execute();
+    	if (!(parser.getOpByID(srcListID).getExecBuffer() instanceof SesameTupleBuffer)){
+    		parser.log("sourcelist must contain Tuple set result, the FOR LOOP can't not be executed");    	
+    		return;
+    	}
+    	
+    	buffer=new SesameMemoryBuffer(parser); 
     	try{
-	    	while (sourcelist.hasNext()) {
-	    	   String tmp=pipeCode;
-	    	   
-			   BindingSet bindingSet = sourcelist.next();		   
+    		TupleQueryResult tupleBuff=((SesameTupleBuffer)parser.getOpByID(srcListID).getExecBuffer()).getTupleQueryResult();
+    		List<String> bindingNames=tupleBuff.getBindingNames();
+	    	while (tupleBuff.hasNext()) {
+	    	   PipeParser parser = new PipeParser();
+	    	   String tmp=pipeCode;	    	    
+			   BindingSet bindingSet = tupleBuff.next();		   
 			   for(int i=0;i<bindingNames.size();i++){				   
 			       tmp=tmp.replace("${{"+bindingNames.get(i)+"}}",
 			    		          bindingSet.getValue(bindingNames.get(i)).toString());
 			       try{
-						tmp=tmp.replace(URLEncoder.encode("${" + bindingNames.get(i) + "}","UTF-8"),
-												URLEncoder.encode(bindingSet.getValue(bindingNames.get(i)).toString(),"UTF-8"));
-					}
-					catch(java.io.UnsupportedEncodingException e){
-						e.printStackTrace();
-					}
+						tmp=tmp.replace(URLEncoder.encode("${{" + bindingNames.get(i) + "}}","UTF-8"),
+												URLEncoder.encode(bindingSet.getValue(bindingNames.get(i)).stringValue(),"UTF-8"));						
+				   }
+				   catch(java.io.UnsupportedEncodingException e){
+						parser.log(e);
+				   }
 			   }
-			   //System.out.println("For loop\n"+bindingNames.get(0)+"\n"+tmp);
-			   stream = parser.parseCode(tmp);
-			   if (stream instanceof Box) 
-				   if(!((Box)stream).isExecuted()) ((Box)stream).execute();					
-			   if(stream!=null)
-		    		    stream.streamming(buffer);    
+			   Operator op = parser.parseCode(tmp); 
+			   if(op instanceof RDFBox){
+				   if(!(op.isExecuted())) op.execute();					
+				   if(op.getExecBuffer()!=null)
+					   op.stream(buffer);
+			   }
 			}
     	}catch(QueryEvaluationException e){
     		
@@ -70,8 +66,7 @@ public class ForLoopBox extends RDFBox{
     }
     
         
-    public static Stream loadStream(Element element){    
-    	ForLoopBox forLoopBox= new ForLoopBox();
+    public void initialize(Element element){    
     	java.io.StringWriter  strWriter =new java.io.StringWriter(); 
 		try{
 			java.util.Properties props = 
@@ -81,43 +76,17 @@ public class ForLoopBox extends RDFBox{
 			ser.asDOMSerializer().serialize((Element)(XMLUtil.getFirstChildByType(
 							                   			XMLUtil.getFirstSubElementByName(element,"forloop"),
 							                               Node.ELEMENT_NODE)));
-			/*(new XMLSerializer(strWriter,
-					new OutputFormat())).serialize(
-							(Element)(XMLUtil.getFirstChildByType(
-							    XMLUtil.getFirstSubElementByName(element,"forloop"),
-							       Node.ELEMENT_NODE)));*/
 		}
-		catch(java.io.IOException e){ }
-		forLoopBox.setPipeCode(strWriter.toString());
+		catch(java.io.IOException e){
+			parser.log(e);
+		}
+		pipeCode=strWriter.toString();
     	
-    	Element sourcelistEle=XMLUtil.getFirstSubElementByName(element,"sourcelist");
-    	String tmpStr=XMLUtil.getTextData(sourcelistEle);
-    	SesameTupleBuffer tmpSourceList=null;
-    	if(tmpStr!=null){
-    		tmpSourceList=new SesameTupleBuffer();
-    		tmpSourceList.loadFromText(tmpStr);
-    	}
-    	else{
-    		Element tmpSubEle=XMLUtil.getFirstSubElementByName(sourcelistEle, "sparqlresultfetch");
-    		if(tmpSubEle!=null){
-    			TupleQueryResultFetchBox fetch=(TupleQueryResultFetchBox)TupleQueryResultFetchBox.loadStream(tmpSubEle);
-    			fetch.execute();
-    			tmpSourceList=(SesameTupleBuffer)fetch.getExecBuffer();
-    		}
-    		else{
-    			tmpSubEle=XMLUtil.getFirstSubElementByName(sourcelistEle, "select");
-    			if(tmpSubEle!=null){
-    				SelectBox select=(SelectBox)SelectBox.loadStream(tmpSubEle);
-        			select.execute();
-        			tmpSourceList=(SesameTupleBuffer)select.getExecBuffer();
-        		}
-    			else{
-    				//syntax error
-    				return null;
-    			}
-    		}
-    	}
-    	forLoopBox.setSourceList(tmpSourceList.getTupleQueryResult());    	
-		return forLoopBox;
+    	Element srcListEle=XMLUtil.getFirstSubElementByName(element,"sourcelist");
+    	srcListID=parser.getSource(srcListEle);
+      	if (null==srcListID){
+      		parser.log("<sourcelist> element must be set !!!");
+      		//TODO : Handling error of lacking data set for FOR LOOP 	
+      	}  
      }
 }

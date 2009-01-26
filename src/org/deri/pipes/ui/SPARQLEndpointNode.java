@@ -3,17 +3,14 @@ package org.deri.pipes.ui;
 import java.net.URLEncoder;
 
 import org.deri.execeng.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
-import org.openrdf.rio.RDFFormat;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.zkoss.zk.ui.event.Event;
+import org.w3c.dom.Node;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Bandbox;
-import org.zkoss.zul.Bandpopup;
 import org.zkoss.zul.Vbox;
 
 public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNode,ConnectingOutputNode {
@@ -107,8 +104,9 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 		queryBox.setQuery(query);
 	}
 	
-	public String getCode(){
+	public String getSrcCode(boolean config){
 		if(getWorkspace()!=null){
+			if (config) return "";
 			String code="";
 			code+=getConnectedCode(endpoint, endpointPort);
 			String uri=getConnectedCode(defaulturi, defaulturiPort);
@@ -125,14 +123,23 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 		return null;
 	}
 	
-	public String getConfig(){
+	@Override
+	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-			code+="<endpoint>\n"+getConnectedConfig(endpoint, endpointPort)+"</endpoint>\n";
-			code+="<default-graph-uri>\n"+getConnectedConfig(defaulturi, defaulturiPort)+"</default-graph-uri>\n";
-			code+="<query><![CDATA[\n"+queryBox.getQuery()+"\n]]></query>";
-			code+="</"+tagName+">\n";
-			return code;
+			if(srcCode!=null) return srcCode;
+			srcCode =doc.createElement(tagName);
+			if(config) setPosition((Element)srcCode);
+			
+			Element endpointElm=doc.createElement("endpoint");
+			endpointElm.appendChild(getConnectedCode(doc, endpoint, endpointPort, config));
+			srcCode.appendChild(endpointElm);
+			
+			Element graphElm=doc.createElement("default-graph-uri");
+			graphElm.appendChild(getConnectedCode(doc, defaulturi, defaulturiPort, config));
+			srcCode.appendChild(endpointElm);
+			
+			srcCode.appendChild(XMLUtil.createElmWithText(doc, "query", queryBox.getQuery()));
+			return srcCode;
 		}
 		return null;
 	}
@@ -151,7 +158,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 	}
 	
 	public void debug(){
-		((PipeEditor)getWorkspace()).reloadTextDebug(getCode()) ;
+		((PipeEditor)getWorkspace()).reloadTextDebug(getSrcCode(false)) ;
 		((PipeEditor)getWorkspace()).reloadTabularDebug(null);
 		
 	}

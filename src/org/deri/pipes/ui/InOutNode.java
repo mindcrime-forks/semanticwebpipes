@@ -12,7 +12,9 @@ import org.integratedmodelling.zk.diagram.components.PortType;
 import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Toolbarbutton;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 public class InOutNode extends PipeNode{
 	/**
 	 * 
@@ -44,32 +46,21 @@ public class InOutNode extends PipeNode{
         output =createPort(outPType,"bottom");
 	}
 	
-	public String getCode(){
+	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-	    	String code="<"+tagName+">\n";
-	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<source>\n";
-	    		code+=((PipeNode)port.getParent()).getCode();
-	    		code+="</source>\n";
-	    	}
-	    	code+="</"+tagName+">\n";
-	    	return code;
+			if (srcCode!=null) return srcCode;
+			Element codeElm =doc.createElement(tagName);
+			if(config) setPosition(codeElm);
+			insertInSrcCode(codeElm, input, "source", config);
+			return codeElm;
 		}
 		return null;
     }
 	
-	public String getConfig(){
-		if(getWorkspace()!=null){
-	    	String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<source>\n";
-	    		code+=((PipeNode)port.getParent()).getConfig();
-	    		code+="</source>\n";
-	    	}
-	    	code+="</"+tagName+">\n";
-	    	return code;
-		}
-		return null;
+	public void reset(boolean recursive){
+		super.reset(recursive);
+		if (!recursive) return;
+		reset(input,recursive);
 	}
 	
 	public void connectSource(Element elm){

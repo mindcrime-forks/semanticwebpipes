@@ -5,7 +5,6 @@ package org.deri.pipes.ui;
  *
  */
 
-import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.w3c.dom.Element;
 import org.deri.execeng.utils.XMLUtil;
 public class ConstructNode extends QueryNode {

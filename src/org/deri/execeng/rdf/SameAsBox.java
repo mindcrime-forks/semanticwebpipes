@@ -2,7 +2,8 @@ package org.deri.execeng.rdf;
 import java.util.Vector;
 
 import org.deri.execeng.core.BoxParser;
-import org.deri.execeng.model.Box;
+import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.model.Operator;
 import org.deri.execeng.model.Stream;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -13,26 +14,17 @@ import org.deri.execeng.utils.XMLUtil;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
-public class SameAsBox extends RDFBox{ 
+public class SameAsBox extends AbstractMerge{ 
 	
-	 private Vector<Stream> inputStreams = new Vector<Stream>();
-	 public SameAsBox(){ 
-		 buffer= new SesameMemoryBuffer();
+	 public SameAsBox(PipeParser parser,Element element){
+		 this.parser=parser;
+		 initialize(element);
+		 
      }
-     
-     public void addStream(Stream stream){
-    	 inputStreams.add(stream);
-     }
-     
      
      public void execute(){
-    	 for(int i=0;i<inputStreams.size();i++){
-    		 Stream stream=(Stream)(inputStreams.elementAt(i));
-    		 if(stream instanceof Box) 
-        	      if(!((Box)stream).isExecuted()) ((Box)stream).execute();    		    
-    		 if(stream!=null)
-    		    stream.streamming(buffer);
-    	 }
+    	 buffer= new SesameMemoryBuffer(parser);
+    	 mergeInputs();
     	 
     	 RepositoryConnection conn = buffer.getConnection();
     	 Repository rep = conn.getRepository();
@@ -41,25 +33,9 @@ public class SameAsBox extends RDFBox{
     	 try {
 			smusher.smoosh(rep);
 		} catch (RepositoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			parser.log(e);
 		}
     	 
-    	 
     	 isExecuted=true;
-     }
-     
-     public static Stream loadStream(Element element){    	 
-    	SameAsBox sameAsBox= new SameAsBox();
- 		java.util.ArrayList<Element> childNodes=XMLUtil.getSubElementByName(element, "source");
- 		for(int i=0;i<childNodes.size();i++){
- 			Element tmp=XMLUtil.getFirstSubElement((Element)(childNodes.get(i)));
- 			if(tmp==null){
- 				sameAsBox.addStream(new TextBox(XMLUtil.getTextData(childNodes.get(i))));
- 			}
- 			else
- 				sameAsBox.addStream(BoxParserImplRDF.loadStream(tmp)); 			
- 		}    		
- 		return sameAsBox;
      }     
 }

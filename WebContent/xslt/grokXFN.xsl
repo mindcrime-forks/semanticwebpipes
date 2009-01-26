@@ -7,7 +7,7 @@
     >
 
 <!--
-  $Id: grokXFN.xsl,v 1.1 2008/06/28 21:32:24 danhlp Exp $
+  $Id: grokXFN.xsl,v 1.2 2009/01/26 14:17:06 fuller Exp $
   interpret XFN as RDF
 
   We take the liberty of treating link relationship names

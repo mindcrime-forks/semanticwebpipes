@@ -26,11 +26,11 @@ public class XSLTUtil {
 		return sw.getBuffer().toString();
 	}
 	
-	public static String transform(Source xmlStream,Source xsltStream){
+	public static StringBuffer transform(Source xmlStream,Source xsltStream){
 		StringWriter sw=new StringWriter();
 		StreamResult output = new StreamResult(sw);
 		transform(xmlStream,xsltStream,output);
-		return sw.getBuffer().toString();
+		return sw.getBuffer();
 	}
 	
 	public static void transform(String xmlURL,String xsltURL,Result result){

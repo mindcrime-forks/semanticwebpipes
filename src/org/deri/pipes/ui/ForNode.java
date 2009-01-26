@@ -3,7 +3,9 @@ import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.deri.execeng.utils.XMLUtil;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -27,51 +29,28 @@ public class ForNode extends InOutNode{
 		return loopPort;
 	}
 	
-	public String getCode(){
+	@Override
+	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-	    	String code="<"+tagName+">\n";
+	    	if(srcCode!=null) return srcCode;
 	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<sourcelist>\n";
-	    		code+=((PipeNode)port.getParent()).getCode();
-	    		code+="</sourcelist>\n";
-	    		break;
-	    	}
+	    	srcCode=doc.createElement("for");
+	    	if(config) setPosition((Element)srcCode);
 	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(loopPort.getUuid())){
-	    		code+="<forloop>\n";
-	    		code+=((PipeNode)port.getParent()).getCode();
-	    		code+="</forloop>\n";
-	    		break;
-	    	}
-	    	code+="</"+tagName+">\n";
-	    	return code;
+	    	srcCode.appendChild(getConnectedCode(doc, "sourcelist", input, config));
+	    	srcCode.appendChild(getConnectedCode(doc, "forloop", loopPort, config));		
+	    	
+	    	return srcCode;
 		}
 		return null;
     }
 	
-	public String getConfig(){
-		if(getWorkspace()!=null){
-	    	String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<sourcelist>\n";
-	    		code+=((PipeNode)port.getParent()).getConfig();
-	    		code+="</sourcelist>\n";
-	    		break;
-	    	}
-	    	
-	    	for(Port port:getWorkspace().getIncomingConnections(loopPort.getUuid())){
-	    		code+="<forloop>\n";
-	    		code+=((PipeNode)port.getParent()).getConfig();
-	    		code+="</forloop>\n";
-	    		break;
-	    	}
-	    	code+="</"+tagName+">\n";
-	    	return code;
-		}
-		return null;
-    }
+	@Override
+	public void reset(boolean recursive){
+		super.reset(recursive);
+		if (!recursive) return;
+		reset(loopPort,recursive);
+	}
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		ForNode node= new ForNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));

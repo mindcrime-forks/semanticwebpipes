@@ -1,9 +1,7 @@
 package org.deri.execeng.rdf;
 
-import java.util.ArrayList;
-
-import org.deri.execeng.model.Box;
-import org.deri.execeng.model.Stream;
+import java.util.Vector;
+import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.utils.XMLUtil;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -13,80 +11,55 @@ import org.openrdf.repository.util.RDFInserter;
 import org.openrdf.rio.RDFHandlerException;
 import org.w3c.dom.Element;
 
-public class ConstructBox extends RDFBox {
-
-	private ArrayList<Stream> baseStreams =new ArrayList<Stream>();
-    private ArrayList<String> graphNames =new ArrayList<String>();
+public class ConstructBox extends AbstractMerge {
+	
+    private Vector<String> graphNames =new Vector<String>();
     private String constructQuery;
 	
-    public ConstructBox(){  
-    	buffer= new SesameMemoryBuffer();
+    public ConstructBox(PipeParser parser, Element element){  
+    	this.parser=parser;
+    	initialize(element);    	
     }
-    
-    public void addBaseStream(Stream stream,String uri){
-   	    baseStreams.add(stream);
-   	    graphNames.add(uri);
-    }
-    
-    public void setConstructQuery(String query){
-   	    constructQuery=query;
-    }
-    
-    public org.deri.execeng.core.ExecBuffer getExecBuffer(){
-   	    return buffer;
-    }
-    
+   
     public void execute(){
-       SesameMemoryBuffer tmp= new SesameMemoryBuffer();
-       for(int i=0;i<baseStreams.size();i++){
-    	   if(baseStreams.get(i) instanceof Box) 
-			 if(!((Box)baseStreams.get(i)).isExecuted()) ((Box)baseStreams.get(i)).execute();
-    	   if(graphNames.get(i)==null)
-    		   baseStreams.get(i).streamming(tmp);
-    	   else
-    		   if(graphNames.get(i).trim().length()>0)
-    		   ((Box)baseStreams.get(i)).streamming(tmp,graphNames.get(i));
-    		   else baseStreams.get(i).streamming(tmp);
-       }
+       buffer= new SesameMemoryBuffer(parser);
+       SesameMemoryBuffer tmp=new SesameMemoryBuffer(parser);
+       mergeInputs(tmp);
+       
        try{    	  
-          tmp.getConnection().prepareGraphQuery(QueryLanguage.SPARQL,constructQuery.trim()).evaluate(new RDFInserter(buffer.getConnection()));
+          tmp.getConnection().prepareGraphQuery(QueryLanguage.SPARQL,constructQuery).evaluate(new RDFInserter(buffer.getConnection()));
        }
-       catch(RDFHandlerException e){    	   
+       catch(RDFHandlerException e){
+    	   parser.log(e.toString());
        }
        catch(MalformedQueryException e){ 
-    	   log.append(e.toString()+"\n");
+    	   parser.log(e.toString());
        }
        catch(QueryEvaluationException e){
-    	   log.append(e.toString()+"\n");
+    	   parser.log(e.toString());
        }
        catch(RepositoryException e){
-    	   log.append(e.toString()+"\n");
+    	   parser.log(e.toString());
        }
    	   isExecuted=true;
     }
     
-    public static Stream loadStream(Element element){    
-    	ConstructBox transformBox= new ConstructBox();
+    protected void initialize(Element element){   
+    	
     	java.util.ArrayList<Element> sources=XMLUtil.getSubElementByName(element, "source");
-    	String constructQuery=XMLUtil.getTextFromFirstSubEleByName(element, "query");
+    	constructQuery=XMLUtil.getTextFromFirstSubEleByName(element, "query");
     	if((sources.size()<=0)&&(constructQuery==null)){
-			Stream.log.append("Construct operator syntax error at\n");
-		    Stream.log.append(element.toString());
-		    Stream.log.append("\n");
-			return null;
+			parser.log("Construct operator syntax error at");
+		    parser.log(element.toString());
+		    return;
 		}
-    	
+    	constructQuery=constructQuery.trim();
     	for(int i=0;i<sources.size();i++){
-    		Element tmp=XMLUtil.getFirstSubElement((Element)(sources.get(i)));
-    		Stream tmpStream=null;
- 			if(tmp==null)
- 				tmpStream= new TextBox(XMLUtil.getTextData(sources.get(i)));
- 			else
- 				tmpStream=BoxParserImplRDF.loadStream(tmp);
-    		transformBox.addBaseStream(tmpStream,sources.get(i).getAttribute("uri"));
-    	}
-    	
-    	transformBox.setConstructQuery(constructQuery);
-    	return transformBox;
+    		String opID=parser.getSource(sources.get(i));
+    		if (null!=opID){
+    			addStream(opID);
+    	   	    graphNames.add(sources.get(i).getAttribute("uri"));
+    		}
+    	}    	
      }
 }

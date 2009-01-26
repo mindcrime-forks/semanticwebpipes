@@ -1,19 +1,5 @@
 package org.deri.pipes.ui;
 
-import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.model.Box;
-import org.deri.execeng.model.Stream;
-import org.deri.execeng.rdf.BoxParserImplRDF;
-import org.deri.execeng.rdf.ConstructBox;
-import org.deri.execeng.rdf.ForLoopBox;
-import org.deri.execeng.rdf.PatchExecutorBox;
-import org.deri.execeng.rdf.PatchGeneratorBox;
-import org.deri.execeng.rdf.RDFBox;
-import org.deri.execeng.rdf.RDFFetchBox;
-import org.deri.execeng.rdf.RDFSMixBox;
-import org.deri.execeng.rdf.SameAsBox;
-import org.deri.execeng.rdf.SimpleMixBox;
-import org.deri.execeng.rdf.TupleQueryResultFetchBox;
 import org.integratedmodelling.zk.diagram.components.*;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -21,20 +7,10 @@ import org.zkoss.zul.Caption;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Window;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Bandbox;
-import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Listhead;
-import org.zkoss.zul.Listcell;
-import org.zkoss.zul.Listheader;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.query.BindingSet;
+import org.w3c.dom.Node;
+import org.apache.xerces.dom.DocumentImpl;
 import org.deri.execeng.utils.*;
 
 import java.util.ArrayList;
@@ -46,6 +22,7 @@ public class PipeNode extends ZKNode{
 	
 	private static final long serialVersionUID = -1520720934219234911L;
 	protected String tagName=null;	
+	protected Node srcCode=null;
 	public class DeleteListener implements org.zkoss.zk.ui.event.EventListener {
 		   PipeNode node;
 		   public DeleteListener(PipeNode node){
@@ -110,38 +87,55 @@ public class PipeNode extends ZKNode{
 		return box;
    }
    
-   protected String getConnectedCode(Textbox txtBox,Port port){
-	    String code="";
-	    boolean isConnected=false;
-		for(Port p:getWorkspace().getIncomingConnections(port.getUuid())){
-			if(p.getParent() instanceof ConnectingOutputNode){
-				code=((PipeNode)p.getParent()).getCode();
-				isConnected=true;
-				break;
+   protected Node getConnectedCode(Document doc,Textbox txtBox,Port port,boolean config){
+	    for(Port p:getWorkspace().getIncomingConnections(port.getUuid()))
+			if(p.getParent() instanceof ConnectingOutputNode){			
+				if(config)	return ((PipeNode)p.getParent()).getSrcCode(doc,config);
+				else doc.createCDATASection(((PipeNode)p.getParent()).getSrcCode(config));
 			}
-		}
-		if(!isConnected){
-			code=txtBox.getValue().trim();
-		}
-		return code;
+		return doc.createCDATASection(txtBox.getValue().trim());
    }
    
-   protected String getConnectedConfig(Textbox txtBox,Port port){
-	    String code="";
-		boolean isConnected=false;
-		for(Port p:getWorkspace().getIncomingConnections(port.getUuid())){
-			if(p.getParent() instanceof ConnectingOutputNode){
-				code=((PipeNode)p.getParent()).getConfig();
-				isConnected=true;
-				break;
-			}			
-		}
-		if(!isConnected){
-			code+="<![CDATA["+txtBox.getValue().trim()+"]]>";;
-		}
-		return code;
-  }
+   protected String getConnectedCode(Textbox txtBox,Port port){
+	    for(Port p:getWorkspace().getIncomingConnections(port.getUuid()))
+			if(p.getParent() instanceof ConnectingOutputNode)			
+				return (((PipeNode)p.getParent()).getSrcCode(false));
+		return (txtBox.getValue().trim());
+   }
    
+   protected Node getConnectedCode(Document doc,String tagName, Port port,boolean config){
+	   Element elm=doc.createElement(tagName);    	
+   	   for(Port p:getWorkspace().getIncomingConnections(port.getUuid())){
+   		  elm.appendChild(((PipeNode)p.getParent()).getSrcCode(doc,config));
+   		  break;
+   	   }
+   	   return elm;	
+   }
+   
+   public String generateID(){
+	  return ""+((Math.random()*1000000)+System.currentTimeMillis());
+   }
+  
+   public void insertInSrcCode(Element parentElm,Port incommingPort,String tagName,boolean config){
+		for(Port port:getWorkspace().getIncomingConnections(incommingPort.getUuid())){
+			Element outElm=parentElm.getOwnerDocument().createElement(tagName);
+			Element node=(Element)((PipeNode)port.getParent()).getSrcCode(parentElm.getOwnerDocument(),config);
+			if(node.getParentNode()!=null){
+				String refID=generateID();
+				node.setAttribute("ID", refID);
+				outElm.setAttribute("REFID", refID);
+			}
+			else
+				outElm.appendChild(node);
+			parentElm.appendChild(outElm);
+		}
+  }
+  
+  public void setPosition(Element elm){
+	  elm.setAttribute("x", ""+getX());
+	  elm.setAttribute("y", ""+getY());
+  }
+  
   protected void loadConnectedConfig(Element elm,Port port,Textbox txtbox){	  
 		Element linkedElm=XMLUtil.getFirstSubElement(elm);
 		String txt;
@@ -172,11 +166,37 @@ public class PipeNode extends ZKNode{
  	   caption.appendChild(delButton);
    }
    
-   public String getCode(){
-	   return null;
+   public Node getSrcCode(Document doc,boolean config){
+	   return srcCode;
    }
    
-   public String getConfig(){
+   public void reset(boolean recursive){
+	   srcCode=null;
+   }
+   
+   public void reset(Port inPort,boolean recursive){
+		for(Port p:getWorkspace().getIncomingConnections(inPort.getUuid()))		
+			if(p.getParent() instanceof PipeNode)
+				((PipeNode)p.getParent()).reset(recursive);
+   }
+   
+   public String getSrcCode(boolean config){
+	   reset(true);
+	   DocumentImpl doc =new DocumentImpl();
+	   getSrcCode(doc,config);
+	   
+	   java.io.StringWriter  strWriter =new java.io.StringWriter(); 
+	   try{
+			java.util.Properties props = 
+			org.apache.xml.serializer.OutputPropertiesFactory.getDefaultMethodProperties(org.apache.xml.serializer.Method.XML);
+			org.apache.xml.serializer.Serializer ser = org.apache.xml.serializer.SerializerFactory.getSerializer(props);
+			ser.setWriter(strWriter);
+			ser.asDOMSerializer().serialize(srcCode!=null?(Element)srcCode:doc.getDocumentElement());
+			return strWriter.getBuffer().toString();
+	   }	 
+	   catch(java.io.IOException e){
+			
+	   }
 	   return null;
    }
    
@@ -259,6 +279,6 @@ public class PipeNode extends ZKNode{
    }
    
    public void debug(){	   
-	   ((PipeEditor)getWorkspace()).hotDebug(getCode());
+	   ((PipeEditor)getWorkspace()).hotDebug(getSrcCode(false));
    }
 }

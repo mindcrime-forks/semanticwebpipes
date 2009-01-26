@@ -5,19 +5,17 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.model.Stream;
-import org.deri.execeng.rdf.BoxParserImplRDF;
 import org.deri.execeng.rdf.RDFBox;
 import org.deri.execeng.rdf.SesameMemoryBuffer;
 import org.deri.execeng.rdf.SesameTupleBuffer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.zkoss.zk.ui.Executions;
 
 import java.net.*;
-
 import org.apache.xerces.parsers.DOMParser;
-
-
 import edu.mit.simile.babel.exhibit.ExhibitJsonWriter;
 import edu.mit.simile.babel.exhibit.ExhibitJsonpWriter;
 import edu.mit.simile.babel.BabelWriter;
@@ -25,10 +23,16 @@ import org.deri.execeng.utils.XSLTUtil;
 import org.deri.execeng.utils.XMLUtil;
 import org.openrdf.rio.RDFFormat;
 import org.w3c.dom.Element;
+
+import java.util.Properties;
+import java.io.InputStream;
 public class Pipes extends HttpServlet {
   public static HttpServletRequest  REQ=null;
+  public static Pipes instance;
+  public static String OP_MAP="operatormapping.properties";
   public void doGet(HttpServletRequest req, HttpServletResponse res)
                                throws ServletException, IOException {
+	  instance =this;
 	  String format=req.getParameter("format");
 	  String acceptHeaderValue = getMimeHeader(req.getHeader("Accept") + "",format + "");	
 	  
@@ -39,7 +43,7 @@ public class Pipes extends HttpServlet {
 		  res.setContentType(acceptHeaderValue); 
 		  SesameMemoryBuffer buffer=getRDFBuffer(req, res); 		  
 		  if(buffer!=null)
-			  buffer.toOutputStream(res.getOutputStream(),rdfFormat);
+			  buffer.stream(res.getOutputStream(),rdfFormat);
 			
 	 }
 	 else if(acceptHeaderValue.contains("application/json")){
@@ -182,7 +186,7 @@ public class Pipes extends HttpServlet {
 					}
 				}
 		  		//System.out.println(syntax);
-		  		BoxParserImplRDF pipeParser= new BoxParserImplRDF();
+		  		PipeParser pipeParser= new PipeParser();
 				Stream stream = pipeParser.parse(syntax);
 				if (stream instanceof RDFBox) {
 					((RDFBox) stream).execute();
@@ -219,8 +223,33 @@ public class Pipes extends HttpServlet {
     	return "text/html";
 	}
    
-  
-  public String getServletInfo() {
-    return "Semantic Pipe End Points";
-  }
+    public static Pipes getInstance(){
+    	if (instance!= null) return instance;
+    	return new Pipes(); 
+    }
+    
+    public static Properties getOperatorProps(){ 
+	    Properties prop = new Properties();
+		try
+		{
+			if(Executions.getCurrent()!=null)
+				prop.load(new FileReader(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+OP_MAP)));
+			else{
+				if(getInstance()!=null){
+					System.out.println("servlet "+((getInstance()!=null)?getInstance().getServletInfo():"null"));
+					System.out.println(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP));
+					prop.load(new FileReader(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP)));
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return prop;
+    }
+    
+    public String getServletInfo() {
+        return "Semantic Pipe End Points";
+    }
 }

@@ -2,7 +2,6 @@ package org.deri.pipes.ui;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
 import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.integratedmodelling.zk.diagram.components.PortTypeMask;
@@ -13,9 +12,6 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryException;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
@@ -26,11 +22,9 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Tabpanel;
 import org.apache.xerces.parsers.DOMParser;
-import org.deri.pipes.ui.*;
-import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.endpoints.*;
+import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.model.Operator;
 import org.deri.execeng.model.Stream;
-import org.deri.execeng.rdf.BoxParserImplRDF;
 import org.deri.execeng.rdf.RDFBox;
 import org.deri.execeng.rdf.SelectBox;
 import org.zkoss.zk.ui.Component;
@@ -108,14 +102,10 @@ public class PipeEditor extends Workspace {
 		return PipeManager.savePipe(this); 
 	}
 	
-	public String getCode(){
+	public String getSrcCode(boolean config){
 		if(outputNode==null) return "";
-		return outputNode.getCode();
-	}
-	
-	public String getConfig(){
-		if(outputNode==null) return "";
-		return outputNode.getConfig();
+		outputNode.reset(true);
+		return outputNode.getSrcCode(config);
 	}
 	
 	public String getPipeId(){
@@ -254,7 +244,7 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void debug(){
-		debug(getCode());
+		debug(getSrcCode(false));
 	}
 	public String populatePara(String syntax){
 		for(int i=0;i<paraList.size();i++){
@@ -273,7 +263,7 @@ public class PipeEditor extends Workspace {
 	public void debug(String syntax){
 		   syntax=populatePara(syntax);	
 		   //System.out.println(syntax);
-		   BoxParserImplRDF parser= new BoxParserImplRDF();	   
+		   PipeParser parser= new PipeParser();	   
 		   Stream    stream= parser.parse(syntax);
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
@@ -312,12 +302,13 @@ public class PipeEditor extends Workspace {
 		try {
            DOMParser parser = new DOMParser();
            parser.parse(input);
-		   Stream    stream= BoxParserImplRDF.loadStream(parser.getDocument().getDocumentElement());
+           PipeParser pipeParser= new PipeParser();
+		   Operator    op= pipeParser.parseOperator(parser.getDocument().getDocumentElement());
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
-		   if(stream instanceof RDFBox){
-			   ((RDFBox) stream).execute();
-			   org.deri.execeng.core.ExecBuffer buff=((RDFBox)stream).getExecBuffer();
+		   if(op instanceof RDFBox){
+			   ((RDFBox) op).execute();
+			   org.deri.execeng.core.ExecBuffer buff=((RDFBox)op).getExecBuffer();
 			   textResult=buff.toString();
 			   if(buff instanceof org.deri.execeng.rdf.SesameMemoryBuffer){
 				   try{
@@ -335,9 +326,9 @@ public class PipeEditor extends Workspace {
 			      	  
 			        }
 			   }   
-		   }else if(stream instanceof SelectBox){
-			   ((SelectBox) stream).execute();
-			   org.deri.execeng.core.ExecBuffer buff=((SelectBox)stream).getExecBuffer();
+		   }else if(op instanceof SelectBox){
+			   ((SelectBox) op).execute();
+			   org.deri.execeng.core.ExecBuffer buff=((SelectBox)op).getExecBuffer();
 			   //textResult=buff.toString();
 			   
 			   if(buff instanceof org.deri.execeng.rdf.SesameTupleBuffer){

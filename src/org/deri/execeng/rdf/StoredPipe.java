@@ -1,7 +1,7 @@
 package org.deri.execeng.rdf;
 
 import org.deri.execeng.endpoints.PipeManager;
-import org.deri.execeng.core.BoxParser;
+import org.deri.execeng.core.PipeParser;
 import org.w3c.dom.Element;
 import org.deri.execeng.model.Stream;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class StoredPipe{
 			syntax = syntax.replace("${" + parameters.get(i).getTagName() + "}", XMLUtil.getTextData(parameters.get(i)));
 		}
 		if (syntax != null) {
-			return (new BoxParserImplRDF()).parse(syntax);
+			return (new PipeParser()).parse(syntax);
 		}
 		return null;
 	}

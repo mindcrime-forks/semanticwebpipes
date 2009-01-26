@@ -9,7 +9,7 @@
 
 <xsl:output indent="yes" method="xml" />
 
-<xsl:param name="prodid" select='"-//connolly.w3.org//RDF Calendar $Date: 2008/06/28 21:32:24 $ (BETA)//EN"' />
+<xsl:param name="prodid" select='"-//connolly.w3.org//RDF Calendar $Date: 2009/01/26 14:17:06 $ (BETA)//EN"' />
 
 <xsl:param name="CalNS">http://www.w3.org/2002/12/cal/icaltzd#</xsl:param>
 <xsl:param name="XdtNS">http://www.w3.org/2001/XMLSchema#</xsl:param>

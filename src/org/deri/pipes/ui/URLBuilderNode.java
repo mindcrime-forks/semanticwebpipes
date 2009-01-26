@@ -12,7 +12,10 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.*;
 import java.net.URLEncoder;
 import org.deri.execeng.utils.XMLUtil;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import java.util.ArrayList;
 
 public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,ConnectingOutputNode{
@@ -58,6 +61,8 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	public URLBuilderNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,220,138);
 		wnd.setTitle("URL builder");
+		tagName="urlbuilder";
+		
 		vbox=new Vbox();
 		wnd.appendChild(vbox);
 		paraVbox =new Vbox();
@@ -89,6 +94,8 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	public URLBuilderNode(int x,int y,Element elm){
 		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,220,getHeight(elm));
 		wnd.setTitle("URL builder");
+		tagName="urlbuilder";
+		
 		vbox=new Vbox();
 		wnd.appendChild(vbox);
 		paraVbox =new Vbox();
@@ -271,13 +278,13 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 				
 				Hbox hbox=(Hbox)pathVbox.getChildren().get(i);
 				tmp=getConnectedCode(((Textbox)hbox.getLastChild()), pathPorts.get(hbox.getUuid()));
-				
-				if(null!=tmp&&tmp.trim()!=""){
+				code+=tmp.trim();
+				/*if(null!=tmp&&tmp.trim()!=""){
 					if((code.charAt(code.length()-1)=='/')||(tmp.charAt(0)=='/'))
 						code+=tmp;
 					else
 						code+="/"+tmp;
-				}
+				}*/
 				
 			}
 			String and="";
@@ -288,7 +295,9 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 					if(((Textbox)hbox.getFirstChild().getNextSibling()).getValue().trim()!=""){
 						tmp=getConnectedCode(((Textbox)hbox.getLastChild()), paraPorts.get(hbox.getUuid()));											
 						//TODO : encoding url fragments here?
-						tmp=URLEncoder.encode(tmp,"UTF-8");
+						
+						if(tmp.indexOf('}')>=0)
+							tmp=URLEncoder.encode(tmp,"UTF-8");
 						code+=and+URLEncoder.encode(((Textbox)hbox.getFirstChild().getNextSibling()).getValue(),"UTF-8")+"="+tmp;
 						and="&";
 					}
@@ -303,23 +312,31 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		return null;
 	}
 	
-	public String getConfig(){
+	@Override
+	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			String code="<urlbuilder x=\""+getX()+"\" y=\""+getY()+"\">\n";
-			code+="<base>\n"+getConnectedConfig(baseURL, basePort)+"</base>\n";
+			if(srcCode!=null) return srcCode;
+			srcCode =doc.createElement(tagName);
+			if(config) setPosition((Element)srcCode);
+			
+			Element baseElm = doc.createElement("base");
+			baseElm.appendChild(getConnectedCode(doc, baseURL, basePort, config));
+			srcCode.appendChild(baseElm);
 			
 			for(int i=1;i<pathVbox.getChildren().size();i++){
-				Hbox hbox=(Hbox)pathVbox.getChildren().get(i);
-				code+="<path>\n"+getConnectedConfig(((Textbox)hbox.getLastChild()),pathPorts.get(hbox.getUuid()))+"</path>\n";							
+				Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
+				Element pathElm=doc.createElement("path");
+				pathElm.appendChild(getConnectedCode(doc, (Textbox)hbox.getLastChild(), pathPorts.get(hbox.getUuid()), config));	
+				srcCode.appendChild(pathElm);
 			}
 			String tmp=null;
 			for(int i=1;i<paraVbox.getChildren().size();i++){
 				Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
-				tmp=getConnectedConfig(((Textbox)hbox.getLastChild()), paraPorts.get(hbox.getUuid()));
-				code+="<para name=\""+((Textbox)hbox.getFirstChild().getNextSibling()).getValue()+"\">\n"+tmp+"</para>\n";			
+				Element paraElm =doc.createElement("para");
+				paraElm.appendChild(getConnectedCode(doc,(Textbox)hbox.getLastChild(), paraPorts.get(hbox.getUuid()),config));
+				srcCode.appendChild(paraElm);	
 			}
-			code+="</urlbuilder>";
-			return code;
+			return srcCode;
 		}
 		return null;
 	}

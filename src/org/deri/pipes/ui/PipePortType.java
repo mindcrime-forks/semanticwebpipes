@@ -29,11 +29,11 @@ public class PipePortType implements PortType {
 	@Override
 	public boolean isConnectableFrom(PortType portType) {
 		PipePortType pType=(PipePortType)portType;		
-		if((pType.getIdx()==RDFOUT)&&(idx==RDFIN))return true;
+		if((pType.getIdx()==RDFOUT)&&((idx==RDFIN)||(idx==XMLIN)))return true;
 		if((pType.getIdx()==TEXTOUT)&&(idx==TEXTIN))return true;
-		if((pType.getIdx()==SPARQLRESULTOUT)&&(idx==SPARQLRESULTIN))return true;
-		if((pType.getIdx()==XMLOUT)&&(idx==XMLIN))return true;
-		if((pType.getIdx()==XSLOUT)&&(idx==XSLIN))return true;
+		if((pType.getIdx()==SPARQLRESULTOUT)&&((idx==SPARQLRESULTIN)||(idx==XMLIN)))return true;
+		if((pType.getIdx()==XMLOUT)&&((idx==XMLIN)||(idx==XSLIN)||(idx==SPARQLRESULTIN)||(idx==RDFIN)))return true;
+		if((pType.getIdx()==XSLOUT)&&((idx==XSLIN)||(idx==XMLIN)))return true;
 		return false;
 	}
 	

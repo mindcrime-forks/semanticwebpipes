@@ -2,7 +2,9 @@ package org.deri.pipes.ui;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.PortType;
 import org.integratedmodelling.zk.diagram.components.Workspace;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.zkforge.codepress.*;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zk.ui.event.*;
@@ -31,36 +33,15 @@ public class QueryNode extends InOutNode{
 	public void setQuery(String query){
 		queryBox.setQuery(query);
 	}
-	public String getCode(){
-		if(getWorkspace()!=null){
-	    	String code="<"+tagName+">\n";
-	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<source>\n";
-	    		code+=((PipeNode)port.getParent()).getCode();
-	    		code+="</source>\n";
-	    	}
-	    	code+="<query>\n";
-	    	code+="<![CDATA[\n"+queryBox.getQuery()+"\n]]>";
-	    	code+="</query>\n";
-	    	code+="</"+tagName+">\n";
-	    	return code;
-	    }
-		return null;
-	}
 	
-	public String getConfig(){
+	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-	    	for(Port port:getWorkspace().getIncomingConnections(input.getUuid())){
-	    		code+="<source>\n";
-	    		code+=((PipeNode)port.getParent()).getConfig();
-	    		code+="</source>\n";
-	    	}
-	    	code+="<query>\n";
-	    	code+="<![CDATA[\n"+queryBox.getQuery()+"\n]]>";
-	    	code+="</query>\n";
-	    	code+="</"+tagName+">\n";
-	    	return code;
+			if (srcCode!=null) return srcCode;
+			srcCode =super.getSrcCode(doc, config);
+			Element queryElm=doc.createElement("query");
+			queryElm.appendChild(doc.createCDATASection(queryBox.getQuery()));
+	    	srcCode.appendChild(queryElm);
+	    	return srcCode;
 	    }
 		return null;
 	}
