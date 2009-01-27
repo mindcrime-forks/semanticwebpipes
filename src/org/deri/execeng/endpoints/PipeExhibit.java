@@ -1,13 +1,16 @@
 package org.deri.execeng.endpoints;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
-
-import org.openrdf.rio.RDFFormat;
 
 public class PipeExhibit extends HttpServlet {
 	final Logger logger = LoggerFactory.getLogger(PipeExhibit.class);

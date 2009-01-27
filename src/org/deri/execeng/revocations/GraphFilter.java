@@ -1,7 +1,5 @@
 package org.deri.execeng.revocations;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 

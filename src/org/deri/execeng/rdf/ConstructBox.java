@@ -1,24 +1,20 @@
 package org.deri.execeng.rdf;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
+
 import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.utils.XMLUtil;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
-import org.openrdf.rio.RDFHandlerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 public class ConstructBox extends AbstractMerge {
 	final Logger logger = LoggerFactory.getLogger(ConstructBox.class);
 	
-    private Vector<String> graphNames =new Vector<String>();
+    private List<String> graphNames =new ArrayList<String>();
     private String constructQuery;
 	
     public ConstructBox(PipeParser parser, Element element){  

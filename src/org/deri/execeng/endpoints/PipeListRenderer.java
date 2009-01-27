@@ -1,29 +1,21 @@
 package org.deri.execeng.endpoints;
+import org.deri.pipes.ui.PipeEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zkoss.zul.Row;
-import org.zkoss.zul.Label;
-import org.zkoss.zul.RowRenderer;
+import org.zkoss.zk.ui.Execution;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Html;
 import org.zkoss.zul.Menu;
 import org.zkoss.zul.Menubar;
-import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Menuitem;
-import org.zkoss.zul.Textbox;
-import org.zkoss.zul.impl.InputElement;
-import org.zkforge.codepress.Codepress;
-import org.zkoss.zul.Row;
-import org.zkoss.zul.Window;
+import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Vbox;
-import org.zkoss.zul.Separator;
-import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zul.Html;
-import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Execution;
-import org.zkoss.zul.impl.MessageboxDlg;
-import org.zkoss.zkex.zul.LayoutRegion;
-import org.deri.pipes.ui.PipeEditor;
+import org.zkoss.zul.Row;
+import org.zkoss.zul.RowRenderer;
+import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Window;
 
 public class PipeListRenderer implements RowRenderer {
 	final Logger logger = LoggerFactory.getLogger(PipeListRenderer.class);
@@ -73,9 +65,9 @@ public class PipeListRenderer implements RowRenderer {
 	
     public void render(Row row, Object data) {
       row.setValign("top");	
-      String pipeid=((Pipe)data).pipeid;
+      String pipeid=((Pipe)data).getPipeid();
       Html pipeLink=new Html("<a href='./pipes/?id="+pipeid+"'>"+pipeid+"</a><br />" + 
-    		  justify(((Pipe)data).pipename,30));
+    		  justify(((Pipe)data).getPipename(),30));
       pipeLink.setParent(row);
 
       

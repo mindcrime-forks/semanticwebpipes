@@ -1,13 +1,10 @@
 package org.deri.execeng.revocations;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 
 import org.deri.execeng.utils.Base64;
-import org.openrdf.model.Graph;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -19,6 +16,8 @@ import org.openrdf.repository.RepositoryResult;
 import org.rdfcontext.model.RDFContextOnt;
 import org.rdfcontext.model.MSG.sesame.RDFN;
 import org.rdfcontext.model.MSG.sesame.SMSG;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RevokationFilter extends GraphFilter{
 	final Logger logger = LoggerFactory.getLogger(RevokationFilter.class);

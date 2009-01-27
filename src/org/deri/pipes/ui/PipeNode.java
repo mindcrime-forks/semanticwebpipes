@@ -1,22 +1,25 @@
 package org.deri.pipes.ui;
 
+import java.util.List;
+
+import org.apache.xerces.dom.DocumentImpl;
+import org.deri.execeng.utils.IDTool;
+import org.deri.execeng.utils.XMLUtil;
+import org.integratedmodelling.zk.diagram.components.CustomPort;
+import org.integratedmodelling.zk.diagram.components.Port;
+import org.integratedmodelling.zk.diagram.components.PortType;
+import org.integratedmodelling.zk.diagram.components.ZKNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.integratedmodelling.zk.diagram.components.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Window;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.apache.xerces.dom.DocumentImpl;
-import org.deri.execeng.utils.*;
-
-import java.util.ArrayList;
-import java.util.List;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *

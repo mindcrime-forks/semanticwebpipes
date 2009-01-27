@@ -1,8 +1,6 @@
 package org.deri.pipes.ui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.deri.execeng.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.*;
 import org.w3c.dom.Element;
 public class PatchExecutorNode extends InOutNode {
 	final Logger logger = LoggerFactory.getLogger(PatchExecutorNode.class);

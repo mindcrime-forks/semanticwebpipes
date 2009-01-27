@@ -1,10 +1,9 @@
 package org.deri.pipes.ui;
 
+import org.deri.execeng.utils.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.w3c.dom.Element;
-import org.deri.execeng.utils.*;
 public class SelectNode extends QueryNode {
 	final Logger logger = LoggerFactory.getLogger(SelectNode.class);
 

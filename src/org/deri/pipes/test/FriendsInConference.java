@@ -1,20 +1,14 @@
 package org.deri.pipes.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URLEncoder;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
+
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.TupleQueryResultHandlerException;
 import org.openrdf.query.resultio.QueryResultIO;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
-import org.openrdf.query.resultio.UnsupportedQueryResultFormatException;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FriendsInConference { 
 	final Logger logger = LoggerFactory.getLogger(FriendsInConference.class);

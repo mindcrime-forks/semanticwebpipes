@@ -1,7 +1,5 @@
 package org.deri.execeng.revocations;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import org.openrdf.model.ValueFactory;
@@ -11,6 +9,8 @@ import org.openrdf.repository.RepositoryException;
 import org.rdfcontext.model.RDFContextOnt;
 import org.rdfcontext.model.MSG.sesame.SMSG;
 import org.rdfcontext.rdfsync.MSGModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Revoker {
 	final Logger logger = LoggerFactory.getLogger(Revoker.class);

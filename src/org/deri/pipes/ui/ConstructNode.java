@@ -5,10 +5,10 @@ package org.deri.pipes.ui;
  *
  */
 
+import org.deri.execeng.utils.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
-import org.deri.execeng.utils.XMLUtil;
 public class ConstructNode extends QueryNode {
 	final Logger logger = LoggerFactory.getLogger(ConstructNode.class);
 

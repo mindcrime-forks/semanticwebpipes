@@ -1,8 +1,8 @@
 package org.deri.pipes.ui;
 
+import org.integratedmodelling.zk.diagram.components.PortType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.integratedmodelling.zk.diagram.components.PortType;
 
 public class PipePortType implements PortType {	
 	final Logger logger = LoggerFactory.getLogger(PipePortType.class);

@@ -1,9 +1,9 @@
 package org.deri.execeng.rdf;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.model.Operator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class RDFBox implements Operator {
 	Logger logger = LoggerFactory.getLogger(RDFBox.class);

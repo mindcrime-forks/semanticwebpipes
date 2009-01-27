@@ -2,13 +2,7 @@ package org.deri.pipes.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.deri.execeng.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.CustomPort;
-import org.integratedmodelling.zk.diagram.components.Port;
-import org.openrdf.rio.RDFFormat;
 import org.w3c.dom.Element;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Textbox;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *

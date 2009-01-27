@@ -1,11 +1,11 @@
 package org.deri.execeng.rdf;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.model.Operator;
 import org.deri.execeng.utils.XMLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 public class XMLFetchBox implements Operator {

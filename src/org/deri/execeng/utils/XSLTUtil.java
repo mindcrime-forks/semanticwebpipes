@@ -1,24 +1,21 @@
 package org.deri.execeng.utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URI;
 
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.Source;
-import javax.xml.transform.Result;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
+import org.deri.execeng.endpoints.Pipes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
-import org.deri.execeng.endpoints.*;
 public class XSLTUtil {
 	final Logger logger = LoggerFactory.getLogger(XSLTUtil.class);
 	

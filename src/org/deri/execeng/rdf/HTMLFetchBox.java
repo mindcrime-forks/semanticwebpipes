@@ -1,13 +1,16 @@
 package org.deri.execeng.rdf;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import javax.xml.transform.stream.StreamSource;
+
+import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.utils.XMLUtil;
+import org.deri.execeng.utils.XSLTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.deri.execeng.core.PipeParser;
 import org.w3c.dom.Element;
-import java.util.Hashtable;
-import java.util.Enumeration;
-import javax.xml.transform.stream.StreamSource;
-import org.deri.execeng.utils.*;
 
 public class HTMLFetchBox extends RDFBox {
 	final Logger logger = LoggerFactory.getLogger(HTMLFetchBox.class);

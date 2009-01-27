@@ -1,7 +1,5 @@
 package org.deri.execeng.rdf;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,6 +22,8 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.sail.memory.MemoryStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Smoosher {
 	final Logger logger = LoggerFactory.getLogger(Smoosher.class);

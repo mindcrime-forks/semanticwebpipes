@@ -1,16 +1,9 @@
 package org.deri.execeng.rdf;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
-import org.deri.execeng.core.BoxParser;
 import org.deri.execeng.core.PipeParser;
-import org.deri.execeng.model.Stream;
-import org.deri.execeng.model.Operator;
+import org.deri.execeng.utils.XMLUtil;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -20,17 +13,11 @@ import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.util.RDFInserter;
 import org.openrdf.rio.RDFHandlerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
-import org.deri.execeng.utils.XMLUtil;
-
-import com.hp.hpl.jena.rdf.model.InfModel;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.reasoner.Reasoner;
-import com.hp.hpl.jena.reasoner.ReasonerRegistry;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *

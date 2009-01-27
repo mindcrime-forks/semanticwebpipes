@@ -6,7 +6,6 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Bandpopup;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.impl.InputElement;
 
 public class QueryBox extends Bandbox {
 	final Logger logger = LoggerFactory.getLogger(QueryBox.class);

@@ -4,23 +4,23 @@ package org.deri.pipes.ui;
  *
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.integratedmodelling.zk.diagram.components.CustomPort;
-import org.integratedmodelling.zk.diagram.components.Port;
-import org.integratedmodelling.zk.diagram.components.Workspace;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zul.*;
-import java.net.URLEncoder;
 import org.deri.execeng.utils.XMLUtil;
+import org.integratedmodelling.zk.diagram.components.Port;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import java.util.ArrayList;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Image;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Vbox;
 
 public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,ConnectingOutputNode{
 	final Logger logger = LoggerFactory.getLogger(URLBuilderNode.class);

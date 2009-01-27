@@ -1,11 +1,12 @@
 package org.deri.execeng.rdf;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.io.StringReader;
 import java.io.StringWriter;
+
 import org.deri.execeng.core.PipeParser;
-import org.w3c.dom.Element;
 import org.deri.execeng.utils.XMLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;

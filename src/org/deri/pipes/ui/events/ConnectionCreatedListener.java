@@ -1,10 +1,12 @@
 package org.deri.pipes.ui.events;
+import org.deri.pipes.ui.ConnectingInputNode;
+import org.deri.pipes.ui.ConnectingOutputNode;
+import org.integratedmodelling.zk.diagram.components.Node;
+import org.integratedmodelling.zk.diagram.events.ConnectionCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.integratedmodelling.zk.diagram.events.ConnectionCreatedEvent;
-import org.zkoss.zk.ui.event.*;
-import org.deri.pipes.ui.*;
-import org.integratedmodelling.zk.diagram.components.*;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 public class ConnectionCreatedListener implements EventListener {	
 	final Logger logger = LoggerFactory.getLogger(ConnectionCreatedListener.class);
 	   

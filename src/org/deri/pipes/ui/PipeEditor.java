@@ -1,37 +1,38 @@
 package org.deri.pipes.ui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+
+import org.apache.xerces.parsers.DOMParser;
+import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.endpoints.Pipe;
+import org.deri.execeng.endpoints.PipeManager;
+import org.deri.execeng.model.Operator;
+import org.deri.execeng.model.Stream;
+import org.deri.execeng.rdf.RDFBox;
+import org.deri.execeng.rdf.SelectBox;
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
-import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.integratedmodelling.zk.diagram.components.PortTypeMask;
 import org.integratedmodelling.zk.diagram.components.Shape;
+import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Bandbox;
 import org.zkoss.zul.Tabpanel;
-import org.apache.xerces.parsers.DOMParser;
-import org.deri.execeng.core.PipeParser;
-import org.deri.execeng.model.Operator;
-import org.deri.execeng.model.Stream;
-import org.deri.execeng.rdf.RDFBox;
-import org.deri.execeng.rdf.SelectBox;
-import org.zkoss.zk.ui.Component;
-import org.deri.execeng.endpoints.PipeManager;
-import org.deri.execeng.endpoints.Pipe;
+import org.zkoss.zul.Textbox;
 public class PipeEditor extends Workspace {
 	final Logger logger = LoggerFactory.getLogger(PipeEditor.class);
 	private Textbox textDebugPanel,pipeid,pipename,password;
@@ -375,9 +376,9 @@ public class PipeEditor extends Workspace {
 	
 	public void edit(String pid){
 		Pipe pipe=PipeManager.getPipe(pid);
-		reload(pipe.config);
-		pipeid.setValue(pipe.pipeid);
-		bdid.setValue(pipe.pipeid);
-		pipename.setValue(pipe.pipename);
+		reload(pipe.getConfig());
+		pipeid.setValue(pipe.getPipeid());
+		bdid.setValue(pipe.getPipeid());
+		pipename.setValue(pipe.getPipename());
 	}
 }

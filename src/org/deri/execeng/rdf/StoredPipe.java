@@ -1,15 +1,14 @@
 package org.deri.execeng.rdf;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.deri.execeng.endpoints.PipeManager;
-import org.deri.execeng.core.PipeParser;
-import org.w3c.dom.Element;
-import org.deri.execeng.model.Stream;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.endpoints.PipeManager;
+import org.deri.execeng.model.Stream;
 import org.deri.execeng.utils.XMLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *

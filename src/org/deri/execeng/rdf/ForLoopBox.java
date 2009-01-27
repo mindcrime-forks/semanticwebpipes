@@ -1,18 +1,18 @@
 package org.deri.execeng.rdf;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.net.URLEncoder;
 import java.util.List;
 
 import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.model.Operator;
-import org.openrdf.query.QueryEvaluationException;
+import org.deri.execeng.utils.XMLUtil;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.deri.execeng.utils.XMLUtil;
 
 public class ForLoopBox extends RDFBox{
 	final Logger logger = LoggerFactory.getLogger(ForLoopBox.class);

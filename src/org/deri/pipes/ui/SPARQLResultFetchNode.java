@@ -1,12 +1,9 @@
 package org.deri.pipes.ui;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.integratedmodelling.zk.diagram.components.*;
-import org.zkoss.zul.*;
-import org.deri.execeng.utils.XMLUtil;
 import org.w3c.dom.Element;
-import org.openrdf.query.resultio.TupleQueryResultFormat;
-import org.openrdf.rio.RDFFormat;
+import org.zkoss.zul.Listbox;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *

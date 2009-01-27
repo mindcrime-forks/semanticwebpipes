@@ -1,20 +1,18 @@
 package org.deri.execeng.endpoints;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.io.FileReader;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.PreparedStatement;
-import javax.sql.DataSource;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+
 import org.deri.pipes.ui.PipeEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Executions;
 
 public class PipeManager {
@@ -46,7 +44,7 @@ public class PipeManager {
     	return conn;
     }
 	
-	public static  ArrayList<Pipe> getPipeList(){
+	public static  List<Pipe> getPipeList(){
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
@@ -54,9 +52,12 @@ public class PipeManager {
 		try {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);	
-			ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
-			while(rs.next()){				
-				pipeList.add(new Pipe(rs.getString("pipeid"),rs.getString("pipename")));
+			List<Pipe> pipeList = new ArrayList<Pipe>();
+			while(rs.next()){
+				Pipe pipe = new Pipe();
+				pipe.setPipeid(rs.getString("pipeid"));
+				pipe.setPipename(rs.getString("pipename"));
+				pipeList.add(pipe);
 			}
 			return pipeList;
 		}
@@ -160,7 +161,12 @@ public class PipeManager {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 			if(rs.next()){
-				return new Pipe(pipeid,rs.getString("pipename"),rs.getString("syntax"),rs.getString("config"));
+				Pipe pipe = new Pipe();
+				pipe.setPipeid(pipeid);
+				pipe.setPipename(rs.getString("pipename"));
+				pipe.setSyntax(rs.getString("syntax"));
+				pipe.setConfig(rs.getString("config"));
+				return pipe;
 			}
 		}
 		catch(SQLException e){
