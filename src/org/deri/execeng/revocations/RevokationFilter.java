@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 
-import org.deri.execeng.utils.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -28,7 +28,8 @@ public class RevokationFilter extends GraphFilter{
 	protected void removeUnacceptableNegations(Repository trusted, Repository untrusted) throws RepositoryException {
 		ArrayList<Statement> negatives = getNegativeStatements(untrusted);
 		for (Statement statement : negatives) {
-			byte[] hashCode=Base64.decode(statement.getObject().toString());
+			String value = statement.getObject().toString();
+			byte[] hashCode= Base64.decodeBase64(value.getBytes());
 			URI uri = getAnInvolvedURI(statement.getSubject(), untrusted);
 			if (uri != null) {
 				try {
@@ -108,8 +109,8 @@ public class RevokationFilter extends GraphFilter{
 		//For each of these statements:
 		for (Statement element : negatives) {
 			try {
-				
-				byte[] hashCode=Base64.decode(element.getObject().toString());
+				String value = element.getObject().toString();
+				byte[] hashCode= Base64.decodeBase64(value.getBytes());
 				if ((hashCode==null)) continue;
 				// grab the a (only one is required) uri which is INVOLVED by the MSG to be removed
 				URI involvedURI = getAnInvolvedURI(element.getSubject(), graph);

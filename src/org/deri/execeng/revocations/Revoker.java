@@ -2,6 +2,7 @@ package org.deri.execeng.revocations;
 
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -34,7 +35,7 @@ public class Revoker {
 
 		org.openrdf.model.Resource rev = f.createBNode();
 
-		value = org.deri.execeng.utils.Base64.encodeToString(msg.hashMD5());
+		value = new String(Base64.encodeBase64(msg.hashMD5()));
 
 		conn.add(rev, f.createURI(RDFContextOnt.MSG_REVOCATIONBYHASH.toString()),f.createLiteral(value));
 
