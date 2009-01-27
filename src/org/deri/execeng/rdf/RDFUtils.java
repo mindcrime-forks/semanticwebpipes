@@ -9,17 +9,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class RDFUtils {
-	final Logger logger = LoggerFactory.getLogger(RDFUtils.class);
+	static Logger logger = LoggerFactory.getLogger(RDFUtils.class);
 	public static Connection getConnection(){
+    	String virtuosoDriverClass = "virtuoso.jdbc3.Driver";
 		Connection conn = null;
 		try{
-	    	Class.forName("virtuoso.jdbc3.Driver");
+			Class.forName(virtuosoDriverClass);
 	    	conn = DriverManager.getConnection("jdbc:virtuoso://localhost:1112/DATABASE=Demo/UID=dba/PWD=dba/");
 		}
 		catch(ClassNotFoundException e){
+			logger.warn("Could not load virtuoso driver (not in classpath) "+virtuosoDriverClass,e);
 		}
 		catch(SQLException e){
-			logger.debug("Exception in openning connection");
+			logger.debug("Exception in opening connection",e);
 		}
 		return conn;
 	}

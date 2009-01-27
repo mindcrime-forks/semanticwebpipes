@@ -33,7 +33,7 @@ public class Xml {
 			org.apache.xml.serializer.Serializer ser = org.apache.xml.serializer.SerializerFactory.getSerializer(props);
 			ser.setWriter(strWriter);
 			ser.asDOMSerializer().serialize(doc.getDocumentElement());
-			logger.debug(strWriter.getBuffer().toString());
+			System.out.println(strWriter.getBuffer().toString());
 		}
 		catch(java.io.IOException e){
 			

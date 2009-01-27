@@ -183,9 +183,9 @@ public class Base64
 	public static void main(String[] args)
 	{
 		byte[] pippo= "lavispateresa".getBytes();
-		logger.debug(Base64.encode(pippo));
+		System.out.println(Base64.encode(pippo));
 		pippo=Base64.decode(Base64.encode(pippo));
-		logger.debug(new String(pippo));
+		System.out.println(new String(pippo));
 	}
 
 	/**
