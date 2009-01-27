@@ -117,7 +117,7 @@ public class PipeNode extends ZKNode{
    }
    
    public String generateID(){
-	  return ""+((Math.random()*1000000)+System.currentTimeMillis());
+	  return IDTool.generateRandomID("");
    }
   
    public void insertInSrcCode(Element parentElm,Port incommingPort,String tagName,boolean config){

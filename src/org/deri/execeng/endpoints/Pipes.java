@@ -1,34 +1,37 @@
 package org.deri.execeng.endpoints;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Properties;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.xerces.parsers.DOMParser;
 import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.rdf.RDFBox;
 import org.deri.execeng.rdf.SesameMemoryBuffer;
-import org.deri.execeng.rdf.SesameTupleBuffer;
+import org.deri.execeng.utils.XMLUtil;
+import org.deri.execeng.utils.XSLTUtil;
+import org.openrdf.rio.RDFFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.zkoss.zk.ui.Executions;
 
-import java.net.*;
-import org.apache.xerces.parsers.DOMParser;
+import edu.mit.simile.babel.BabelWriter;
 import edu.mit.simile.babel.exhibit.ExhibitJsonWriter;
 import edu.mit.simile.babel.exhibit.ExhibitJsonpWriter;
-import edu.mit.simile.babel.BabelWriter;
-import org.deri.execeng.utils.XSLTUtil;
-import org.deri.execeng.utils.XMLUtil;
-import org.openrdf.rio.RDFFormat;
-import org.w3c.dom.Element;
-
-import java.util.List;
-import java.util.Properties;
-import java.io.InputStream;
 public class Pipes extends HttpServlet {
 	static Logger logger = LoggerFactory.getLogger(Pipes.class);
   public static HttpServletRequest  REQ=null;

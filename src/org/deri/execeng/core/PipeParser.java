@@ -3,23 +3,23 @@
  */
 package org.deri.execeng.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.lang.reflect.Constructor;
+import java.util.Hashtable;
+import java.util.List;
+
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.execeng.endpoints.PipeManager;
 import org.deri.execeng.endpoints.Pipes;
 import org.deri.execeng.model.Operator;
 import org.deri.execeng.rdf.TextBox;
+import org.deri.execeng.utils.IDTool;
 import org.deri.execeng.utils.XMLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -140,7 +140,7 @@ public class PipeParser {
 	}
 	
 	private String generateID(){
-		return null;
+		return IDTool.generateRandomID("ID");
 	}
 	
 	public Operator getOpByID(String id){
