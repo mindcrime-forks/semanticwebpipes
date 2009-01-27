@@ -1,4 +1,6 @@
 package org.deri.pipes.ui;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.integratedmodelling.zk.diagram.components.*;
 import org.zkoss.zul.*;
 import org.deri.execeng.utils.XMLUtil;
@@ -9,6 +11,7 @@ import org.openrdf.rio.RDFFormat;
  *
  */
 public class RDFFetchNode extends SelectFetchNode{
+	final Logger logger = LoggerFactory.getLogger(RDFFetchNode.class);
 	
 	public RDFFetchNode(int x,int y){
 		super(PipePortType.RDFOUT,x,y,"RDF Fetch","rdffetch");

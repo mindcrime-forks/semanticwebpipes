@@ -5,9 +5,12 @@ package org.deri.pipes.ui;
  *
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.deri.execeng.utils.XMLUtil;
 public class ConstructNode extends QueryNode {
+	final Logger logger = LoggerFactory.getLogger(ConstructNode.class);
 
 	public ConstructNode(int x, int y) {
 		super(PipePortType.getPType(PipePortType.RDFOUT),x, y,"Construct");

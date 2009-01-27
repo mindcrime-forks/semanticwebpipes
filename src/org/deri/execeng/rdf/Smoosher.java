@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.sail.memory.MemoryStore;
 
 public class Smoosher {
+	final Logger logger = LoggerFactory.getLogger(Smoosher.class);
 
 	private ArrayList<Resource> visitedNodes = new ArrayList<Resource>();
 	
@@ -64,8 +67,7 @@ public class Smoosher {
 			}
 			
 		} catch (RepositoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info("Repository exception occurred while executing findSameAs ["+resource+"]",e);
 		}
    	 
     }
@@ -103,8 +105,7 @@ public class Smoosher {
     		return correspondences;
 			
 		} catch (RepositoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info("RepositoryException occurred while trying getCorrespondences",e);
 		}
 		 return null;
 	}
@@ -144,9 +145,9 @@ public class Smoosher {
 		/*
 		HashMap<Resource, ArrayList<Resource>> corr = smusher.getCorrespondences(rep);
 		for (Resource res : corr.keySet()) {
-			System.out.println("\nCorrepondences for " + res.toString());
+			logger.debug("\nCorrepondences for " + res.toString());
 			for (Resource same : corr.get(res)) {
-				System.out.println(same.toString());
+				logger.debug(same.toString());
 			}
 		}
 		*/

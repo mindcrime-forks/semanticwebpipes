@@ -1,5 +1,7 @@
 package org.deri.pipes.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -15,6 +17,7 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 public class FriendsInConference { 
+	final Logger logger = LoggerFactory.getLogger(FriendsInConference.class);
 
 	static String CONFQUERY=    "PREFIX swc: <http://data.semanticweb.org/ns/swc/ontology#>"+
 								"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" +
@@ -38,9 +41,8 @@ public class FriendsInConference {
 		"      	   ?person swc:attend ?conf." +
 		"      }";
 	static final String SPARQLENDPOINT="http://data.semanticweb.org/sparql";
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		StringBuilder endPointQuery =new StringBuilder(SPARQLENDPOINT);
-		try{
 			endPointQuery.append("?query=")
 							.append(URLEncoder.encode(CONFQUERY.replace("$CONFNAME", args[1]),"UTF-8"));			
 			RepositoryConnection buff =Utils.createTripleBufferFromURL(endPointQuery.toString());
@@ -51,22 +53,5 @@ public class FriendsInConference {
 		    else
 		    	QueryResultIO.write(results, TupleQueryResultFormat.SPARQL, System.out);
 			
-		}
-		catch(java.io.UnsupportedEncodingException e){
-			e.printStackTrace();
-		} catch (QueryEvaluationException e) {
-			e.printStackTrace();
-		} catch (RepositoryException e) {
-			e.printStackTrace();
-		} catch (MalformedQueryException e) {			e.printStackTrace();
-		} catch (TupleQueryResultHandlerException e) {
-			e.printStackTrace();
-		} catch (UnsupportedQueryResultFormatException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
 	}
 } 

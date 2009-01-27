@@ -1,5 +1,7 @@
 package org.deri.pipes.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.openrdf.OpenRDFException;
@@ -11,15 +13,16 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
 
 public class Utils {	
+	static Logger logger = LoggerFactory.getLogger(Utils.class);
 	
-	public static   RepositoryConnection createTripleBuffer(){
+	public static RepositoryConnection createTripleBuffer(){
 		Repository buffRepository = new SailRepository(new MemoryStore());
 		try{
 			buffRepository.initialize();
 			return buffRepository.getConnection();
 		}
 		catch(RepositoryException e){
-			e.printStackTrace();
+			logger.info("problem creating triple buffer",e);
 		}		
 		return null;
 	}
@@ -31,11 +34,8 @@ public class Utils {
 			urlConn.connect();
 			conn.add(urlConn.getInputStream(), url, RDFFormat.RDFXML);			
 	    }
-		catch (OpenRDFException e) {
-		     e.printStackTrace();
-		}
-		catch (java.io.IOException e) {
-			e.printStackTrace();
+		catch (Exception e) {
+		     logger.info("problim loading rdf from ["+url+"]",e);
 		}
 		return conn;
 	}

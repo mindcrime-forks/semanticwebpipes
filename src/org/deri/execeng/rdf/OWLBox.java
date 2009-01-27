@@ -1,4 +1,6 @@
 package org.deri.execeng.rdf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.StringReader;
 import java.io.StringWriter;
 import org.deri.execeng.core.PipeParser;
@@ -15,6 +17,7 @@ import com.hp.hpl.jena.reasoner.ReasonerRegistry;
  *
  */
 public class OWLBox extends AbstractMerge{
+	final Logger logger = LoggerFactory.getLogger(OWLBox.class);
 	 String owlOpID;
 	 public  OWLBox(PipeParser parser,Element element){
 		 this.parser=parser;

@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.core.PipeParser;
 import org.w3c.dom.Element;
 import java.util.Hashtable;
@@ -8,6 +10,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.deri.execeng.utils.*;
 
 public class HTMLFetchBox extends RDFBox {
+	final Logger logger = LoggerFactory.getLogger(HTMLFetchBox.class);
 	private static Hashtable<String,StreamSource> xsltFile=new Hashtable<String,StreamSource>();
 	private static Hashtable<String,String> formats=new Hashtable<String,String>();
 	private static String xsltPath=XSLTUtil.getBaseURL()+"/xslt/";

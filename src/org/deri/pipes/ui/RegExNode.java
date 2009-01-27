@@ -4,6 +4,8 @@ package org.deri.pipes.ui;
  *
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Hashtable;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
@@ -21,6 +23,7 @@ import org.w3c.dom.Node;
 import java.util.ArrayList;
 
 public class RegExNode extends InOutNode implements ConnectingInputNode{
+	final Logger logger = LoggerFactory.getLogger(RegExNode.class);
 	Hashtable<String,Port> regPorts= new Hashtable<String,Port>();
 	Hashtable<String,Port> replPorts= new Hashtable<String,Port>();	
 	Vbox vbox;

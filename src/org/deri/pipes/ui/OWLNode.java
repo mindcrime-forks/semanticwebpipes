@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.deri.execeng.utils.XMLUtil;
 import org.w3c.dom.Document;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
  *
  */
 public class OWLNode extends InOutNode{
+	final Logger logger = LoggerFactory.getLogger(OWLNode.class);
 	Port owlPort= null;
 	public OWLNode(int x,int y){		
 		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);

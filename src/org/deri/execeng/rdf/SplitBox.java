@@ -1,4 +1,6 @@
 package org.deri.execeng.rdf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Vector;
 import org.deri.execeng.model.Stream;
 import org.deri.execeng.model.Operator;
@@ -12,6 +14,7 @@ import org.w3c.dom.Element;
  *
  */
 public class SplitBox implements Operator{ 
+	final Logger logger = LoggerFactory.getLogger(SplitBox.class);
 	 ExecBuffer buffer;
 	 String inputOpID;
 	 protected boolean isExecuted=false;

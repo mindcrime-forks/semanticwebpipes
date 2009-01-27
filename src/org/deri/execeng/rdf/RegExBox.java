@@ -1,4 +1,6 @@
 package org.deri.execeng.rdf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import com.hp.hpl.jena.reasoner.ReasonerRegistry;
  *
  */
 public class RegExBox extends AbstractMerge{
+	final Logger logger = LoggerFactory.getLogger(RegExBox.class);
 	 ArrayList<String> types,regexes,replacements;
 	 public  RegExBox(PipeParser parser,Element element){
 		 this.parser=parser;

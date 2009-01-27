@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.utils.XMLUtil;
@@ -10,6 +12,7 @@ import org.openrdf.rio.RDFFormat;
  *
  */
 public class RDFFetchBox extends RDFBox {
+	final Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
 	private boolean isExecuted=false;
 	private String url=null;
 	private RDFFormat format=null;

@@ -1,5 +1,7 @@
 package org.deri.execeng.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 
 import org.w3c.dom.Document;
@@ -9,6 +11,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 public class XMLUtil {
+	final Logger logger = LoggerFactory.getLogger(XMLUtil.class);
 	 public static ArrayList<Element> getSubElementByName(Element element,String tagName){
 		   ArrayList<Element> result=new ArrayList<Element>();
 		   NodeList childNodes=element.getChildNodes();

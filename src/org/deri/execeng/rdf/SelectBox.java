@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.core.PipeParser;
@@ -11,6 +13,7 @@ import org.openrdf.repository.RepositoryException;
 import org.w3c.dom.Element;
 
 public class SelectBox extends AbstractMerge {
+	final Logger logger = LoggerFactory.getLogger(SelectBox.class);
 
     private ArrayList<String> graphNames =new ArrayList<String>();
     private String selectQuery;    
@@ -26,7 +29,7 @@ public class SelectBox extends AbstractMerge {
 	  /* if((buffer!=null)&&(outputBuffer!=null))	
 		   buffer.streamming(outputBuffer);
 	   else{
-		   System.out.println("check"+(buffer==null));
+		   logger.debug("check"+(buffer==null));
 	   }*/
     }
 	

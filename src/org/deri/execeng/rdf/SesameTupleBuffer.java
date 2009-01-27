@@ -1,4 +1,6 @@
 package org.deri.execeng.rdf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -19,6 +21,7 @@ import org.deri.execeng.model.Stream;
 import org.deri.execeng.model.Operator;
 import org.deri.execeng.utils.XMLUtil;
 public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
+	final Logger logger = LoggerFactory.getLogger(SesameTupleBuffer.class);
 	private MutableTupleQueryResult buffer=null;
 	private PipeParser parser;
 	
@@ -48,7 +51,7 @@ public class SesameTupleBuffer extends org.deri.execeng.core.ExecBuffer{
 		try{
 			return buffer.clone();
 		}catch(CloneNotSupportedException e){
-			e.printStackTrace();
+			logger.warn("Clone was not supported for "+buffer.getClass(),e);
 			return null;
 		}
 	}

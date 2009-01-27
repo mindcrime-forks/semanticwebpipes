@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.model.Operator;
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.core.PipeParser;
@@ -10,6 +12,7 @@ import java.net.URLEncoder;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 
 public class TupleQueryResultFetchBox implements Operator {
+	final Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchBox.class);
 	private ExecBuffer buffer=null;
 	private boolean isExecuted=false;
 	private String url=null;

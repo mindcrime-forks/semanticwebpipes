@@ -1,4 +1,6 @@
 package org.deri.execeng.utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -18,6 +20,7 @@ import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.deri.execeng.endpoints.*;
 public class XSLTUtil {
+	final Logger logger = LoggerFactory.getLogger(XSLTUtil.class);
 	
 	public static String transform(String xmlURL,String xsltURL){
 		StringWriter sw=new StringWriter();

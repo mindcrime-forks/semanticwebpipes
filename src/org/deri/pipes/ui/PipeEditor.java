@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
@@ -31,6 +33,7 @@ import org.zkoss.zk.ui.Component;
 import org.deri.execeng.endpoints.PipeManager;
 import org.deri.execeng.endpoints.Pipe;
 public class PipeEditor extends Workspace {
+	final Logger logger = LoggerFactory.getLogger(PipeEditor.class);
 	private Textbox textDebugPanel,pipeid,pipename,password;
 	private Bandbox bdid;
 	private Tabpanel tabularDebugPanel=null;
@@ -254,7 +257,7 @@ public class PipeEditor extends Workspace {
 										URLEncoder.encode(paraList.get(i).getDefaultVal(),"UTF-8"));
 			}
 			catch(java.io.UnsupportedEncodingException e){
-				e.printStackTrace();
+				logger.warn("UTF-8 support is required by the JVM specification",e);
 			}
 		}
 		
@@ -262,7 +265,7 @@ public class PipeEditor extends Workspace {
 	}
 	public void debug(String syntax){
 		   syntax=populatePara(syntax);	
-		   //System.out.println(syntax);
+		   //logger.debug(syntax);
 		   PipeParser parser= new PipeParser();	   
 		   Stream    stream= parser.parse(syntax);
 		   TupleQueryResult tuple=null;
@@ -297,7 +300,7 @@ public class PipeEditor extends Workspace {
 	
 	public void hotDebug(String syntax){
 		syntax=populatePara(syntax);
-		 //System.out.println(syntax);
+		 //logger.debug(syntax);
 		InputSource input=new InputSource(new java.io.StringReader(syntax));
 		try {
            DOMParser parser = new DOMParser();
@@ -311,19 +314,13 @@ public class PipeEditor extends Workspace {
 			   org.deri.execeng.core.ExecBuffer buff=((RDFBox)op).getExecBuffer();
 			   textResult=buff.toString();
 			   if(buff instanceof org.deri.execeng.rdf.SesameMemoryBuffer){
+				   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
 				   try{
-					   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
 			    		tuple=((((org.deri.execeng.rdf.SesameMemoryBuffer)buff).
 			    				     getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
 			    	}
-			        catch(MalformedQueryException e){ 
-			      	  
-			        }
-			        catch(QueryEvaluationException e){
-			      	  
-			        }
-			        catch(RepositoryException e){
-			      	  
+			        catch(Exception e){ 
+			        	logger.warn("Problem executing sparql query ["+query+"]",e);
 			        }
 			   }   
 		   }else if(op instanceof SelectBox){
@@ -340,7 +337,7 @@ public class PipeEditor extends Workspace {
 		   reloadTextDebug(textResult);
 		   reloadTabularDebug(tuple);		
 		} catch (Exception e) {
-	    	System.out.print(e.toString()+"\n");
+			logger.warn("could not hotDebug",e);
 	    }
 	}
 	

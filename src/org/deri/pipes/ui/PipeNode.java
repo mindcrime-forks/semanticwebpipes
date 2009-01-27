@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.integratedmodelling.zk.diagram.components.*;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
  *
  */
 public class PipeNode extends ZKNode{  
+	final Logger logger = LoggerFactory.getLogger(PipeNode.class);
 	
 	private static final long serialVersionUID = -1520720934219234911L;
 	protected String tagName=null;	
@@ -201,7 +204,7 @@ public class PipeNode extends ZKNode{
    }
    
    public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-	   //System.out.println(elm.getTagName());
+	   //logger.debug(elm.getTagName());
 	   if(elm.getTagName().equalsIgnoreCase("pipe")){    
 		   ArrayList<Element>  paraElms=XMLUtil.getSubElementByName(
 				   								XMLUtil.getFirstSubElementByName(elm, "parameters"),"parameter");

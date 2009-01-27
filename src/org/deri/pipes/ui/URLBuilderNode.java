@@ -4,6 +4,8 @@ package org.deri.pipes.ui;
  *
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Hashtable;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
@@ -19,6 +21,7 @@ import org.w3c.dom.Node;
 import java.util.ArrayList;
 
 public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,ConnectingOutputNode{
+	final Logger logger = LoggerFactory.getLogger(URLBuilderNode.class);
 	Hashtable<String,Port> pathPorts= new Hashtable<String,Port>();
 	Hashtable<String,Port> paraPorts= new Hashtable<String,Port>();
 	
@@ -303,7 +306,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 					}
 				}
 				catch(java.io.UnsupportedEncodingException e){
-					e.printStackTrace();
+					logger.info("UTF-8 support is required by the JVM specification",e);
 				}
 			}
 			

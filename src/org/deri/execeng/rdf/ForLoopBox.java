@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import org.w3c.dom.Node;
 import org.deri.execeng.utils.XMLUtil;
 
 public class ForLoopBox extends RDFBox{
+	final Logger logger = LoggerFactory.getLogger(ForLoopBox.class);
    
     private String srcListID;
     private String pipeCode=null;

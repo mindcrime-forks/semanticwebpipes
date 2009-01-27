@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.core.ExecBuffer;
 
 public abstract class RDFBox implements org.deri.execeng.model.Operator {
@@ -10,7 +12,7 @@ public abstract class RDFBox implements org.deri.execeng.model.Operator {
 	   if((buffer!=null)&&(outputBuffer!=null))	
 		   buffer.stream(outputBuffer);
 	   else{
-		   //System.out.println("check"+(buffer==null));
+		   //logger.debug("check"+(buffer==null));
 	   }
     }
 	public void stream(ExecBuffer outputBuffer,String uri){

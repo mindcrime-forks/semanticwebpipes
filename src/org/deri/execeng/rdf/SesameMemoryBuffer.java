@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -19,6 +21,7 @@ import org.openrdf.rio.Rio;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.model.impl.URIImpl;
 public class SesameMemoryBuffer extends ExecBuffer {
+	final Logger logger = LoggerFactory.getLogger(SesameMemoryBuffer.class);
 	Repository buffRepository=null;
 	public static final int NONE=0;
 	public static final int RDFS=1;

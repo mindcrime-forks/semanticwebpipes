@@ -1,9 +1,12 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.model.Operator;
 public class TextBox implements Operator{
+	final Logger logger = LoggerFactory.getLogger(TextBox.class);
 	private ExecBuffer buffer=null;
 	private boolean isExecuted=false;
 	private String text=null;

@@ -1,5 +1,7 @@
 package org.deri.execeng.revocations;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
@@ -19,6 +21,7 @@ import org.rdfcontext.model.MSG.sesame.RDFN;
 import org.rdfcontext.model.MSG.sesame.SMSG;
 
 public class RevokationFilter extends GraphFilter{
+	final Logger logger = LoggerFactory.getLogger(RevokationFilter.class);
 
 	/*
 	 * Removes from the untrusted graph all the MSGs which revoke an MSG present in the trusted graph
@@ -36,8 +39,7 @@ public class RevokationFilter extends GraphFilter{
 						untrusted.getConnection().remove(revokationMSG.getGraph());
 					}
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.info("problem removing unacceptable negations for "+uri,e);
 				}
 			}
 			
@@ -123,8 +125,7 @@ public class RevokationFilter extends GraphFilter{
 				}
 				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.info("problem simplifying negations",e);
 			}
 		}
 		

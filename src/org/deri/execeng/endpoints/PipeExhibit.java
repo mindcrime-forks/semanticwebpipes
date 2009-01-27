@@ -1,5 +1,7 @@
 package org.deri.execeng.endpoints;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.*;
 
 import javax.servlet.*;
@@ -8,6 +10,7 @@ import javax.servlet.http.*;
 import org.openrdf.rio.RDFFormat;
 
 public class PipeExhibit extends HttpServlet {
+	final Logger logger = LoggerFactory.getLogger(PipeExhibit.class);
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {

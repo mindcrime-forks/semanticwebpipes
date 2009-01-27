@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
@@ -12,6 +14,7 @@ import org.zkoss.zul.Textbox;
  *
  */
 public class XMLFetchNode extends SimpleFetchNode{
+	final Logger logger = LoggerFactory.getLogger(XMLFetchNode.class);
 
 	public XMLFetchNode(int x,int y){
 		super(PipePortType.XMLOUT,x,y,"XML Fetch","xmlfetch");

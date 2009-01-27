@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.utils.XMLUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -10,6 +12,7 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
 
 public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
+	final Logger logger = LoggerFactory.getLogger(ParameterNode.class);
 	Textbox nameBox,labelBox,defaultBox;
 	public ParameterNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,200,100);

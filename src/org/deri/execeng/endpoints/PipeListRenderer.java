@@ -1,4 +1,6 @@
 package org.deri.execeng.endpoints;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.RowRenderer;
@@ -24,6 +26,7 @@ import org.zkoss.zkex.zul.LayoutRegion;
 import org.deri.pipes.ui.PipeEditor;
 
 public class PipeListRenderer implements RowRenderer {
+	final Logger logger = LoggerFactory.getLogger(PipeListRenderer.class);
 	Textbox checkPassText;
 	Window checkPassWin=null;
 	Button checkPassEnter,checkPassCancel;

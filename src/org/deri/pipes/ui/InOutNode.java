@@ -3,6 +3,8 @@ package org.deri.pipes.ui;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.utils.XMLUtil;
 import org.deri.pipes.ui.PipeNode.DeleteListener;
 import org.integratedmodelling.zk.diagram.components.Connection;
@@ -16,6 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 public class InOutNode extends PipeNode{
+	final Logger logger = LoggerFactory.getLogger(InOutNode.class);
 	/**
 	 * 
 	 */

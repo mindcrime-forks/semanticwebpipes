@@ -1,4 +1,6 @@
 package org.deri.pipes.ui;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.PortType;
 import org.integratedmodelling.zk.diagram.components.Workspace;
@@ -12,6 +14,7 @@ import org.zkoss.zul.impl.InputElement;
 import org.zkoss.zk.ui.event.*;
 import org.zkoss.zul.*;
 public class QueryNode extends InOutNode{
+	final Logger logger = LoggerFactory.getLogger(QueryNode.class);
 	org.zkoss.zul.Label label;
 	QueryBox queryBox=null;	
 	public QueryNode(PortType outPType,int x,int y,String title){

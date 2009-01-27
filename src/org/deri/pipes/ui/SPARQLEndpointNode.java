@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.net.URLEncoder;
 
 import org.deri.execeng.utils.XMLUtil;
@@ -14,6 +16,7 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
 
 public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNode,ConnectingOutputNode {
+	final Logger logger = LoggerFactory.getLogger(SPARQLEndpointNode.class);
 	Textbox endpoint,defaulturi;
 	QueryBox queryBox;
 	Port endpointPort,defaulturiPort=null;
@@ -116,7 +119,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 						code+="&default-graph-uri="+URLEncoder.encode(uri.trim(),"UTF-8");
 			}
 			catch(java.io.UnsupportedEncodingException e){
-				e.printStackTrace();
+				logger.info("UTF-8 support is required by the JVM specification",e);
 			}
 			return code;
 		}

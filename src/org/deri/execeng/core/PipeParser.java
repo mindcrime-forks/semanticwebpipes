@@ -3,6 +3,8 @@
  */
 package org.deri.execeng.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.execeng.endpoints.PipeManager;
 import org.deri.execeng.endpoints.Pipes;
@@ -22,6 +24,7 @@ import java.util.Hashtable;
  *
  */
 public class PipeParser {
+	final Logger logger = LoggerFactory.getLogger(PipeParser.class);
 	private Hashtable<String,Operator> operators=null;
 	private StringBuffer log= new StringBuffer();
 	
@@ -84,7 +87,7 @@ public class PipeParser {
 	
 	public Operator parseOperator(Element element){
 		String opClassName=Pipes.getOperatorProps().getProperty(element.getTagName().toLowerCase());
-		System.out.println(element.getTagName()+"---"+opClassName);
+		logger.debug(element.getTagName()+"---"+opClassName);
 		if(opClassName!=null){
 			try {
 				//find proper implemented class for an operator syntax 
@@ -94,29 +97,11 @@ public class PipeParser {
 				//initialize operator (PipeParser,Element)
 				Constructor operatorConstructor=operatorClass.getConstructor(parameterTypes);
 				Object obj= operatorConstructor.newInstance(this,element);
-				System.out.println("output "+obj.toString());
+				logger.debug("output "+obj.toString());
 				if((obj!=null)||(obj instanceof Operator)) return (Operator)obj;
-				System.out.println("cant create operator");
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.debug("cant create operator");
+			} catch (Exception e) {
+				logger.info("Could not parse element "+element,e);
 			}
 		}
 		

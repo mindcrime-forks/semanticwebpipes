@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -7,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class RDFUtils {
+	final Logger logger = LoggerFactory.getLogger(RDFUtils.class);
 	public static Connection getConnection(){
 		Connection conn = null;
 		try{
@@ -16,7 +19,7 @@ public class RDFUtils {
 		catch(ClassNotFoundException e){
 		}
 		catch(SQLException e){
-			System.out.println("Exception in openning connection");
+			logger.debug("Exception in openning connection");
 		}
 		return conn;
 	}
@@ -37,13 +40,13 @@ public class RDFUtils {
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
-		System.out.println("query "+query);
+		logger.debug("query "+query);
 		try {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);		
 		}
 		catch(SQLException e){
-			System.out.println("query Exception"+e);
+			logger.debug("query Exception"+e);
 		}
 		finally { 
 			if (stmt != null) {

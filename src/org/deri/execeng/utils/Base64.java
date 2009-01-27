@@ -1,4 +1,6 @@
 package org.deri.execeng.utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.*; // needed only for main() method.
 
 
@@ -8,6 +10,7 @@ import java.io.*; // needed only for main() method.
  */
 public class Base64
 {
+	static Logger logger = LoggerFactory.getLogger(Base64.class);
 
 	/**
 	 * returns an array of base64-encoded characters to represent the
@@ -180,9 +183,9 @@ public class Base64
 	public static void main(String[] args)
 	{
 		byte[] pippo= "lavispateresa".getBytes();
-		System.out.println(Base64.encode(pippo));
+		logger.debug(Base64.encode(pippo));
 		pippo=Base64.decode(Base64.encode(pippo));
-		System.out.println(new String(pippo));
+		logger.debug(new String(pippo));
 	}
 
 	/**
@@ -208,7 +211,7 @@ public class Base64
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.info("problem reading file ["+file+"]",e);
 		}
 
 		return baos.toByteArray();
@@ -237,7 +240,7 @@ public class Base64
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.info("problem readign file ["+file+"]",e);
 		}
 
 		return caw.toCharArray();
@@ -259,7 +262,7 @@ public class Base64
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.info("problem writing file ["+file+"]",e);
 		}
 	}
 
@@ -279,7 +282,7 @@ public class Base64
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.info("couldn't write file ["+file+"]",e);
 		}
 	}
 

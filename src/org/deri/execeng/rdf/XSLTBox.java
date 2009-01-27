@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.model.Operator;
@@ -9,6 +11,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.deri.execeng.utils.*;
 public class XSLTBox implements Operator {
+	final Logger logger = LoggerFactory.getLogger(XSLTBox.class);
 	String xmlStrID,xslStrID;
 	private boolean isExecuted=false;
 	PipeParser parser;

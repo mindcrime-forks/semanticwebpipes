@@ -1,5 +1,7 @@
 package org.deri.execeng.rdf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.endpoints.PipeManager;
 import org.deri.execeng.core.PipeParser;
 import org.w3c.dom.Element;
@@ -11,6 +13,7 @@ import org.deri.execeng.utils.XMLUtil;
  *
  */
 public class StoredPipe{
+	final Logger logger = LoggerFactory.getLogger(StoredPipe.class);
 	public static Stream loadStream(Element element){
 		String syntax =PipeManager.getPipeSyntax(element.getTagName());
 		if (syntax==null) return null;

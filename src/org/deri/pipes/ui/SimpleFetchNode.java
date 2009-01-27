@@ -1,5 +1,7 @@
 package org.deri.pipes.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.deri.execeng.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
@@ -14,6 +16,7 @@ import org.zkoss.zul.Textbox;
  *
  */
 public class SimpleFetchNode extends InPipeNode implements ConnectingInputNode{
+	final Logger logger = LoggerFactory.getLogger(SimpleFetchNode.class);
 	protected Textbox urlTextbox=null;
 	protected Port urlPort=null;
 

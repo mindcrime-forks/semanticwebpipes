@@ -1,4 +1,6 @@
 package org.deri.pipes.ui;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.Workspace;
@@ -11,6 +13,7 @@ import org.w3c.dom.Node;
  *
  */
 public class ForNode extends InOutNode{
+	final Logger logger = LoggerFactory.getLogger(ForNode.class);
 	Port loopPort= null;
 	public ForNode(int x,int y){		
 		super(PipePortType.getPType(PipePortType.SPARQLRESULTIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,130,25);

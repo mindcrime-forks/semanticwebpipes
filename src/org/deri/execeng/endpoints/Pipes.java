@@ -1,5 +1,7 @@
 package org.deri.execeng.endpoints;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.*;
 
 import javax.servlet.*;
@@ -27,6 +29,7 @@ import org.w3c.dom.Element;
 import java.util.Properties;
 import java.io.InputStream;
 public class Pipes extends HttpServlet {
+	static Logger logger = LoggerFactory.getLogger(Pipes.class);
   public static HttpServletRequest  REQ=null;
   public static Pipes instance;
   public static String OP_MAP="operatormapping.properties";
@@ -55,7 +58,7 @@ public class Pipes extends HttpServlet {
 					writer =new ExhibitJsonWriter();
 				else{
 					writer =new ExhibitJsonpWriter();
-					System.out.println("Jsonp");
+					logger.debug("Jsonp");
 				}
 				try{
 					java.util.Properties prop=new java.util.Properties();
@@ -64,10 +67,10 @@ public class Pipes extends HttpServlet {
 					StringWriter sw=new StringWriter();
 					//writer.write(res.getWriter(),buffer.getSail(),prop,null);
 					writer.write(sw,buffer.getSail(),prop,null);
-					//System.out.println(sw.getBuffer().toString());
+					//logger.debug(sw.getBuffer().toString());
 					res.getWriter().write(sw.getBuffer().toString());
 				}catch(Exception e){
-					e.printStackTrace();
+					logger.info("couldn't write json",e);
 				}
 		    }
 	 }
@@ -149,10 +152,10 @@ public class Pipes extends HttpServlet {
 
 
 				} catch (Exception e) {
-					System.out.println("Exception during HTML query form creation.");
+					logger.debug("Exception during HTML query form creation.");
 		            outputString = outputString.replace("$query_form$", "");
 		            outputString = outputString.replace("$error_messages$", "");
-					//e.printStackTrace();
+					//logger.info(e);
 				}
 			}	
 				
@@ -182,10 +185,10 @@ public class Pipes extends HttpServlet {
 												URLEncoder.encode(paraVal,"UTF-8"));
 					}
 					catch(java.io.UnsupportedEncodingException e){
-						e.printStackTrace();
+						logger.info("UTF-8 Encoding must be supported by JVM specification",e);
 					}
 				}
-		  		//System.out.println(syntax);
+		  		//logger.debug(syntax);
 		  		PipeParser pipeParser= new PipeParser();
 				Stream stream = pipeParser.parse(syntax);
 				if (stream instanceof RDFBox) {
@@ -193,7 +196,7 @@ public class Pipes extends HttpServlet {
 					return (SesameMemoryBuffer)((RDFBox) stream).getExecBuffer();
 			
 				} else {
-					System.out.println("parsing error");
+					logger.debug("parsing error");
 				}
 			}
 			catch (IOException e) {				
@@ -236,15 +239,15 @@ public class Pipes extends HttpServlet {
 				prop.load(new FileReader(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+OP_MAP)));
 			else{
 				if(getInstance()!=null){
-					System.out.println("servlet "+((getInstance()!=null)?getInstance().getServletInfo():"null"));
-					System.out.println(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP));
+					logger.debug("servlet "+((getInstance()!=null)?getInstance().getServletInfo():"null"));
+					logger.debug(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP));
 					prop.load(new FileReader(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP)));
 				}
 			}
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			logger.info("Could not read operator properties",e);
 		}
 		return prop;
     }

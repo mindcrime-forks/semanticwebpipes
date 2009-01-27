@@ -1,4 +1,6 @@
 package org.deri.execeng.endpoints;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -16,6 +18,7 @@ import org.deri.pipes.ui.PipeEditor;
 import org.zkoss.zk.ui.Executions;
 
 public class PipeManager {
+	static Logger logger = LoggerFactory.getLogger(PipeManager.class);
 	private static String DB_PROP ="db.properties";
 	public static Connection getConnection(){
     	Connection conn = null;
@@ -35,17 +38,10 @@ public class PipeManager {
     	
  	    	Class.forName("com.mysql.jdbc.Driver");
 	    	conn = DriverManager.getConnection(connStr.toString(), prop.getProperty("username"), prop.getProperty("password"));
-	    	//System.out.println("connStr "+ connStr.toString());
+	    	//logger.debug("connStr "+ connStr.toString());
     	}
-    	catch(ClassNotFoundException e){
-   // 	catch(NamingException e){
-    		e.printStackTrace();
-		}
-    	catch(SQLException e){
-			System.out.println("Exception in openning connection");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+    	catch(Exception e){
+			logger.info("could not get connection",e);
 		}
     	return conn;
     }
@@ -54,9 +50,10 @@ public class PipeManager {
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
+		String query = "SELECT pipeid,pipename FROM pipes";
 		try {
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT pipeid,pipename FROM pipes");	
+			rs = stmt.executeQuery(query);	
 			ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
 			while(rs.next()){				
 				pipeList.add(new Pipe(rs.getString("pipeid"),rs.getString("pipename")));
@@ -64,8 +61,7 @@ public class PipeManager {
 			return pipeList;
 		}
 		catch(SQLException e){
-			System.out.println("query Exception"+e);
-			e.printStackTrace();
+			logger.info("error executing query ["+query+"]",e);
 		}
 		finally { 
 			if (stmt != null) {
@@ -89,18 +85,18 @@ public class PipeManager {
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
+		String query = "SELECT syntax FROM pipes where pipeid='"+pipeid+"'";
 		try {
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT syntax FROM pipes where pipeid='"+pipeid+"'");	
-			//System.out.println(rs.getString("syntax"));
+			rs = stmt.executeQuery(query);	
+			//logger.debug(rs.getString("syntax"));
 			if(rs.next()){
-				///System.out.println(rs.getString("syntax"));
+				///logger.debug(rs.getString("syntax"));
 				return rs.getString("syntax");
 			}
 		}
 		catch(SQLException e){
-			System.out.println("query Exception"+e);
-			e.printStackTrace();
+			logger.info("problem executing query ["+query+"]",e);
 		}
 		finally { 
 			if (stmt != null) {
@@ -124,18 +120,18 @@ public class PipeManager {
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
+		String query = "SELECT config FROM pipes where pipeid='"+pipeid+"'";
 		try {
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT config FROM pipes where pipeid='"+pipeid+"'");	
-			//System.out.println(rs.getString("syntax"));
+			rs = stmt.executeQuery(query);	
+			//logger.debug(rs.getString("syntax"));
 			if(rs.next()){
-				///System.out.println(rs.getString("syntax"));
+				///logger.debug(rs.getString("syntax"));
 				return rs.getString("config");
 			}
 		}
 		catch(SQLException e){
-			System.out.println("query Exception"+e);
-			e.printStackTrace();
+			logger.info("problem executing query ["+query+"]",e);
 		}
 		finally { 
 			if (stmt != null) {
@@ -159,16 +155,16 @@ public class PipeManager {
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
+		String query ="SELECT syntax,pipename,config FROM pipes where pipeid='"+pipeid+"'";
 		try {
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT syntax,pipename,config FROM pipes where pipeid='"+pipeid+"'");
+			rs = stmt.executeQuery(query);
 			if(rs.next()){
 				return new Pipe(pipeid,rs.getString("pipename"),rs.getString("syntax"),rs.getString("config"));
 			}
 		}
 		catch(SQLException e){
-			System.out.println("query Exception"+e);
-			e.printStackTrace();
+			logger.info("problem executing query ["+query+"]",e);
 		}
 		finally { 
 			if (stmt != null) {
@@ -190,15 +186,15 @@ public class PipeManager {
 	
 	public static void deletePipe(String pipeid){
 		Connection conn = getConnection();
+		String query = "DELETE FROM pipes where pipeid=?";
 		try {
-			PreparedStatement pstmt = conn.prepareStatement("DELETE FROM pipes where pipeid=?");
+			PreparedStatement pstmt = conn.prepareStatement(query);
 			pstmt.setString(1, pipeid);
 			pstmt.executeUpdate();
 			org.zkoss.zk.ui.Executions.sendRedirect(".");
 		}
 		catch(SQLException e){
-			System.out.println("query Exception"+e);
-			e.printStackTrace();
+			logger.info("problem executing query ["+query+"]",e);
 		}
 		finally { 
 			if (conn != null) {
@@ -214,14 +210,14 @@ public class PipeManager {
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
+		String query = "SELECT pipeid FROM pipes where pipeid='"+pipeid+"'";
 		try {
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT pipeid FROM pipes where pipeid='"+pipeid+"'");	
+			rs = stmt.executeQuery(query);	
 			if(rs.next())return true;			
 		}
 		catch(SQLException e){
-			System.out.println("query Exception"+e);
-			e.printStackTrace();
+			logger.info("problem executing query ["+query+"]",e);
 		}
 		finally { 
 			if (stmt != null) {
@@ -245,16 +241,16 @@ public class PipeManager {
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
+		String query = "SELECT password FROM pipes where pipeid='"+pipeid+"'";
 		try {
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT password FROM pipes where pipeid='"+pipeid+"'");	
+			rs = stmt.executeQuery(query);	
 			if(rs.next())
 				if(rs.getString("password")!=null)
 					if (rs.getString("password").trim().length()>0) return rs.getString("password").trim();
 		}
 		catch(SQLException e){
-			System.out.println("query Exception"+e);
-			e.printStackTrace();
+			logger.info("problem executing query ["+query+"]",e);
 		}
 		finally { 
 			if (stmt != null) {
@@ -282,14 +278,19 @@ public class PipeManager {
 			Connection conn = getConnection();
 			Statement stmt = null;
 			ResultSet rs=null;
+			String query = "SELECT pipeid FROM pipes where pipeid='"+pipeid+"'";
 			try {
 				stmt = conn.createStatement();
-				rs = stmt.executeQuery("SELECT pipeid FROM pipes where pipeid='"+pipeid+"'");	
+				rs = stmt.executeQuery(query);	
 				PreparedStatement pstmt;
-				if(rs.next())
-				   pstmt = conn.prepareStatement("UPDATE  pipes set pipeid=?,pipename=?,syntax=?,config=?,password=? where pipeid='"+pipeid+"'");
-				else
-				   pstmt = conn.prepareStatement("INSERT INTO pipes(pipeid,pipename,syntax,config,password) values(?, ?,?,?,?)");				
+
+				if(rs.next()){
+					query =  "UPDATE  pipes set pipeid=?,pipename=?,syntax=?,config=?,password=? where pipeid='"+pipeid+"'";
+				   pstmt = conn.prepareStatement(query);
+				}else{
+					query = "INSERT INTO pipes(pipeid,pipename,syntax,config,password) values(?, ?,?,?,?)";
+				    pstmt = conn.prepareStatement(query);
+				}
 				pstmt.setString(1, pipeid);
 				pstmt.setString(2, pipename);
 				pstmt.setString(3, syntax);
@@ -299,8 +300,7 @@ public class PipeManager {
 				return true;
 			}
 			catch(SQLException e){
-				System.out.println("query Exception"+e);
-				e.printStackTrace();
+				logger.info("problem executing query ["+query+"]",e);
 			}
 			finally { 
 				if (stmt != null) {

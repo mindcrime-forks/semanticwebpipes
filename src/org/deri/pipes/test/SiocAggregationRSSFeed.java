@@ -1,4 +1,6 @@
 package org.deri.pipes.test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +25,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 public class SiocAggregationRSSFeed {
+	final Logger logger = LoggerFactory.getLogger(SiocAggregationRSSFeed.class);
 	static final String SindiceURLQuery="PREFIX ss: <http://sindice.com/vocab/search#> " +
 										" PREFIX fields: <http://sindice.com/vocab/fields#> " +
 										"SELECT ?url WHERE {?p ss:link ?url.?p fields:format \"RDF\"}";
@@ -35,9 +38,8 @@ public class SiocAggregationRSSFeed {
 									 "		  ?post dcterms:title ?title.	" +
 									 "		  ?post sioc:content ?desctription. }";
 	static final String SPARQL2RSS ="http://pipes.deri.org/evaluation/sparql-rss.xsl";
-	public static void main(String[] args) {		
+	public static void main(String[] args) throws Exception{		
 		StringBuilder sindiceQuery =new StringBuilder("http://sindice.com/search?q=");
-		try{
 			sindiceQuery.append(URLEncoder.encode("((* <http://xmlns.com/foaf/0.1/mbox_sha1sum> \""+args[0]+"\") OR ","UTF-8"))
 							.append(URLEncoder.encode("(* <http://rdfs.org/sioc/ns#email_sha1> \""+args[0]+"\")) AND","UTF-8"))
 								.append(URLEncoder.encode("(* <http://rdfs.org/sioc/ns#content> *)","UTF-8"))
@@ -56,27 +58,5 @@ public class SiocAggregationRSSFeed {
 				transformer.transform(new StreamSource(new StringReader(resultBuff.toString("UTF-8"))),new StreamResult(new File(args[1])));			
 		    else
 		    	transformer.transform(new StreamSource(new StringReader(resultBuff.toString("UTF-8"))),new StreamResult(System.out));
-		}
-		catch(java.io.UnsupportedEncodingException e){
-			e.printStackTrace();
-		} catch (QueryEvaluationException e) {
-			e.printStackTrace();
-		} catch (RepositoryException e) {
-			e.printStackTrace();
-		} catch (MalformedQueryException e) {
-			e.printStackTrace();
-		} catch (TupleQueryResultHandlerException e) {
-			e.printStackTrace();
-		} catch (UnsupportedQueryResultFormatException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
-		} catch (TransformerFactoryConfigurationError e) {
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		}
 	}
 }

@@ -1,4 +1,6 @@
 package org.deri.pipes.ui;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.integratedmodelling.zk.diagram.components.*;
 import org.zkoss.zul.*;
 import org.deri.execeng.utils.XMLUtil;
@@ -10,6 +12,7 @@ import org.openrdf.query.resultio.TupleQueryResultFormat;
  *
  */
 public class TupleQueryResultFetchNode extends SelectFetchNode{
+	final Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchNode.class);
 	public TupleQueryResultFetchNode (int x,int y){
 		super(PipePortType.SPARQLRESULTOUT,x,y,"Tuple Result Fetch","tuplefetch");
 		
