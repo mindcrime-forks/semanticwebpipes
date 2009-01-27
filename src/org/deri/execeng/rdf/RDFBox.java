@@ -3,8 +3,10 @@ package org.deri.execeng.rdf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.deri.execeng.core.ExecBuffer;
+import org.deri.execeng.model.Operator;
 
-public abstract class RDFBox implements org.deri.execeng.model.Operator {
+public abstract class RDFBox implements Operator {
+	Logger logger = LoggerFactory.getLogger(RDFBox.class);
 	protected SesameMemoryBuffer buffer;
 	protected boolean isExecuted=false;
 	
@@ -12,7 +14,7 @@ public abstract class RDFBox implements org.deri.execeng.model.Operator {
 	   if((buffer!=null)&&(outputBuffer!=null))	
 		   buffer.stream(outputBuffer);
 	   else{
-		   //logger.debug("check"+(buffer==null));
+		   logger.debug("check "+(buffer==null));
 	   }
     }
 	public void stream(ExecBuffer outputBuffer,String uri){
@@ -22,7 +24,7 @@ public abstract class RDFBox implements org.deri.execeng.model.Operator {
 			   buffer.stream(outputBuffer);
 	}
 	
-	public org.deri.execeng.core.ExecBuffer getExecBuffer(){
+	public ExecBuffer getExecBuffer(){
    	 	return buffer;
     }
 	

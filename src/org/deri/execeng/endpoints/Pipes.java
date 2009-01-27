@@ -26,6 +26,7 @@ import org.deri.execeng.utils.XMLUtil;
 import org.openrdf.rio.RDFFormat;
 import org.w3c.dom.Element;
 
+import java.util.List;
 import java.util.Properties;
 import java.io.InputStream;
 public class Pipes extends HttpServlet {
@@ -125,7 +126,7 @@ public class Pipes extends HttpServlet {
     	            parser.parse(new InputSource(new java.io.StringReader(syntax)));  
     	    
     		        Element rootElm=parser.getDocument().getDocumentElement();
-    				java.util.ArrayList<Element> paraElms=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(rootElm,"parameters"), "parameter");
+    				List<Element> paraElms=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(rootElm,"parameters"), "parameter");
 		            // iterate through pipe parameter descriptions, construct query form
 					String paraLbl,paraVal,paraId;
 
@@ -174,7 +175,7 @@ public class Pipes extends HttpServlet {
 			try{
 	            parser.parse(new InputSource(new java.io.StringReader(syntax)));  
 	            Element rootElm=parser.getDocument().getDocumentElement();
-				java.util.ArrayList<Element> paraElms=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(rootElm,"parameters"), "parameter");
+				List<Element> paraElms=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(rootElm,"parameters"), "parameter");
 		  		for(int i=0;i<paraElms.size();i++){		
 					String paraId = XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i),"id").trim();
 					String paraVal = (String) req.getParameter(paraId);

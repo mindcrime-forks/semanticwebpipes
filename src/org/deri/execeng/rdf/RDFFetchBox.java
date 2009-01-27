@@ -33,7 +33,7 @@ public class RDFFetchBox extends RDFBox {
 	
 	public void execute(){
 		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer(parser);
-		rdfBuffer.loadFromURL(url,(RDFFormat)format);			
+		rdfBuffer.loadFromURL(url,format);			
 		buffer=rdfBuffer;
 		isExecuted=true;
 	}
@@ -45,7 +45,9 @@ public class RDFFetchBox extends RDFBox {
     private void initialize(Element element){
     	url=XMLUtil.getTextFromFirstSubEleByName(element, "location");
     	
-    	if((null!=url)&&(url.trim().length()>0)){    		
+    	if((null==url)&&(url.trim().length()==0)){
+    		parser.log("Missing location for element "+element);
+    	}else{
     		if(null==element.getAttribute("format"))
     			format=RDFFormat.RDFXML;
     		else	

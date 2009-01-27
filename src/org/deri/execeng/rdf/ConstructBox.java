@@ -2,6 +2,8 @@ package org.deri.execeng.rdf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 import java.util.Vector;
 import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.utils.XMLUtil;
@@ -25,31 +27,21 @@ public class ConstructBox extends AbstractMerge {
     }
    
     public void execute(){
-       buffer= new SesameMemoryBuffer(parser);
-       SesameMemoryBuffer tmp=new SesameMemoryBuffer(parser);
-       mergeInputs(tmp);
-       
-       try{    	  
-          tmp.getConnection().prepareGraphQuery(QueryLanguage.SPARQL,constructQuery).evaluate(new RDFInserter(buffer.getConnection()));
-       }
-       catch(RDFHandlerException e){
-    	   parser.log(e.toString());
-       }
-       catch(MalformedQueryException e){ 
-    	   parser.log(e.toString());
-       }
-       catch(QueryEvaluationException e){
-    	   parser.log(e.toString());
-       }
-       catch(RepositoryException e){
-    	   parser.log(e.toString());
-       }
-   	   isExecuted=true;
+    	buffer= new SesameMemoryBuffer(parser);
+    	SesameMemoryBuffer tmp=new SesameMemoryBuffer(parser);
+    	mergeInputs(tmp);
+    	try{    	  
+    		tmp.getConnection().prepareGraphQuery(QueryLanguage.SPARQL,constructQuery).evaluate(new RDFInserter(buffer.getConnection()));
+    	}
+    	catch(Exception e){
+    		parser.log(e.toString());
+    	}
+    	isExecuted=true;
     }
-    
+
     protected void initialize(Element element){   
     	
-    	java.util.ArrayList<Element> sources=XMLUtil.getSubElementByName(element, "source");
+    	List<Element> sources=XMLUtil.getSubElementByName(element, "source");
     	constructQuery=XMLUtil.getTextFromFirstSubEleByName(element, "query");
     	if((sources.size()<=0)&&(constructQuery==null)){
 			parser.log("Construct operator syntax error at");

@@ -7,6 +7,8 @@ package org.deri.pipes.ui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Hashtable;
+import java.util.List;
+
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.Workspace;
@@ -163,10 +165,10 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	public void loadContent(Element elm){   
 	    Element baseElm=XMLUtil.getFirstSubElementByName(elm,"base");
 	    loadConnectedConfig(baseElm, basePort, baseURL);		
-	    ArrayList<Element> pathElms=XMLUtil.getSubElementByName(elm, "path");
+	    List<Element> pathElms=XMLUtil.getSubElementByName(elm, "path");
 	    for(int i=0;i<pathElms.size();i++)
 	    	addPath(pathElms.get(i));		    
-	    ArrayList<Element> paraElms=XMLUtil.getSubElementByName(elm, "para");
+	    List<Element> paraElms=XMLUtil.getSubElementByName(elm, "para");
 	    for(int i=0;i<paraElms.size();i++)
 	    	addParameter(paraElms.get(i));
 	}

@@ -19,6 +19,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -75,7 +76,7 @@ public class PipeParser {
 	public static Operator loadStoredOperator(Element element){
 		String syntax =PipeManager.getPipeSyntax(element.getTagName());
 		if (syntax==null) return null;
-		ArrayList<Element> parameters =XMLUtil.getSubElement(element);
+		List<Element> parameters =XMLUtil.getSubElement(element);
 		for (int i=0;i<parameters.size();i++) {			
 			syntax = syntax.replace("${" + parameters.get(i).getTagName() + "}", XMLUtil.getTextData(parameters.get(i)));
 		}
@@ -129,7 +130,10 @@ public class PipeParser {
 	}
 	
 	public String addOperator(Operator operator){
-		if(operator==null) return null;
+		if(operator==null){
+			logger.debug("addOperator invoked with null operator");
+			return null;
+		}
 		String id=generateID();
 		operators.put(generateID(),operator);
 		return id;
@@ -152,18 +156,19 @@ public class PipeParser {
 	}
 	
 	public String getSource(Element source){
-		if(source.getAttribute("refid")!=null)
+		if(source.getAttribute("refid")!=null){
 		    return source.getAttribute("refid");	
-		else{
+		}else{
 			Element tmp=XMLUtil.getFirstSubElement(source);	    		
 			if(tmp==null){
-				if(source.getAttribute("format")!=null)
+				if(source.getAttribute("format")!=null){
 					return addOperator(new TextBox(this,XMLUtil.getTextData(source),source.getAttribute("format")));
-				else
+				}else{
 					return addOperator(new TextBox(this,XMLUtil.getTextData(source)));
-			}
-			else
+				}
+			}else{
 				return addOperator(tmp.getAttribute("id"),parseOperator(tmp));
+			}
 	    }
 	}
 

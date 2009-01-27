@@ -2,8 +2,16 @@ package org.deri.execeng.rdf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import info.aduna.lang.FileFormat;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.core.PipeParser;
@@ -17,6 +25,7 @@ import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.rdfxml.util.RDFXMLPrettyWriter;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.model.impl.URIImpl;
@@ -54,21 +63,13 @@ public class SesameMemoryBuffer extends ExecBuffer {
 			       break;
 			}
 			
-			try{
-				buffRepository.initialize();
-				return buffRepository.getConnection();
-			}
-			catch(RepositoryException e){
-				parser.log(e);
-			}
 		}
-		else{
-			try{
-				return buffRepository.getConnection();
-			}
-			catch(RepositoryException e){
-				parser.log(e);
-			}
+		try{
+			buffRepository.initialize();
+			return buffRepository.getConnection();
+		}
+		catch(RepositoryException e){
+			parser.log(e);
 		}
 		return null;
 	}
@@ -78,25 +79,31 @@ public class SesameMemoryBuffer extends ExecBuffer {
 	}
 	
 	public void loadFromURL(String url,RDFFormat format){
-		RepositoryConnection conn=this.getConnection() ;
-    	try{
-	    	HttpURLConnection urlConn=(HttpURLConnection)((new URL(url)).openConnection());
-			urlConn.setRequestProperty("Accept", format.getDefaultMIMEType());
-			urlConn.connect();
-			conn.add(urlConn.getInputStream(), url, format);
-	    }
-		catch (OpenRDFException e) {
-			parser.log(e);
-		}
-		catch (java.io.IOException e) {
-			parser.log(e);
+		try{
+		InputStream in = openConnection(url, format);
+		load(in,url,format);
+		}catch(Exception e){
+    			parser.log(e);
 		}
 	}
+	public void load(InputStream in, String url, RDFFormat format) throws RDFParseException, RepositoryException, IOException {
+		load(new InputStreamReader(in),url,format);
+
+	}
 	
-	public void loadFromText(String text, String baseURL){
+	private void load(Reader in, String url,
+			RDFFormat format) throws RDFParseException, RepositoryException, IOException {
 		RepositoryConnection conn=this.getConnection() ;
+		try{
+			conn.add(in, url, format);
+		}finally{
+			in.close();
+		}		
+	}
+
+	public void loadFromText(String text, String baseURL){
     	try{
-	    	conn.add(new java.io.StringReader(text), 
+	    	load(new java.io.StringReader(text), 
 	    	    ((null!=baseURL)&(baseURL.trim().length()>0))?baseURL.trim():"http://pipes.deri.org/",
 	    			 RDFFormat.RDFXML);
 	    }
@@ -127,9 +134,10 @@ public class SesameMemoryBuffer extends ExecBuffer {
 					((SesameMemoryBuffer)outputBuffer).getConnection().add(
 							(getConnection().getStatements(null, null, null, true)).asList());
 				
-	    	}
-			else if(outputBuffer instanceof XMLStreamBuffer){
+	    	}else if(outputBuffer instanceof XMLStreamBuffer){
 				((XMLStreamBuffer)outputBuffer).setStreamSource(toXMLStringBuffer());
+			}else{
+				logger.warn("the outputBuffer was not a SesameMemoryBuffor or XMLStreamBuffer - cannot stream uri=["+uri+"]");
 			}
 	    }
 		catch(RepositoryException e){

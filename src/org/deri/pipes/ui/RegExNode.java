@@ -7,6 +7,8 @@ package org.deri.pipes.ui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Hashtable;
+import java.util.List;
+
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.Workspace;
@@ -109,7 +111,7 @@ public class RegExNode extends InOutNode implements ConnectingInputNode{
 	}
 	
 	public void loadContent(Element elm){   
-	    ArrayList<Element> rules=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(elm,"rules"),"rule");
+	    List<Element> rules=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(elm,"rules"),"rule");
 	    for(int i=0;i<rules.size();i++) addRule(rules.get(i));
 	}
 	

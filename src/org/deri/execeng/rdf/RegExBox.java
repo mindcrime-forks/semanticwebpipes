@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.deri.execeng.core.BoxParser;
@@ -20,6 +21,7 @@ import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.util.RDFInserter;
 import org.openrdf.rio.RDFHandlerException;
 import org.w3c.dom.Element;
 import org.deri.execeng.utils.XMLUtil;
@@ -66,10 +68,7 @@ public class RegExBox extends AbstractMerge{
     	 try{
 			 tmp.getConnection().export(new ReplaceHandler(this));
 		 }
-		 catch(RDFHandlerException e){
-			 parser.log(e);
-		 }
-		 catch(RepositoryException e){
+		 catch(Exception e){
 			 parser.log(e);
 		 }
     	     	 
@@ -79,7 +78,7 @@ public class RegExBox extends AbstractMerge{
      @Override
      protected void initialize(Element element){
     	super.initialize(element); 
-   		ArrayList<Element> ruleEles =XMLUtil.getSubElementByName(
+   		List<Element> ruleEles =XMLUtil.getSubElementByName(
    				                       XMLUtil.getFirstSubElementByName(element, "rules"),"rule");
    		types =new ArrayList<String>();
    		regexes= new ArrayList<String>();
@@ -104,8 +103,7 @@ public class RegExBox extends AbstractMerge{
 		 return buffer.getConnection();
 	 }
      
-     public class ReplaceHandler extends org.openrdf.repository.util.RDFInserter{
-  		private RegExBox regexBox;
+     public class ReplaceHandler extends RDFInserter{
   		public ReplaceHandler(RegExBox regexBox){
   			super(regexBox.getConnection());
   		}
@@ -117,24 +115,30 @@ public class RegExBox extends AbstractMerge{
   			Resource sub =st.getSubject();
   			URI pred=st.getPredicate();
   			Value obj=st.getObject();
-  			for(int i=0;i<regexBox.getTypes().size();i++){	  			
-	  			if(regexBox.getTypes().get(i)=="uri"){
-	  				if(sub instanceof URI) sub=replace((URI)sub,i);
+  			for(int i=0;i<getTypes().size();i++){	  			
+	  			if(getTypes().get(i)=="uri"){
+	  				if(sub instanceof URI){
+	  					sub=replace((URI)sub,i);
+	  				}
 	  				pred=replace(pred,i); 
-	  				if(obj instanceof URI) obj=replace((URI)obj,i);
+	  				if(obj instanceof URI){
+	  					obj=replace((URI)obj,i);
+	  				}
 	  			}
 	  			else
-	  				if(obj instanceof Literal) obj=replace((Literal)obj,i);
+	  				if(obj instanceof Literal){
+	  					obj=replace((Literal)obj,i);
+	  				}
   			}	
   			super.handleStatement(new StatementImpl(sub,pred,obj));
   		}	
   		
   		public URI replace(URI uri,int i){
-  			return new URIImpl(uri.toString().replaceAll(regexBox.getRegexes().get(i), regexBox.getReplacements().get(i)));
+  			return new URIImpl(uri.toString().replaceAll(getRegexes().get(i), getReplacements().get(i)));
   		}
   		
   		public Literal replace(Literal literal,int i){
-  			return new LiteralImpl(literal.stringValue().replaceAll(regexBox.getRegexes().get(i), regexBox.getReplacements().get(i)));
+  			return new LiteralImpl(literal.stringValue().replaceAll(getRegexes().get(i), getReplacements().get(i)));
   		}
      }
 }

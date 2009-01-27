@@ -3,6 +3,8 @@ package org.deri.execeng.rdf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.deri.execeng.core.ExecBuffer;
 import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.utils.XMLUtil;
@@ -68,7 +70,7 @@ public class SelectBox extends AbstractMerge {
     @Override
     protected void initialize(Element element){    
     	
-    	java.util.ArrayList<Element> sources=XMLUtil.getSubElementByName(element, "source");
+    	List<Element> sources=XMLUtil.getSubElementByName(element, "source");
     	selectQuery=XMLUtil.getTextFromFirstSubEleByName(element, "query");
     	if((sources.size()<=0)&&(selectQuery==null)){
 			parser.log("SELECT operator syntax error at");

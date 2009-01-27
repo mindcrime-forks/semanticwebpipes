@@ -3,6 +3,8 @@ package org.deri.pipes.ui;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.deri.execeng.utils.XMLUtil;
@@ -67,7 +69,7 @@ public class InOutNode extends PipeNode{
 	}
 	
 	public void connectSource(Element elm){
-		java.util.ArrayList<Element> childNodes=XMLUtil.getSubElementByName(elm, "source");
+		List<Element> childNodes=XMLUtil.getSubElementByName(elm, "source");
  		for(int i=0;i<childNodes.size();i++){		
  			PipeNode nextNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(childNodes.get(i)),(PipeEditor)getWorkspace());
  			nextNode.connectTo(getInputPort());

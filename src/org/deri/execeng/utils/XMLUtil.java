@@ -3,6 +3,7 @@ package org.deri.execeng.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -12,7 +13,7 @@ import org.w3c.dom.Text;
 
 public class XMLUtil {
 	final Logger logger = LoggerFactory.getLogger(XMLUtil.class);
-	 public static ArrayList<Element> getSubElementByName(Element element,String tagName){
+	 public static List<Element> getSubElementByName(Element element,String tagName){
 		   ArrayList<Element> result=new ArrayList<Element>();
 		   NodeList childNodes=element.getChildNodes();
 		   for(int i=0;i<childNodes.getLength();i++){
@@ -26,7 +27,7 @@ public class XMLUtil {
 		   return result;
 	   }
 	   
-	   public static ArrayList<Element> getSubElement(Element element){
+	   public static List<Element> getSubElement(Element element){
 		   ArrayList<Element> result=new ArrayList<Element>();
 		   NodeList childNodes=element.getChildNodes();
 		   for(int i=0;i<childNodes.getLength();i++){
@@ -73,7 +74,7 @@ public class XMLUtil {
 	   }
 	   
 	   public static String getTextFromFirstSubEleByName(Element element,String tagName){
-		   ArrayList<Element> childEle= getSubElementByName(element, tagName);
+		   List<Element> childEle= getSubElementByName(element, tagName);
 		   for(int i=0;i<childEle.size();i++){
 			   String tmp=getTextData(childEle.get(i));
 			   if(tmp!=null) return tmp;

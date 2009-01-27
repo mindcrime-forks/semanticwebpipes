@@ -1,13 +1,7 @@
 package org.deri.execeng.rdf;
+import org.deri.execeng.core.PipeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Vector;
-import org.deri.execeng.model.Stream;
-import org.deri.execeng.model.Operator;
-import org.deri.execeng.core.BoxParser;
-import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.core.PipeParser;
-import org.deri.execeng.utils.XMLUtil;
 import org.w3c.dom.Element;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org

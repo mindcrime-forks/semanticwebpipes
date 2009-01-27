@@ -16,6 +16,7 @@ import org.apache.xerces.dom.DocumentImpl;
 import org.deri.execeng.utils.*;
 
 import java.util.ArrayList;
+import java.util.List;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -206,7 +207,7 @@ public class PipeNode extends ZKNode{
    public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 	   //logger.debug(elm.getTagName());
 	   if(elm.getTagName().equalsIgnoreCase("pipe")){    
-		   ArrayList<Element>  paraElms=XMLUtil.getSubElementByName(
+		   List<Element>  paraElms=XMLUtil.getSubElementByName(
 				   								XMLUtil.getFirstSubElementByName(elm, "parameters"),"parameter");
 		   for(int i=0;i<paraElms.size();i++){
 			   wsp.addParameter((ParameterNode)PipeNode.loadConfig(paraElms.get(i),wsp));

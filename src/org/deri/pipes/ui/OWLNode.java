@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
+import java.util.List;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -52,7 +53,7 @@ public class OWLNode extends InOutNode{
 		OWLNode node= new OWLNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
 		
-		ArrayList<Element> srcEles=XMLUtil.getSubElementByName(elm, "source");
+		List<Element> srcEles=XMLUtil.getSubElementByName(elm, "source");
 		for(int i=0;i<srcEles.size();i++){
 			PipeNode xmlNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(srcEles.get(i)),wsp);
 			xmlNode.connectTo(node.getInputPort());
