@@ -1,4 +1,5 @@
 package org.deri.execeng.endpoints;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,7 +24,7 @@ public class PipeManager {
     	Properties prop = new Properties();
 		try
 		{
-			prop.load(new FileReader(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+DB_PROP)));
+			prop.load(new FileInputStream(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+DB_PROP)));
 			
             StringBuffer connStr= new StringBuffer("jdbc:mysql://");
             connStr.append(prop.getProperty("host"));

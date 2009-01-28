@@ -240,12 +240,12 @@ public class Pipes extends HttpServlet {
 		try
 		{
 			if(Executions.getCurrent()!=null)
-				prop.load(new FileReader(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+OP_MAP)));
+				prop.load(new FileInputStream(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+OP_MAP)));
 			else{
 				if(getInstance()!=null){
 					logger.debug("servlet "+((getInstance()!=null)?getInstance().getServletInfo():"null"));
 					logger.debug(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP));
-					prop.load(new FileReader(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP)));
+					prop.load(new FileInputStream(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP)));
 				}
 			}
 		}
