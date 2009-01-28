@@ -3,18 +3,21 @@ package org.deri.execeng.rdf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.List;
 
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.core.PipeParser;
-import org.openrdf.OpenRDFException;
+import org.openrdf.model.Statement;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.rdfxml.util.RDFXMLPrettyWriter;
@@ -29,62 +32,59 @@ public class SesameMemoryBuffer extends ExecBuffer {
 	public static final int NONE=0;
 	public static final int RDFS=1;
 	public static final int OWL=2;
-	private int reasoningType=0;
+	private int reasoningType=NONE;
 	private Sail sail;
-	PipeParser parser;
 	
-	public SesameMemoryBuffer(PipeParser parser,int reasoningType){
-		this.parser=parser;
+	public SesameMemoryBuffer(int reasoningType){
 		this.reasoningType=reasoningType;
 	}
-	
-	public SesameMemoryBuffer(PipeParser pipeParser){
-		this.parser=pipeParser;
-		reasoningType=NONE;
+
+	public SesameMemoryBuffer(){
+		this(NONE);
 	}
-	
+
 	public  RepositoryConnection getConnection(){
 		if(buffRepository==null){
 			sail=new MemoryStore();
 			switch (reasoningType){
-			   case RDFS:
-				   buffRepository =new SailRepository(
-	                          new ForwardChainingRDFSInferencer(sail));
-				   break;
-			   case NONE:
-			   default:
-				   buffRepository = new SailRepository(sail);
-			       break;
+			case RDFS:
+				buffRepository =new SailRepository(
+						new ForwardChainingRDFSInferencer(sail));
+				break;
+			case NONE:
+			default:
+				buffRepository = new SailRepository(sail);
+			break;
 			}
-			
+
 		}
 		try{
 			buffRepository.initialize();
 			return buffRepository.getConnection();
 		}
 		catch(RepositoryException e){
-			parser.log(e);
+			logger.warn("could not initialise repository",e);
 		}
 		return null;
 	}
-	
+
 	public Sail getSail(){
 		return sail;
 	}
-	
+
 	public void loadFromURL(String url,RDFFormat format){
 		try{
-		InputStream in = openConnection(url, format);
-		load(in,url,format);
+			InputStream in = openConnection(url, format);
+			load(in,url,format);
 		}catch(Exception e){
-    			parser.log(e);
+			logger.warn("error loading url ["+url+"]",e);
 		}
 	}
+	
 	public void load(InputStream in, String url, RDFFormat format) throws RDFParseException, RepositoryException, IOException {
 		load(new InputStreamReader(in),url,format);
-
 	}
-	
+
 	private void load(Reader in, String url,
 			RDFFormat format) throws RDFParseException, RepositoryException, IOException {
 		RepositoryConnection conn=this.getConnection() ;
@@ -96,79 +96,72 @@ public class SesameMemoryBuffer extends ExecBuffer {
 	}
 
 	public void loadFromText(String text, String baseURL){
-    	try{
-	    	load(new java.io.StringReader(text), 
-	    	    ((null!=baseURL)&(baseURL.trim().length()>0))?baseURL.trim():"http://pipes.deri.org/",
-	    			 RDFFormat.RDFXML);
-	    }
-		catch (OpenRDFException e) {
-			parser.log(e);
+		try{
+			String url = ((null!=baseURL)&(baseURL.trim().length()>0))?baseURL.trim():"http://pipes.deri.org/";
+			load(new StringReader(text),url, RDFFormat.RDFXML);
 		}
-		catch (java.io.IOException e) {
-			parser.log(e);
+		catch (Exception e) {
+			logger.warn("problem loading from text",e);
 		}
 	}
-	
+
 	public void loadFromText(String text){
 		loadFromText(text,null);
 	}
-	
+
 	public void stream(ExecBuffer outputBuffer){
 		stream(outputBuffer,null);
-    }
-	
+	}
+
 	public void stream(ExecBuffer outputBuffer,String uri){
 		URIImpl uriImpl=((null!=uri)&&(uri.trim().length()>0))?(new URIImpl(uri.trim())):null;
 		try{
 			if(outputBuffer instanceof SesameMemoryBuffer){
-				if(uriImpl!=null)
-					((SesameMemoryBuffer)outputBuffer).getConnection().add(
-							(getConnection().getStatements(null, null, null, true)).asList(),uriImpl);
-				else
-					((SesameMemoryBuffer)outputBuffer).getConnection().add(
-							(getConnection().getStatements(null, null, null, true)).asList());
-				
-	    	}else if(outputBuffer instanceof XMLStreamBuffer){
+				RepositoryConnection repositoryConnection = ((SesameMemoryBuffer)outputBuffer).getConnection();
+				RepositoryResult<Statement> repositoryResult = getConnection().getStatements(null, null, null, true);
+				List<Statement> statements = repositoryResult.asList();
+				if(uriImpl!=null) {
+					repositoryConnection.add(statements,uriImpl);
+				} else{
+					repositoryConnection.add(statements);
+				}
+			}else if(outputBuffer instanceof XMLStreamBuffer){
 				((XMLStreamBuffer)outputBuffer).setStreamSource(toXMLStringBuffer());
 			}else{
 				logger.warn("the outputBuffer was not a SesameMemoryBuffor or XMLStreamBuffer - cannot stream uri=["+uri+"]");
 			}
-	    }
-		catch(RepositoryException e){
-			parser.log(e);
 		}
-    }
-	
+		catch(RepositoryException e){
+			logger.warn("problem streaming to ExecBuffer",e);
+		}
+	}
+
 	public String toString(){
 		return toXMLStringBuffer().toString(); 	
 	}
-	
+
 	public StringBuffer toXMLStringBuffer(){
-		java.io.StringWriter stBuff=new java.io.StringWriter();
+		StringWriter stBuff=new StringWriter();
 		try{
-		  getConnection().export(new RDFXMLPrettyWriter(stBuff));
-		  return stBuff.getBuffer();
+			getConnection().export(new RDFXMLPrettyWriter(stBuff));
+			return stBuff.getBuffer();
 		}
-		catch(RepositoryException e){
-			parser.log(e);
-		}catch(RDFHandlerException e){
-			parser.log(e);
+		catch(Exception e){
+			logger.warn("could not export to StringBuffer",e);
 		}
-	   return null; 	
+		return null; 	
 	}
-	
-	public void stream(java.io.OutputStream output){
+
+	public void stream(OutputStream output){
 		stream(output, RDFFormat.RDFXML);
 	}
-	
-	public void stream(java.io.OutputStream output,RDFFormat format){
+
+	public void stream(OutputStream output,RDFFormat format){
 		try{
-		  getConnection().export(Rio.createWriter(format, output));
+			getConnection().export(Rio.createWriter(format, output));
 		}
-		catch(RepositoryException e){
-			parser.log(e);
-		}catch(RDFHandlerException e){
-			parser.log(e);
+		catch(Exception e){
+			logger.warn("problem exportin",e);
 		}
 	}
 }

@@ -1,5 +1,4 @@
 package org.deri.execeng.rdf;
-import org.deri.execeng.core.PipeParser;
 import org.deri.execeng.revocations.Revoker;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
@@ -13,14 +12,9 @@ import org.w3c.dom.Element;
 public class PatchGeneratorBox extends AbstractMerge{ 
 	final Logger logger = LoggerFactory.getLogger(PatchGeneratorBox.class);
 	
-	 public PatchGeneratorBox(PipeParser parser,Element element){
-		 this.parser=parser;
-		 initialize(element);
-		 
-     }
      
      public void execute(){
-    	 buffer= new SesameMemoryBuffer(parser);
+    	 buffer= new SesameMemoryBuffer();
     	 mergeInputs();
     	 
     	 Repository rep = buffer.getConnection().getRepository();
@@ -28,7 +22,7 @@ public class PatchGeneratorBox extends AbstractMerge{
     	 try {
 			revoker.revoke(rep);
 		} catch (RepositoryException e) {
-			parser.log(e);
+			logger.warn("problem executing revoker",e);
 		}
     	 
     	 isExecuted=true;

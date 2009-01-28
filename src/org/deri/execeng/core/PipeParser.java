@@ -4,7 +4,6 @@
 package org.deri.execeng.core;
 
 import java.lang.reflect.Constructor;
-import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.xerces.parsers.DOMParser;
@@ -25,22 +24,23 @@ import org.xml.sax.InputSource;
  *
  */
 public class PipeParser {
-	final Logger logger = LoggerFactory.getLogger(PipeParser.class);
-	private Hashtable<String,Operator> operators=null;
-	private StringBuffer log= new StringBuffer();
+	final static Logger logger = LoggerFactory.getLogger(PipeParser.class);
+	PipeContext pipeContext = new PipeContext();
 	
-	public PipeParser(){
-		operators= new Hashtable<String,Operator>();
-	}
 	
-	/* (non-Javadoc)
-	 * @see org.deri.execeng.core.BoxParser#parse(java.lang.String)
+	/**
+	 * Parse the xml syntax contained in this String.
+	 * @param syntax xml pipe syntax.
 	 */
 	public Operator parse(String syntax) {
-		// TODO Auto-generated method stub
 		return parse(new InputSource(new java.io.StringReader(syntax)));
 	}
-	
+
+	/**
+	 * Parse the xml syntax contained in the first 'code' element
+	 * @param inputStream an xml stream.
+	 * @return an Operator, or null if the element could not be parsed.
+	 */
     public Operator parse(InputSource inputStream){
     	try {
             DOMParser parser = new DOMParser();
@@ -57,7 +57,7 @@ public class PipeParser {
     		} 
 
         } catch (Exception e) {
-        	log(e);
+        	logger.warn("could not parse input stream",e);
         }
     	return null;
     }
@@ -68,65 +68,70 @@ public class PipeParser {
             parser.parse(new InputSource(new java.io.StringReader(code)));  
             return parseOperator(parser.getDocument().getDocumentElement());
         } catch (Exception e) {
-        	log(e);
+        	logger.debug("problem parsing code: ["+code+"]");
+        	logger.warn("could not parse code",e);
         }
     	return null;
     }
     
 	public static Operator loadStoredOperator(Element element){
-		String syntax =PipeManager.getPipeSyntax(element.getTagName());
-		if (syntax==null) return null;
+		String tagName = element.getTagName();
+		String syntax =PipeManager.getPipeSyntax(tagName);
+		if (syntax==null){
+			logger.warn("no syntax found for element "+element);
+			return null;
+		}
 		List<Element> parameters =XMLUtil.getSubElement(element);
 		for (int i=0;i<parameters.size();i++) {			
 			syntax = syntax.replace("${" + parameters.get(i).getTagName() + "}", XMLUtil.getTextData(parameters.get(i)));
 		}
-		if (syntax != null) {
-			return (new PipeParser()).parse(syntax);
-		}
-		return null;
+		return (new PipeParser()).parse(syntax);
 	}
 	
 	public Operator parseOperator(Element element){
-		String opClassName=Pipes.getOperatorProps().getProperty(element.getTagName().toLowerCase());
-		logger.debug(element.getTagName()+"---"+opClassName);
+		String lowerCaseTagName = element.getTagName().toLowerCase();
+		String opClassName = Pipes.getOperatorProps().getProperty(lowerCaseTagName);
+		logger.debug("mapped element ["+element.getTagName()+"] to operator ["+opClassName+"]");
 		if(opClassName!=null){
 			try {
 				//find proper implemented class for an operator syntax 
 				Class operatorClass = Class.forName(opClassName);
-				Class parameterTypes[] ={PipeParser.class,org.w3c.dom.Element.class};
 				
 				//initialize operator (PipeParser,Element)
-				Constructor operatorConstructor=operatorClass.getConstructor(parameterTypes);
-				Object obj= operatorConstructor.newInstance(this,element);
+				Object obj= operatorClass.newInstance();
 				logger.debug("output "+obj.toString());
-				if((obj!=null)||(obj instanceof Operator)) return (Operator)obj;
-				logger.debug("cant create operator");
+				if((obj!=null)||(obj instanceof Operator)){
+					Operator operator = (Operator)obj;
+					operator.initialize(pipeContext,element);
+					return operator;
+				}
+				logger.debug("cant create Operator was: "+obj);
 			} catch (Exception e) {
 				logger.info("Could not parse element "+element,e);
 			}
 		}
 		
-		Operator tmp=loadStoredOperator(element);
-		if(tmp!=null) return tmp;
-    	log("Unreconigzed tag :");
-	    log(element.getTagName());
-	    log(element.toString());
+		Operator operator=loadStoredOperator(element);
+		if(operator!=null){
+			return operator;
+		}
+    	logger.warn("Unreconigzed tag :"+element.getTagName()+" "+element.toString());
 		return null;
 	}
 	
 	public String addOperator(String id,Operator operator){
 		if((null!=id)&&(id.trim().length()>0)){
 			id=id.trim().toLowerCase();
-			if(operators.containsKey(id)){
-				log("Duplicated ID" +id);
+			if(pipeContext.contains(id)){
+				logger.warn("Not adding operator with duplicated ID [" +id+"]");
 				return null;
-			}				
-			else
-				operators.put(id,operator);
-		}
-		else
+			}else{
+				pipeContext.addOperator(id,operator);
+				return id;
+			}
+		}else{
 			return addOperator(operator);
-		return id;
+		}
 	}
 	
 	public String addOperator(Operator operator){
@@ -135,7 +140,7 @@ public class PipeParser {
 			return null;
 		}
 		String id=generateID();
-		operators.put(generateID(),operator);
+		pipeContext.addOperator(generateID(),operator);
 		return id;
 	}
 	
@@ -143,31 +148,28 @@ public class PipeParser {
 		return IDTool.generateRandomID("ID");
 	}
 	
-	public Operator getOpByID(String id){
-		return operators.get(id);
-	}
+
 	
-	public void log(String mess){
-		log.append(mess+"\n");
-	}
-	
-	public void log(Exception e){
-		log(e.toString()+"\n");
-	}
-	
-	public String getSource(Element source){
-		if(source.getAttribute("refid")!=null){
-		    return source.getAttribute("refid");	
+	public String getSourceOperatorId(Element source){
+		String refid = source.getAttribute("refid");
+		if(refid!=null){
+		    return refid;	
 		}else{
 			Element tmp=XMLUtil.getFirstSubElement(source);	    		
 			if(tmp==null){
-				if(source.getAttribute("format")!=null){
-					return addOperator(new TextBox(this,XMLUtil.getTextData(source),source.getAttribute("format")));
+				String format = source.getAttribute("format");
+				String textData = XMLUtil.getTextData(source);
+				final Operator operator;
+				if(format!=null){
+					operator = new TextBox(textData,format);
 				}else{
-					return addOperator(new TextBox(this,XMLUtil.getTextData(source)));
+					operator = new TextBox(textData);
 				}
+				return addOperator(operator);
 			}else{
-				return addOperator(tmp.getAttribute("id"),parseOperator(tmp));
+				String id = tmp.getAttribute("id");
+				Operator operator = parseOperator(tmp);
+				return addOperator(id,operator);
 			}
 	    }
 	}

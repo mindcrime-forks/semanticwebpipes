@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.core.PipeParser;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.MutableTupleQueryResult;
 import org.openrdf.query.resultio.QueryResultIO;
@@ -14,19 +13,15 @@ import org.slf4j.LoggerFactory;
 public class SesameTupleBuffer extends ExecBuffer{
 	final Logger logger = LoggerFactory.getLogger(SesameTupleBuffer.class);
 	private MutableTupleQueryResult buffer=null;
-	private PipeParser parser;
 
-	public SesameTupleBuffer(PipeParser parser){
-		this.parser=parser;
+	public SesameTupleBuffer(){
 	}
 
-	public SesameTupleBuffer(PipeParser parser,String url,TupleQueryResultFormat format){
-		this.parser=parser;
+	public SesameTupleBuffer(String url,TupleQueryResultFormat format){
 		loadFromURL(url,format);
 	}
 
-	public SesameTupleBuffer(PipeParser parser,TupleQueryResult buffer){
-		this.parser=parser;
+	public SesameTupleBuffer(TupleQueryResult buffer){
 		copyBuffer(buffer);
 	}
 
@@ -34,7 +29,8 @@ public class SesameTupleBuffer extends ExecBuffer{
 		try{
 			this.buffer=new MutableTupleQueryResult(buffer);
 		}
-		catch(org.openrdf.query.QueryEvaluationException  e){							
+		catch(org.openrdf.query.QueryEvaluationException  e){		
+			logger.warn("could not copy buffer",e);
 		}
 	}
 
@@ -49,12 +45,14 @@ public class SesameTupleBuffer extends ExecBuffer{
 
 
 	public void loadFromText(String text){
-		if (text==null) buffer=null;
+		if (text==null) {
+			buffer=null;
+		}
 		try{
 			copyBuffer(QueryResultIO.parse(new ByteArrayInputStream(text.trim().getBytes()), TupleQueryResultFormat.SPARQL));
 		}
 		catch(Exception e){
-			parser.log(e);
+			logger.warn("problem loading from text",e);
 		}
 	}
 
@@ -69,7 +67,7 @@ public class SesameTupleBuffer extends ExecBuffer{
 			}
 		}
 		catch(Exception e){
-			parser.log(e);
+			logger.warn("problem loading from url ["+url+"]",e);
 		}
 	}
 

@@ -1,7 +1,7 @@
 package org.deri.execeng.rdf;
 
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.core.PipeContext;
 import org.deri.execeng.model.Operator;
 import org.deri.execeng.utils.XMLUtil;
 import org.slf4j.Logger;
@@ -13,15 +13,11 @@ public class XMLFetchBox implements Operator {
 
 	String url;
 	boolean isExecuted=false;
-	PipeParser parser;
 	XMLStreamBuffer buffer;
-	public XMLFetchBox(PipeParser parser,Element element){
-		this.parser=parser;
-		initialize(element);
-	}
+	
 	@Override
 	public void execute() {
-		buffer = new XMLStreamBuffer(parser,url);
+		buffer = new XMLStreamBuffer(url);
 		isExecuted=true;
 	}
 
@@ -47,11 +43,19 @@ public class XMLFetchBox implements Operator {
 			buffer.stream(buffer);
 	}
 	
-	public void initialize(Element element){
-    	url=XMLUtil.getTextFromFirstSubEleByName(element, "location");	    	
+	@Override
+	public void initialize(PipeContext context, Element element) {
+	   	setUrl(XMLUtil.getTextFromFirstSubEleByName(element, "location"));	    	
     	if(null==url){
-    		parser.log("Error in xml fetchbox");
-    		parser.log(element.toString());
+    		logger.warn("Error in xml fetchbox, missing location: "+element.toString());
     	}
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }

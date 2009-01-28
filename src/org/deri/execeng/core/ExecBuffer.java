@@ -4,6 +4,7 @@ import info.aduna.lang.FileFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,8 +20,9 @@ public abstract class ExecBuffer {
 	 public static StringBuffer log= new StringBuffer();
      public abstract void stream(ExecBuffer outputBuffer);
      public abstract void stream(ExecBuffer outputBuffer,String context);
-     public abstract void stream(java.io.OutputStream output);
-     protected InputStream openConnection(String url, FileFormat format)
+     public abstract void stream(OutputStream output);
+     
+     protected static InputStream openConnection(String url, FileFormat format)
      throws IOException, MalformedURLException {
     	 URL netURL = new URL(url.trim());
 		URLConnection urlConnection = netURL.openConnection();

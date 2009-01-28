@@ -5,7 +5,7 @@ import java.util.Hashtable;
 
 import javax.xml.transform.stream.StreamSource;
 
-import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.core.PipeContext;
 import org.deri.execeng.utils.XMLUtil;
 import org.deri.execeng.utils.XSLTUtil;
 import org.slf4j.Logger;
@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 
 public class HTMLFetchBox extends RDFBox {
 	final Logger logger = LoggerFactory.getLogger(HTMLFetchBox.class);
+	//fuller says: WARNING WARNING WARNING MEMORY LEAKS FOLLOW IN STATIC HASHTABLES
 	private static Hashtable<String,StreamSource> xsltFile=new Hashtable<String,StreamSource>();
 	private static Hashtable<String,String> formats=new Hashtable<String,String>();
 	private static String xsltPath=XSLTUtil.getBaseURL()+"/xslt/";
@@ -37,20 +38,15 @@ public class HTMLFetchBox extends RDFBox {
 		formats.put("RDFa", "RDFa");
 	}
 	
-	String url,format;
-	private boolean isExecuted=false;
-	PipeParser parser;
-	public HTMLFetchBox(PipeParser parser, Element element){
-		this.parser=parser;
-		initialize(element);
-	}
+	private String url = null;
+	private String format = null;
 		
 	public static Hashtable<String,String >getFormats(){
 		return formats;
 	}
 	@Override
 	public void execute() {
-		buffer=new SesameMemoryBuffer(parser);
+		buffer=new SesameMemoryBuffer();
 		if(!isExecuted){
 			Enumeration<String> k = xsltFile.keys();
 			StreamSource stream=new StreamSource(url);
@@ -65,13 +61,26 @@ public class HTMLFetchBox extends RDFBox {
 		}
 	}
 	
-	private void  initialize(Element element){
-    	url=XMLUtil.getTextFromFirstSubEleByName(element, "location");
+	public void  initialize(PipeContext context,Element element){
+		super.setContext(context);
+    	setUrl(XMLUtil.getTextFromFirstSubEleByName(element, "location"));
+		setFormat(element.getAttribute("format"));
     	
-    	if((null!=url)&&(url.trim().length()>0))
-    		format=element.getAttribute("format");
+    	if((null!=url)&&(url.trim().length()>0)){
+    		logger.warn("location missing for HTMLFetchBox "+element);
+    	}
     	
-    	parser.log("Error in fetchbox");
-    	parser.log(element.toString());
-    }	
+    }
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getFormat() {
+		return format;
+	}
+	public void setFormat(String format) {
+		this.format = format;
+	}	
 }

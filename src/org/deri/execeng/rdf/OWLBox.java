@@ -2,7 +2,9 @@ package org.deri.execeng.rdf;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.core.ExecBuffer;
+import org.deri.execeng.core.PipeContext;
+import org.deri.execeng.model.Operator;
 import org.deri.execeng.utils.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,27 +21,23 @@ import com.hp.hpl.jena.reasoner.ReasonerRegistry;
  */
 public class OWLBox extends AbstractMerge{
 	final Logger logger = LoggerFactory.getLogger(OWLBox.class);
-	 String owlOpID;
-	 public  OWLBox(PipeParser parser,Element element){
-		 this.parser=parser;
-		 initialize(element);		 
-     }
+	 String owlOpID = null;
      
-     public org.deri.execeng.core.ExecBuffer getExecBuffer(){
+     public ExecBuffer getExecBuffer(){
     	 return buffer;
      }
      
      public void execute(){
     	 //merge all input sources to Sesame buffer
-    	 buffer= new SesameMemoryBuffer(parser);
+    	 buffer= new SesameMemoryBuffer();
     	 mergeInputs();
     	 
     	 //create a Jena Model containing input RDF data for reasoning from merged Sesame buffer
     	 Model data =createJenaModel(buffer);
     	 
     	 //create a Jena Model containing OWL schema from <owlsource> tag parsed into operator with ID owlOpID
-    	 if (!parser.getOpByID(owlOpID).isExecuted()) parser.getOpByID(owlOpID).execute();
-    	 Model schema =createJenaModel((SesameMemoryBuffer)parser.getOpByID(owlOpID).getExecBuffer());
+    	 Operator operator = context.getOperatorExecuted(owlOpID);
+		Model schema =createJenaModel((SesameMemoryBuffer)operator.getExecBuffer());
     	 
     	 //create default Jena reasoner and infer implicit RDF triples
     	 Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
@@ -47,7 +45,7 @@ public class OWLBox extends AbstractMerge{
     	 InfModel infmodel = ModelFactory.createInfModel(reasoner, data);
     	 
     	 //write inferred triples back to opearator's buffer
-    	 buffer = new SesameMemoryBuffer(parser);
+    	 buffer = new SesameMemoryBuffer();
     	 writeJenaModel(infmodel, buffer);
     	 
     	 isExecuted=true;
@@ -66,14 +64,22 @@ public class OWLBox extends AbstractMerge{
      }
      
      @Override
-     protected void initialize(Element element){
-    	super.initialize(element); 
+     public void initialize(PipeContext context, Element element){
+    	super.initialize(context,element); 
    		Element owlSrc =XMLUtil.getFirstSubElementByName(element, "owlsource");
     	
-      	owlOpID=parser.getSource(owlSrc);
+      	setOwlOpID(context.getPipeParser().getSourceOperatorId(owlSrc));
       	if (null==owlOpID){
-      		parser.log("<owlsource> element must be set !!!");
+      		logger.warn("no owlsource found for element "+owlSrc);
       		//TODO : Handling error of lacking OWL data source 	
       	}  		
-     } 
+     }
+
+	public String getOwlOpID() {
+		return owlOpID;
+	}
+
+	public void setOwlOpID(String owlOpID) {
+		this.owlOpID = owlOpID;
+	} 
 }

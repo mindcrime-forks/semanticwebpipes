@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.zkoss.zk.ui.Executions;
 
 import edu.mit.simile.babel.BabelWriter;
@@ -112,7 +111,7 @@ public class Pipes extends HttpServlet {
 	        
 		    String pipeid = req.getParameter("id");			
 			String syntax = PipeManager.getPipeSyntax(pipeid);
-			String pipeName = PipeManager.getPipe(pipeid).getPipename();
+			String pipeName = PipeManager.getPipe(pipeid).getName();
 			
             // replace $pipe_name$ placeholder in the HTML template with the pipe name.
 			outputString = outputString.replace("$pipe_name$", pipeName);
@@ -173,40 +172,41 @@ public class Pipes extends HttpServlet {
   	public SesameMemoryBuffer getRDFBuffer(HttpServletRequest req, HttpServletResponse res){
   		String pipeid = req.getParameter("id");
   		String syntax = PipeManager.getPipeSyntax(pipeid);
-		if (syntax != null) {
-			DOMParser parser = new DOMParser();
-			try{
-	            parser.parse(new InputSource(new java.io.StringReader(syntax)));  
-	            Element rootElm=parser.getDocument().getDocumentElement();
-				List<Element> paraElms=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(rootElm,"parameters"), "parameter");
-		  		for(int i=0;i<paraElms.size();i++){		
-					String paraId = XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i),"id").trim();
-					String paraVal = (String) req.getParameter(paraId);
-					paraVal=(paraVal!=null)?paraVal:XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i),"default");
-					syntax = syntax.replace("${" + paraId + "}", paraVal);
-					try{
-						syntax=syntax.replace(URLEncoder.encode("${" + paraId + "}","UTF-8"),
-												URLEncoder.encode(paraVal,"UTF-8"));
-					}
-					catch(java.io.UnsupportedEncodingException e){
-						logger.info("UTF-8 Encoding must be supported by JVM specification",e);
-					}
+		if (syntax == null) {
+			logger.info("Syntax was null for pipeid=["+pipeid+"]");
+			return null;
+		}
+		DOMParser parser = new DOMParser();
+		try{
+			parser.parse(new InputSource(new java.io.StringReader(syntax)));  
+			Element rootElm=parser.getDocument().getDocumentElement();
+			List<Element> paraElms=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(rootElm,"parameters"), "parameter");
+			for(int i=0;i<paraElms.size();i++){		
+				String paraId = XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i),"id").trim();
+				String paraVal = (String) req.getParameter(paraId);
+				paraVal=(paraVal!=null)?paraVal:XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i),"default");
+				syntax = syntax.replace("${" + paraId + "}", paraVal);
+				try{
+					syntax=syntax.replace(URLEncoder.encode("${" + paraId + "}","UTF-8"),
+							URLEncoder.encode(paraVal,"UTF-8"));
 				}
-		  		//logger.debug(syntax);
-		  		PipeParser pipeParser= new PipeParser();
-				Stream stream = pipeParser.parse(syntax);
-				if (stream instanceof RDFBox) {
-					((RDFBox) stream).execute();
-					return (SesameMemoryBuffer)((RDFBox) stream).getExecBuffer();
-			
-				} else {
-					logger.debug("parsing error");
+				catch(java.io.UnsupportedEncodingException e){
+					logger.info("UTF-8 Encoding must be supported by JVM specification",e);
 				}
 			}
-			catch (IOException e) {				
+			//logger.debug(syntax);
+			PipeParser pipeParser= new PipeParser();
+			Stream stream = pipeParser.parse(syntax);
+			if (stream instanceof RDFBox) {
+				((RDFBox) stream).execute();
+				return (SesameMemoryBuffer)((RDFBox) stream).getExecBuffer();
+
+			} else {
+				logger.debug("parsing error: stream was not an RDFBox");
 			}
-			catch (SAXException e) {				
-			}
+		}catch (Exception e) {				
+			logger.debug("Problem executing pipe from syntax:"+syntax);
+			logger.error("Couldn't execute pipes from syntax (see debug for syntax)",e);
 		}
   		return null;
   	}

@@ -1,5 +1,4 @@
 package org.deri.execeng.rdf;
-import org.deri.execeng.core.PipeParser;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -13,24 +12,19 @@ import org.w3c.dom.Element;
 public class SameAsBox extends AbstractMerge{ 
 	final Logger logger = LoggerFactory.getLogger(SameAsBox.class);
 	
-	 public SameAsBox(PipeParser parser,Element element){
-		 this.parser=parser;
-		 initialize(element);
-		 
-     }
      
      public void execute(){
-    	 buffer= new SesameMemoryBuffer(parser);
+    	 buffer= new SesameMemoryBuffer();
     	 mergeInputs();
     	 
     	 RepositoryConnection conn = buffer.getConnection();
     	 Repository rep = conn.getRepository();
     	 
-    	 Smoosher smusher = new Smoosher();
+    	 Smoosher smoosher = new Smoosher();
     	 try {
-			smusher.smoosh(rep);
+			smoosher.smoosh(rep);
 		} catch (RepositoryException e) {
-			parser.log(e);
+			logger.warn("problem smooshing",e);
 		}
     	 
     	 isExecuted=true;

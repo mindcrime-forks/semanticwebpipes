@@ -3,7 +3,7 @@ package org.deri.execeng.rdf;
 import javax.xml.transform.stream.StreamSource;
 
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.core.PipeContext;
 import org.deri.execeng.model.Operator;
 import org.deri.execeng.utils.XMLUtil;
 import org.deri.execeng.utils.XSLTUtil;
@@ -14,12 +14,8 @@ public class XSLTBox implements Operator {
 	final Logger logger = LoggerFactory.getLogger(XSLTBox.class);
 	String xmlStrID,xslStrID;
 	private boolean isExecuted=false;
-	PipeParser parser;
 	XMLStreamBuffer buffer;
-	public XSLTBox(PipeParser parser,Element element){
-		this.parser=parser;
-		initialize(element);
-	}
+	private PipeContext context;
 	
 	@Override
 	public void execute() {
@@ -27,7 +23,7 @@ public class XSLTBox implements Operator {
 			StreamSource xmlSrc=executeXMLOp(xmlStrID);
 			StreamSource xslSrc=executeXMLOp(xslStrID);
 			if((xmlSrc!=null)&&(xslSrc!=null)){
-				buffer=new XMLStreamBuffer(parser);	
+				buffer=new XMLStreamBuffer();	
 			    buffer.setStreamSource(XSLTUtil.transform(xmlSrc,xslSrc));				
 			}
 	    }
@@ -36,15 +32,14 @@ public class XSLTBox implements Operator {
 	
     private StreamSource executeXMLOp(String strID){
     	
-    	Operator xmlOp=parser.getOpByID(strID);
-		if(!xmlOp.isExecuted())   xmlOp.execute();
+    	Operator xmlOp=context.getOperatorExecuted(strID);
 		ExecBuffer xmlBuff=xmlOp.getExecBuffer();
 		
 		StreamSource xmlSrc=null;
 		if(xmlBuff instanceof XMLStreamBuffer) 
 			xmlSrc=((XMLStreamBuffer)xmlBuff).getStreamSource();
 		if((xmlBuff instanceof SesameTupleBuffer)||(xmlBuff instanceof SesameTupleBuffer)){ 
-			XMLStreamBuffer tmpBuff= new XMLStreamBuffer(parser);
+			XMLStreamBuffer tmpBuff= new XMLStreamBuffer();
 			xmlBuff.stream(tmpBuff);
 			xmlSrc=tmpBuff.getStreamSource();
 		}
@@ -52,20 +47,6 @@ public class XSLTBox implements Operator {
 		return xmlSrc;
     }
     
-	public void initialize(Element element){
-		xmlStrID=parser.getSource(XMLUtil.getFirstSubElement(
-						XMLUtil.getFirstSubElementByName(element, "xmlsource")));
-    	xslStrID=parser.getSource(XMLUtil.getFirstSubElement(
-    					XMLUtil.getFirstSubElementByName(element, "xslsource")));
-    	if (null==xmlStrID){
-      		parser.log("<sourcelist> element must be set !!!");
-      		//TODO : Handling error of lacking xml source for XSLT transformation 	
-      	}
-    	if (null==xslStrID){
-      		parser.log("<sourcelist> element must be set !!!");
-      		//TODO : Handling error of lacking xml source for XSLT transformation 	
-      	}
-    }
 
 	@Override
 	public ExecBuffer getExecBuffer() {
@@ -82,13 +63,36 @@ public class XSLTBox implements Operator {
 
 	@Override
 	public void stream(ExecBuffer buffer) {
+		logger.error("not implemented");
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void stream(ExecBuffer buffer, String context) {
+		logger.error("not implemented");
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void initialize(PipeContext context, Element element) {
+		this.setContext(context);
+		xmlStrID=context.getPipeParser().getSourceOperatorId(XMLUtil.getFirstSubElement(
+				XMLUtil.getFirstSubElementByName(element, "xmlsource")));
+		xslStrID=context.getPipeParser().getSourceOperatorId(XMLUtil.getFirstSubElement(
+				XMLUtil.getFirstSubElementByName(element, "xslsource")));
+		if (null==xmlStrID){
+			logger.warn("<sourcelist> element must be set !!!");
+			//TODO : Handling error of lacking xml source for XSLT transformation 	
+		}
+		if (null==xslStrID){
+			logger.warn("<sourcelist> element must be set !!!");
+			//TODO : Handling error of lacking xml source for XSLT transformation 	
+		}
+	}
+
+	public void setContext(PipeContext context) {
+		this.context = context;
 	}	
 }

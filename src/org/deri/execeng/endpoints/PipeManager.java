@@ -55,8 +55,8 @@ public class PipeManager {
 			List<Pipe> pipeList = new ArrayList<Pipe>();
 			while(rs.next()){
 				Pipe pipe = new Pipe();
-				pipe.setPipeid(rs.getString("pipeid"));
-				pipe.setPipename(rs.getString("pipename"));
+				pipe.setId(rs.getString("pipeid"));
+				pipe.setName(rs.getString("pipename"));
 				pipeList.add(pipe);
 			}
 			return pipeList;
@@ -162,8 +162,8 @@ public class PipeManager {
 			rs = stmt.executeQuery(query);
 			if(rs.next()){
 				Pipe pipe = new Pipe();
-				pipe.setPipeid(pipeid);
-				pipe.setPipename(rs.getString("pipename"));
+				pipe.setId(pipeid);
+				pipe.setName(rs.getString("pipename"));
 				pipe.setSyntax(rs.getString("syntax"));
 				pipe.setConfig(rs.getString("config"));
 				return pipe;

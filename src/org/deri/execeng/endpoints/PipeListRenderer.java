@@ -65,9 +65,9 @@ public class PipeListRenderer implements RowRenderer {
 	
     public void render(Row row, Object data) {
       row.setValign("top");	
-      String pipeid=((Pipe)data).getPipeid();
+      String pipeid=((Pipe)data).getId();
       Html pipeLink=new Html("<a href='./pipes/?id="+pipeid+"'>"+pipeid+"</a><br />" + 
-    		  justify(((Pipe)data).getPipename(),30));
+    		  justify(((Pipe)data).getName(),30));
       pipeLink.setParent(row);
 
       

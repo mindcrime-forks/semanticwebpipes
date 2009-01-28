@@ -4,25 +4,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class Pipe {
 	final Logger logger = LoggerFactory.getLogger(Pipe.class);
-	private String pipeid = null;
-	private String pipename = null;
+	private String id = null;
+	private String name = null;
 	private String syntax = null;
 	private String config=null;
 
-	public String getPipeid() {
-		return pipeid;
+	public String getId() {
+		return id;
 	}
 
-	public void setPipeid(String pipeid) {
-		this.pipeid = pipeid;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public String getPipename() {
-		return pipename;
+	public String getName() {
+		return name;
 	}
 
-	public void setPipename(String pipename) {
-		this.pipename = pipename;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getSyntax() {

@@ -3,7 +3,7 @@ package org.deri.execeng.rdf;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.core.PipeContext;
 import org.deri.execeng.utils.XMLUtil;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.util.RDFInserter;
@@ -16,41 +16,44 @@ public class ConstructBox extends AbstractMerge {
 	
     private List<String> graphNames =new ArrayList<String>();
     private String constructQuery;
-	
-    public ConstructBox(PipeParser parser, Element element){  
-    	this.parser=parser;
-    	initialize(element);    	
-    }
+
    
     public void execute(){
-    	buffer= new SesameMemoryBuffer(parser);
-    	SesameMemoryBuffer tmp=new SesameMemoryBuffer(parser);
+    	buffer= new SesameMemoryBuffer();
+    	SesameMemoryBuffer tmp=new SesameMemoryBuffer();
     	mergeInputs(tmp);
     	try{    	  
     		tmp.getConnection().prepareGraphQuery(QueryLanguage.SPARQL,constructQuery).evaluate(new RDFInserter(buffer.getConnection()));
     	}
     	catch(Exception e){
-    		parser.log(e.toString());
+    		logger.warn("problem executing construct box",e);
     	}
     	isExecuted=true;
     }
 
-    protected void initialize(Element element){   
-    	
+    public void initialize(PipeContext context,Element element){   
+    	super.setContext(context);
     	List<Element> sources=XMLUtil.getSubElementByName(element, "source");
     	constructQuery=XMLUtil.getTextFromFirstSubEleByName(element, "query");
     	if((sources.size()<=0)&&(constructQuery==null)){
-			parser.log("Construct operator syntax error at");
-		    parser.log(element.toString());
+			logger.warn("Construct operator syntax error at "+element);
 		    return;
 		}
-    	constructQuery=constructQuery.trim();
+    	this.setConstructQuery(constructQuery.trim());
     	for(int i=0;i<sources.size();i++){
-    		String opID=parser.getSource(sources.get(i));
+    		String opID=context.getPipeParser().getSourceOperatorId(sources.get(i));
     		if (null!=opID){
     			addStream(opID);
     	   	    graphNames.add(sources.get(i).getAttribute("uri"));
     		}
     	}    	
      }
+
+	public String getConstructQuery() {
+		return constructQuery;
+	}
+
+	public void setConstructQuery(String constructQuery) {
+		this.constructQuery = constructQuery;
+	}
 }

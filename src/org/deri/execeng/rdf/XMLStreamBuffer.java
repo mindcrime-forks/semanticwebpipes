@@ -9,7 +9,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.core.PipeParser;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
@@ -18,19 +17,15 @@ public class XMLStreamBuffer extends ExecBuffer {
 	final Logger logger = LoggerFactory.getLogger(XMLStreamBuffer.class);
 	String url=null;
 	StringBuffer strBuff=null;
-	PipeParser parser;
 	
-	public XMLStreamBuffer(PipeParser parser){
-		this.parser=parser;
+	public XMLStreamBuffer(){
 	}
 	
-	public XMLStreamBuffer(PipeParser parser,String url){
-		this.parser=parser;
+	public XMLStreamBuffer(String url){
 		this.url= url;
 	}
 	
-	public XMLStreamBuffer(PipeParser parser,StringBuffer strBuff){
-		this.parser=parser;
+	public XMLStreamBuffer(StringBuffer strBuff){
 		this.strBuff=strBuff;
 	}
 	
@@ -91,7 +86,7 @@ public class XMLStreamBuffer extends ExecBuffer {
 				outputStreamWriter.write(strBuff.toString());
 				outputStreamWriter.flush();
 			} catch (IOException e) {
-				parser.log(e);
+				logger.warn("problem streaming output",e);
 			}
 		}
 	}

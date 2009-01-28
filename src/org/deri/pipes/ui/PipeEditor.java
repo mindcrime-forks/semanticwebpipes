@@ -377,8 +377,8 @@ public class PipeEditor extends Workspace {
 	public void edit(String pid){
 		Pipe pipe=PipeManager.getPipe(pid);
 		reload(pipe.getConfig());
-		pipeid.setValue(pipe.getPipeid());
-		bdid.setValue(pipe.getPipeid());
-		pipename.setValue(pipe.getPipename());
+		pipeid.setValue(pipe.getId());
+		bdid.setValue(pipe.getId());
+		pipename.setValue(pipe.getName());
 	}
 }

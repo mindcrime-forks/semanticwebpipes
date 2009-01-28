@@ -2,7 +2,7 @@ package org.deri.execeng.rdf;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.core.PipeContext;
 import org.deri.execeng.utils.XMLUtil;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -25,14 +25,6 @@ import org.w3c.dom.Element;
 public class RegExBox extends AbstractMerge{
 	final Logger logger = LoggerFactory.getLogger(RegExBox.class);
 	 ArrayList<String> types,regexes,replacements;
-	 public  RegExBox(PipeParser parser,Element element){
-		 this.parser=parser;
-		 initialize(element);		 
-     }
-     
-     public org.deri.execeng.core.ExecBuffer getExecBuffer(){
-    	 return buffer;
-     }
      
      public ArrayList<String> getTypes(){
     	 return types;
@@ -48,39 +40,39 @@ public class RegExBox extends AbstractMerge{
      
      public void execute(){
     	 //merge all input sources to Sesame buffer
-    	 SesameMemoryBuffer tmp= new SesameMemoryBuffer(parser);
+    	 SesameMemoryBuffer tmp= new SesameMemoryBuffer();
     	 mergeInputs(tmp);
     	 
-    	 buffer = new SesameMemoryBuffer(parser);
+    	 buffer = new SesameMemoryBuffer();
     	 try{
 			 tmp.getConnection().export(new ReplaceHandler(this));
 		 }
 		 catch(Exception e){
-			 parser.log(e);
+			 logger.warn("problem executing",e);
 		 }
     	     	 
     	 isExecuted=true;
      }   
          
      @Override
-     protected void initialize(Element element){
-    	super.initialize(element); 
+     public void initialize(PipeContext context,Element element){
+    	super.initialize(context,element); 
    		List<Element> ruleEles =XMLUtil.getSubElementByName(
    				                       XMLUtil.getFirstSubElementByName(element, "rules"),"rule");
    		types =new ArrayList<String>();
    		regexes= new ArrayList<String>();
    		replacements= new ArrayList<String>();
    		for(int i=0;i<ruleEles.size();i++){
-   			if(ruleEles.get(i).getAttribute("type").equalsIgnoreCase("uri")
-   			   ||ruleEles.get(i).getAttribute("type").equalsIgnoreCase("literal")){
+   			String typeAttribute = ruleEles.get(i).getAttribute("type");
+			if(typeAttribute.equalsIgnoreCase("uri")
+   			   ||typeAttribute.equalsIgnoreCase("literal")){
    				
    				types.add(ruleEles.get(i).getAttribute("type").toLowerCase());
    				regexes.add(XMLUtil.getTextFromFirstSubEleByName(ruleEles.get(i),"regex"));
    				replacements.add(XMLUtil.getTextFromFirstSubEleByName(ruleEles.get(i),"replacement"));
-   			}
-   			   
+   			}   			   
    			else{
-   				parser.log("'type' attribute of <rule> tag must be 'uri' or 'literal'");
+   				logger.warn("'type' attribute of <rule> tag must be 'uri' or 'literal', not ["+typeAttribute+"]");
    			}
    			   
    		}

@@ -1,6 +1,6 @@
 package org.deri.execeng.rdf;
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.core.PipeContext;
 import org.deri.execeng.model.Operator;
 import org.deri.execeng.utils.XMLUtil;
 import org.slf4j.Logger;
@@ -15,16 +15,13 @@ public class SplitBox implements Operator{
 	 ExecBuffer buffer;
 	 String inputOpID;
 	 protected boolean isExecuted=false;
-	 protected PipeParser parser;
-	 public  SplitBox(PipeParser parser,Element element){
-		 this.parser=parser;
-		 initialize(element);		 
-     }
+	private PipeContext context;
+
 
 	@Override
 	public void execute() {
-		if (!parser.getOpByID(inputOpID).isExecuted()) parser.getOpByID(inputOpID).execute();
-		buffer=parser.getOpByID(inputOpID).getExecBuffer();
+		buffer=context.getOperatorExecuted(inputOpID).getExecBuffer();
+		isExecuted = true;
 	}
 
 	@Override
@@ -49,11 +46,12 @@ public class SplitBox implements Operator{
 			buffer.stream(outputBuffer,context);
 	}
 
-	private void initialize(Element element){
+	public void initialize(PipeContext context,Element element){
+		this.context = context;
         Element inputSrc =XMLUtil.getFirstSubElement(element);
-      	inputOpID=parser.getSource(inputSrc);
+      	inputOpID=context.getPipeParser().getSourceOperatorId(inputSrc);
       	if (null==inputOpID){
-      		parser.log("<split> element must contain a sub element or have REFID attribute !!!");
+      		logger.warn("<split> element must contain a sub element or have REFID attribute !!!");
       		//TODO : Handling error of lacking OWL data source 	
       	}
 	}

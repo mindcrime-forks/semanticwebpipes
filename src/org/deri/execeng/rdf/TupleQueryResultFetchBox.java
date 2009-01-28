@@ -1,7 +1,7 @@
 package org.deri.execeng.rdf;
 
 import org.deri.execeng.core.ExecBuffer;
-import org.deri.execeng.core.PipeParser;
+import org.deri.execeng.core.PipeContext;
 import org.deri.execeng.model.Operator;
 import org.deri.execeng.utils.XMLUtil;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
@@ -14,23 +14,7 @@ public class TupleQueryResultFetchBox implements Operator {
 	private ExecBuffer buffer=null;
 	private boolean isExecuted=false;
 	private String url=null;
-	private TupleQueryResultFormat format=null;
-	private PipeParser parser;
-	
-	public TupleQueryResultFetchBox(PipeParser parser,Element element){
-		this.parser=parser;
-		initialize(element);
-	}
-	public TupleQueryResultFetchBox(String url){
-		this.format=TupleQueryResultFormat.SPARQL;
-		this.url=url;
-	}
-	
-	public TupleQueryResultFetchBox(String url,TupleQueryResultFormat format){
-		
-		this.format=format;
-		this.url=url;
-	}	
+	private TupleQueryResultFormat format=TupleQueryResultFormat.SPARQL;
 	
 	public ExecBuffer getExecBuffer(){
 		return buffer;
@@ -49,7 +33,7 @@ public class TupleQueryResultFetchBox implements Operator {
 	}
 	
 	public void execute(){				
-		buffer=new SesameTupleBuffer(parser,url,format);			
+		buffer=new SesameTupleBuffer(url,format);			
 		isExecuted=true;
 	}
 	public static TupleQueryResultFormat formatOf(String format){
@@ -66,16 +50,39 @@ public class TupleQueryResultFetchBox implements Operator {
     	return buffer.toString(); 
     }
     
-    private void initialize(Element element){    	
-    	url=XMLUtil.getTextFromFirstSubEleByName(element, "location");
+	@Override
+	public void initialize(PipeContext context, Element element) {
+		setUrl(XMLUtil.getTextFromFirstSubEleByName(element, "location"));
     	
     	if((null!=url)&&url.trim().length()>0){
-    		if(element.getAttribute("format")!=null)
-    			format=formatOf(element.getAttribute("format"));
-    		else	
-    			format=TupleQueryResultFormat.SPARQL;    		
+     	}else{
+    		logger.warn("location attibute not set:"+element.toString());
     	}
-    	parser.log("Error in Fetching SPARQL Result");
-    	parser.log(element.toString());    	
-    }
+   		if(element.getAttribute("format")!=null){
+			setFormat(element.getAttribute("format"));
+		}
+		else{	
+			setFormat(TupleQueryResultFormat.SPARQL);
+		}
+	}
+
+	public void setFormat(String fmt) {
+		setFormat(formatOf(fmt));
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public TupleQueryResultFormat getFormat() {
+		return format;
+	}
+
+	public void setFormat(TupleQueryResultFormat format) {
+		this.format = format;
+	}
 }
