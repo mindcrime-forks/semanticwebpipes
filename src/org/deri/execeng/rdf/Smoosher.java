@@ -24,7 +24,39 @@ import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+/**
+ This operator produces a merge of all the sources smooshing URIs based on the owl:sameAs statement included in the sources themselves.
+<p>
+For example (see also http://pipes.deri.org:8080/pipes/Pipes/?id=smoosher?), let us consider two RDF files as input. The first one (published at http://bobwebsite.org/foaf.rdf ?) says:
 
+    <pre>    http://bobwebsite.org/Bob/ ?  ex:skill   ex:JavaProgramming
+</pre>
+
+and the second (published at http://charleswebsite.org/info.rdf ?) says:
+<pre>
+    http://charleswebsite.org/Bob/?   foaf:knows  http://charleswebsite.org/Charles/?
+    http://bobwebsite.org/Bob/?   owl:sameAs   http://charleswebsite.org/Charles/ ?
+</pre>
+By creating a pipe like the following:
+<pre>
+    &lt;smoosher&gt;
+          &lt;source&gt;
+            &lt;fetch&gt;&lt;location&gt;http://bobwebsite.org/foaf.rdf?&lt;/location&gt;&lt;/fetch&gt;
+          &lt;/source&gt;
+          &lt;source&gt;
+            &lt;fetch&gt;&lt;location&gt;http://charleswebsite.org/info.rdf?&lt;/location&gt;&lt;/fetch&gt;
+          &lt;/source&gt;
+    &lt;/smoosher&gt;
+</pre>
+I would obtain, as output, an RDF including the following triples:
+<pre>
+    http://bobwebsite.org/Bob/?   ex:skill  ex:JavaProgramming
+    http://bobwebsite.org/Bob/?   foaf:knows   http://charleswebsite.org/Charles/ ?
+</pre>
+where only one URI is used to address Bob as an entity (the shortest one). 
+</p>
+ *
+ */
 public class Smoosher {
 	final Logger logger = LoggerFactory.getLogger(Smoosher.class);
 

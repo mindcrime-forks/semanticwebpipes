@@ -17,7 +17,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+/**
+ * The FOR operator will  invoke a parameterized pipe multiple times and merge the resulting outputs of each invocation. The &lt;sourcelist&gt; specifies an operator that ouputs a SPARQL result set. For each result in the set, the variable  values will be subtituted into the parametrized pipe specified in &lt;forloop&gt; and the pipe will be invoked.
+<pre>
+Syntax template:
 
+&lt;for&gt;
+   &lt;sourcelist&gt;
+requires SPARQL XML FORMAT
+ &lt;/sourcelist&gt;
+&lt;forloop&gt;
+    &lt;simplemix&gt;&lt;fetch&gt;&lt;location&gt;$uri$&lt;/location&gt;&lt;/fetch&gt;&lt;simplemix&gt;
+&lt;/forloop&gt;
+&lt;/for&gt;
+
+Example (See also http://pipes.deri.org:8080/pipes/Pipes/?id=forloop  ): This pipe fech from the URIs of all five people known by the author of a FOAF file.
+
+&lt;for&gt;
+   &lt;sourcelist&gt;
+   &lt;select&gt;
+     &lt;source&gt;&lt;fetch&gt;&lt;location&gt;http://www.w3.org/People/Berners-Lee/card?&lt;/location&gt;&lt;/fetch&gt;&lt;/source&gt;    
+&lt;query&gt;
+       &lt;![CDATA[
+         select ?uri where {?s &lt;http://xmlns.com/foaf/0.1/knows?&gt; ?uri} ORDER by desc(?uri) LIMIT 5
+     ]]&gt;
+   &lt;/query&gt;
+ &lt;/select&gt;
+   &lt;/sourcelist&gt; 
+&lt;forloop&gt;
+&lt;simplemix&gt;&lt;source&gt;&lt;fetch&gt;&lt;location&gt;$uri$&lt;/location&gt;&lt;/fetch&gt;&lt;/source&gt;&lt;/simplemix&gt;
+&lt;/forloop&gt;
+&lt;/for&gt;
+</pre>
+ *
+ */
 public class ForLoopBox extends RDFBox{
 	final Logger logger = LoggerFactory.getLogger(ForLoopBox.class);
    

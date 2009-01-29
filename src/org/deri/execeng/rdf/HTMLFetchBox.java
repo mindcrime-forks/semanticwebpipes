@@ -11,7 +11,35 @@ import org.deri.execeng.utils.XSLTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+/**
+ * The Fetch operator is used to fetch data from an URI in RDF/XML or SPARQL-RESULT/XML . There is an optional attribute &quot;accept&quot; which determines the HTTP accept header for the request. Allowed value are :&quot;rdfxml&quot; and &quot;sparqlxml&quot;.
+<pre>
+Syntax template:
 
+&lt;fetch  accept=&quot;rdfxml/sparqlxml&quot;&gt;
+   &lt;location&gt;
+   URL OF THE WEB FILE TO FETCH
+   &lt;/location&gt;
+&lt;/fetch&gt;
+
+or
+
+&lt;fetch  accept=&quot;rdfxml/sparqlxml&quot;&gt;
+   &lt;sparqlendpoint&gt;
+      &lt;defaultgraph&gt;URI of the default graph&lt;/defaultgraph&gt;
+      &lt;endpoint&gt;URL to the Sparql endpoint&lt;/endpoint&gt;
+      &lt;query&gt;the remote SPARQL query&lt;/query&gt;
+   &lt;/sparqlendpoint&gt;
+&lt;/fetch&gt;
+
+Example:
+
+ &lt;fetch  accept=&quot;rdfxml&quot;&gt;
+     &lt;location&gt;http://www.w3.org/People/Berners-Lee/card?&lt;/location&gt;
+ &lt;/fetch&gt;
+ </pre>
+ *
+ */
 public class HTMLFetchBox extends RDFBox {
 	final Logger logger = LoggerFactory.getLogger(HTMLFetchBox.class);
 	//fuller says: WARNING WARNING WARNING MEMORY LEAKS FOLLOW IN STATIC HASHTABLES
