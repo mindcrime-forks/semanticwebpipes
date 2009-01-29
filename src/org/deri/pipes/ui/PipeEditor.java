@@ -42,13 +42,13 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.apache.xerces.parsers.DOMParser;
-import org.deri.execeng.core.PipeParser;
-import org.deri.execeng.endpoints.Pipe;
-import org.deri.execeng.endpoints.PipeManager;
-import org.deri.execeng.model.Operator;
-import org.deri.execeng.model.Stream;
-import org.deri.execeng.rdf.RDFBox;
-import org.deri.execeng.rdf.SelectBox;
+import org.deri.pipes.core.PipeParser;
+import org.deri.pipes.endpoints.Pipe;
+import org.deri.pipes.endpoints.PipeManager;
+import org.deri.pipes.model.Operator;
+import org.deri.pipes.model.Stream;
+import org.deri.pipes.rdf.RDFBox;
+import org.deri.pipes.rdf.SelectBox;
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
 import org.integratedmodelling.zk.diagram.components.PortTypeMask;
 import org.integratedmodelling.zk.diagram.components.Shape;
@@ -311,12 +311,12 @@ public class PipeEditor extends Workspace {
 		   String textResult=null;
 		   if(stream instanceof RDFBox){
 			   ((RDFBox) stream).execute();
-			   org.deri.execeng.core.ExecBuffer buff=((RDFBox)stream).getExecBuffer();
+			   org.deri.pipes.core.ExecBuffer buff=((RDFBox)stream).getExecBuffer();
 			   textResult=buff.toString();
-			   if(buff instanceof org.deri.execeng.rdf.SesameMemoryBuffer){
+			   if(buff instanceof org.deri.pipes.rdf.SesameMemoryBuffer){
 				   try{
 					   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
-			    		tuple=((((org.deri.execeng.rdf.SesameMemoryBuffer)buff).
+			    		tuple=((((org.deri.pipes.rdf.SesameMemoryBuffer)buff).
 			    				     getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
 			    	}
 			        catch(MalformedQueryException e){ 
@@ -329,8 +329,8 @@ public class PipeEditor extends Workspace {
 			      	  
 			        }
 			   }
-			   else if(buff instanceof org.deri.execeng.rdf.SesameTupleBuffer){
-				   tuple=((org.deri.execeng.rdf.SesameTupleBuffer)buff).getTupleQueryResult();
+			   else if(buff instanceof org.deri.pipes.rdf.SesameTupleBuffer){
+				   tuple=((org.deri.pipes.rdf.SesameTupleBuffer)buff).getTupleQueryResult();
 			   }
 		   }
 		   reloadTextDebug(textResult);
@@ -350,12 +350,12 @@ public class PipeEditor extends Workspace {
 		   String textResult=null;
 		   if(op instanceof RDFBox){
 			   ((RDFBox) op).execute();
-			   org.deri.execeng.core.ExecBuffer buff=((RDFBox)op).getExecBuffer();
+			   org.deri.pipes.core.ExecBuffer buff=((RDFBox)op).getExecBuffer();
 			   textResult=buff.toString();
-			   if(buff instanceof org.deri.execeng.rdf.SesameMemoryBuffer){
+			   if(buff instanceof org.deri.pipes.rdf.SesameMemoryBuffer){
 				   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
 				   try{
-			    		tuple=((((org.deri.execeng.rdf.SesameMemoryBuffer)buff).
+			    		tuple=((((org.deri.pipes.rdf.SesameMemoryBuffer)buff).
 			    				     getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
 			    	}
 			        catch(Exception e){ 
@@ -364,12 +364,12 @@ public class PipeEditor extends Workspace {
 			   }   
 		   }else if(op instanceof SelectBox){
 			   ((SelectBox) op).execute();
-			   org.deri.execeng.core.ExecBuffer buff=((SelectBox)op).getExecBuffer();
+			   org.deri.pipes.core.ExecBuffer buff=((SelectBox)op).getExecBuffer();
 			   //textResult=buff.toString();
 			   
-			   if(buff instanceof org.deri.execeng.rdf.SesameTupleBuffer){
-				   tuple=((org.deri.execeng.rdf.SesameTupleBuffer)buff).getTupleQueryResult();
-				   textResult=((org.deri.execeng.rdf.SesameTupleBuffer)buff).toString();
+			   if(buff instanceof org.deri.pipes.rdf.SesameTupleBuffer){
+				   tuple=((org.deri.pipes.rdf.SesameTupleBuffer)buff).getTupleQueryResult();
+				   textResult=((org.deri.pipes.rdf.SesameTupleBuffer)buff).toString();
 			   }
 			   
 		   }

@@ -41,8 +41,8 @@ package org.deri.pipes.ui;
 import java.util.List;
 
 import org.apache.xerces.dom.DocumentImpl;
-import org.deri.execeng.utils.IDTool;
-import org.deri.execeng.utils.XMLUtil;
+import org.deri.pipes.utils.IDTool;
+import org.deri.pipes.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.PortType;

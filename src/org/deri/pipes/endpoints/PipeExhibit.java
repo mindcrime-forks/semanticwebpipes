@@ -36,70 +36,38 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
+package org.deri.pipes.endpoints;
 
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.Port;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-/**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
- *
- */
-public class OWLNode extends InOutNode{
-	final Logger logger = LoggerFactory.getLogger(OWLNode.class);
-	Port owlPort= null;
-	public OWLNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
-		wnd.setTitle("OWL Reasoner");
-        tagName="OWL";
-	}
+
+public class PipeExhibit extends HttpServlet {
+	final Logger logger = LoggerFactory.getLogger(PipeExhibit.class);
 	
-	protected void initialize(){
-		super.initialize();
-		owlPort =createPort(PipePortType.RDFIN,"left");
-	}
-	
-	public Port getOWLPort(){
-		return owlPort;
-	}
-	
-	@Override
-	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
-			srcCode =super.getSrcCode(doc, config);
-	    	srcCode.appendChild(getConnectedCode(doc,"owlsource",owlPort,config));
-	    	return srcCode;
-		}
-		return null;
-    }
-	
-	@Override
-	public void reset(boolean recursive){
-		super.reset(recursive);
-		if(recursive) reset(owlPort,recursive);
-	}
-	
-	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		OWLNode node= new OWLNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
-		wsp.addFigure(node);
+	public void doGet(HttpServletRequest req, HttpServletResponse res)
+	throws ServletException, IOException {
+
+		res.setStatus(HttpServletResponse.SC_OK);
+		res.setContentType("text/html");
 		
-		List<Element> srcEles=XMLUtil.getSubElementByName(elm, "source");
-		for(int i=0;i<srcEles.size();i++){
-			PipeNode xmlNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(srcEles.get(i)),wsp);
-			xmlNode.connectTo(node.getInputPort());
-		}
-		
-		Element xslElm=XMLUtil.getFirstSubElementByName(elm, "owlsource");
-		PipeNode xslNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(xslElm),wsp);
-		xslNode.connectTo(node.getOWLPort());
-		
-		return node;
-    }
+		FileInputStream file = new FileInputStream (getServletContext().getRealPath("/") + "template/generic_exhibit_result_viewer.html");
+		byte[] b = new byte[file.available()];
+        file.read(b);
+        file.close ();
+        String templateString = new String (b);
+        String outputString = templateString.replace("$rdf_source$", "http://pipes.deri.org:8080/pipes/Pipes/?" + req.getQueryString()); // this links to the absolute path of pipes.deri.org for now. This is just a hack because it does not seem to work with local resources.
+		        
+		PrintWriter outputWriter = res.getWriter();		
+		outputWriter.write(outputString);
+	}
+
 }

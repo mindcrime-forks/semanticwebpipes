@@ -37,7 +37,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.ui;
-import org.deri.execeng.utils.XMLUtil;
+import org.deri.pipes.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.slf4j.Logger;

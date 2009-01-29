@@ -36,70 +36,41 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
+package org.deri.pipes.core;
 
-import java.util.List;
+import info.aduna.lang.FileFormat;
 
-import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.Port;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
-public class OWLNode extends InOutNode{
-	final Logger logger = LoggerFactory.getLogger(OWLNode.class);
-	Port owlPort= null;
-	public OWLNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
-		wnd.setTitle("OWL Reasoner");
-        tagName="OWL";
-	}
-	
-	protected void initialize(){
-		super.initialize();
-		owlPort =createPort(PipePortType.RDFIN,"left");
-	}
-	
-	public Port getOWLPort(){
-		return owlPort;
-	}
-	
-	@Override
-	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
-			srcCode =super.getSrcCode(doc, config);
-	    	srcCode.appendChild(getConnectedCode(doc,"owlsource",owlPort,config));
-	    	return srcCode;
+
+public abstract class ExecBuffer {
+	 public static StringBuffer log= new StringBuffer();
+     public abstract void stream(ExecBuffer outputBuffer);
+     public abstract void stream(ExecBuffer outputBuffer,String context);
+     public abstract void stream(OutputStream output);
+     
+     protected static InputStream openConnection(String url, FileFormat format)
+     throws IOException, MalformedURLException {
+    	 URL netURL = new URL(url.trim());
+		URLConnection urlConnection = netURL.openConnection();
+		if(urlConnection instanceof HttpURLConnection){
+    	 HttpURLConnection httpURLConnection=(HttpURLConnection)urlConnection;
+    	 httpURLConnection.setRequestProperty("Accept", format.getDefaultMIMEType());
 		}
-		return null;
-    }
-	
-	@Override
-	public void reset(boolean recursive){
-		super.reset(recursive);
-		if(recursive) reset(owlPort,recursive);
-	}
-	
-	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		OWLNode node= new OWLNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
-		wsp.addFigure(node);
-		
-		List<Element> srcEles=XMLUtil.getSubElementByName(elm, "source");
-		for(int i=0;i<srcEles.size();i++){
-			PipeNode xmlNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(srcEles.get(i)),wsp);
-			xmlNode.connectTo(node.getInputPort());
-		}
-		
-		Element xslElm=XMLUtil.getFirstSubElementByName(elm, "owlsource");
-		PipeNode xslNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(xslElm),wsp);
-		xslNode.connectTo(node.getOWLPort());
-		
-		return node;
-    }
+    	 urlConnection.connect();
+    	 return urlConnection.getInputStream();
+     }
+
+
 }

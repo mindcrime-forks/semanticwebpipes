@@ -36,70 +36,69 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
+package org.deri.pipes.core;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.Port;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.deri.pipes.model.Operator;
 /**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
+ * Operators belonging to a Pipe.
+ * @author rfuller
  *
  */
-public class OWLNode extends InOutNode{
-	final Logger logger = LoggerFactory.getLogger(OWLNode.class);
-	Port owlPort= null;
-	public OWLNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
-		wnd.setTitle("OWL Reasoner");
-        tagName="OWL";
+public class PipeContext {
+	Map <String,Operator> operators = new HashMap<String,Operator>();
+	PipeParser parser;
+	/**
+	 * Get the operator having this id.
+	 * @param id
+	 * @return The operator having the given id, or null if there is no such operator.
+	 */
+	public Operator getOperator(String id){
+		return operators.get(id);
 	}
-	
-	protected void initialize(){
-		super.initialize();
-		owlPort =createPort(PipePortType.RDFIN,"left");
+	/**
+	 * Add this operator into the context.
+	 * @param id
+	 * @param operator
+	 */
+	void addOperator(String id,Operator operator){
+		operators.put(id, operator);
 	}
-	
-	public Port getOWLPort(){
-		return owlPort;
+	/**
+	 * Whether the context contains an operator having this id.
+	 * @param id
+	 * @return true if there is an operator having this id, false otherwise.
+	 */
+	public boolean contains(String id) {
+		return operators.containsKey(id);
 	}
-	
-	@Override
-	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
-			srcCode =super.getSrcCode(doc, config);
-	    	srcCode.appendChild(getConnectedCode(doc,"owlsource",owlPort,config));
-	    	return srcCode;
-		}
-		return null;
-    }
-	
-	@Override
-	public void reset(boolean recursive){
-		super.reset(recursive);
-		if(recursive) reset(owlPort,recursive);
+	/**
+	 * Set the PipeParser.
+	 * @param parser
+	 */
+	void setPipeParser(PipeParser parser){
+		this.parser = parser;
 	}
-	
-	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		OWLNode node= new OWLNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
-		wsp.addFigure(node);
-		
-		List<Element> srcEles=XMLUtil.getSubElementByName(elm, "source");
-		for(int i=0;i<srcEles.size();i++){
-			PipeNode xmlNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(srcEles.get(i)),wsp);
-			xmlNode.connectTo(node.getInputPort());
-		}
-		
-		Element xslElm=XMLUtil.getFirstSubElementByName(elm, "owlsource");
-		PipeNode xslNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(xslElm),wsp);
-		xslNode.connectTo(node.getOWLPort());
-		
-		return node;
-    }
+	/**
+	 * Get the PipeParser.
+	 * @return
+	 */
+	public PipeParser getPipeParser(){
+		return parser;
+	}
+	/**
+	 * Get the named operator having first tested that
+	 * the execute() method was called, or executing.
+	 * @param id
+	 * @return the operator having been executed.
+	 */
+	public Operator getOperatorExecuted(String id) {
+		Operator operator = getOperator(id);
+		if (operator != null && !operator.isExecuted()){
+    		operator.execute();
+    	}
+		return operator;
+	}
 }

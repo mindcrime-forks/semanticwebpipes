@@ -36,70 +36,55 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
+package org.deri.pipes.revocations;
 
 import java.util.List;
 
-import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.Port;
+import org.apache.commons.codec.binary.Base64;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.rdfcontext.model.RDFContextOnt;
+import org.rdfcontext.model.MSG.sesame.SMSG;
+import org.rdfcontext.rdfsync.MSGModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-/**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
- *
- */
-public class OWLNode extends InOutNode{
-	final Logger logger = LoggerFactory.getLogger(OWLNode.class);
-	Port owlPort= null;
-	public OWLNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
-		wnd.setTitle("OWL Reasoner");
-        tagName="OWL";
-	}
-	
-	protected void initialize(){
-		super.initialize();
-		owlPort =createPort(PipePortType.RDFIN,"left");
-	}
-	
-	public Port getOWLPort(){
-		return owlPort;
-	}
-	
-	@Override
-	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
-			srcCode =super.getSrcCode(doc, config);
-	    	srcCode.appendChild(getConnectedCode(doc,"owlsource",owlPort,config));
-	    	return srcCode;
+
+public class Revoker {
+	final Logger logger = LoggerFactory.getLogger(Revoker.class);
+
+	public void revoke(org.openrdf.repository.Repository repository) throws RepositoryException {
+		MSGModel model = new MSGModel(repository);
+		List<SMSG> msgs = model.getAllMSGs();
+		for (SMSG smsg : msgs) {
+			revokeMSG(smsg, repository);
 		}
-		return null;
-    }
-	
-	@Override
-	public void reset(boolean recursive){
-		super.reset(recursive);
-		if(recursive) reset(owlPort,recursive);
 	}
-	
-	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		OWLNode node= new OWLNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
-		wsp.addFigure(node);
-		
-		List<Element> srcEles=XMLUtil.getSubElementByName(elm, "source");
-		for(int i=0;i<srcEles.size();i++){
-			PipeNode xmlNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(srcEles.get(i)),wsp);
-			xmlNode.connectTo(node.getInputPort());
+
+	public static boolean revokeMSG (SMSG msg, Repository repository) throws RepositoryException {
+
+		//This is the digest attached to the MSG, 
+		//used as an inverse functional property that unequivocally identifies the revoked MSG.
+		String value = null; 
+
+		ValueFactory f = repository.getValueFactory();
+		RepositoryConnection conn = repository.getConnection();
+
+		org.openrdf.model.Resource rev = f.createBNode();
+
+		value = new String(Base64.encodeBase64(msg.hashMD5()));
+
+		conn.add(rev, f.createURI(RDFContextOnt.MSG_REVOCATIONBYHASH.toString()),f.createLiteral(value));
+
+		String[] uris = msg.getInvolvedURIs();
+		for (int i = 0; i < uris.length; i++) {
+			conn.add(rev, f.createURI(RDFContextOnt.INVOLVED_URI.toString()),f.createURI(uris[i]));
 		}
-		
-		Element xslElm=XMLUtil.getFirstSubElementByName(elm, "owlsource");
-		PipeNode xslNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(xslElm),wsp);
-		xslNode.connectTo(node.getOWLPort());
-		
-		return node;
-    }
+
+		conn.remove(msg.getGraph());
+
+		return true;
+	}
+
 }

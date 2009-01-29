@@ -36,70 +36,46 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
+package org.deri.pipes.endpoints;
 
-import java.util.List;
-
-import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.Port;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-/**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
- *
- */
-public class OWLNode extends InOutNode{
-	final Logger logger = LoggerFactory.getLogger(OWLNode.class);
-	Port owlPort= null;
-	public OWLNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
-		wnd.setTitle("OWL Reasoner");
-        tagName="OWL";
+public class Pipe {
+	final Logger logger = LoggerFactory.getLogger(Pipe.class);
+	private String id = null;
+	private String name = null;
+	private String syntax = null;
+	private String config=null;
+
+	public String getId() {
+		return id;
 	}
-	
-	protected void initialize(){
-		super.initialize();
-		owlPort =createPort(PipePortType.RDFIN,"left");
+
+	public void setId(String id) {
+		this.id = id;
 	}
-	
-	public Port getOWLPort(){
-		return owlPort;
+
+	public String getName() {
+		return name;
 	}
-	
-	@Override
-	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
-			srcCode =super.getSrcCode(doc, config);
-	    	srcCode.appendChild(getConnectedCode(doc,"owlsource",owlPort,config));
-	    	return srcCode;
-		}
-		return null;
-    }
-	
-	@Override
-	public void reset(boolean recursive){
-		super.reset(recursive);
-		if(recursive) reset(owlPort,recursive);
+
+	public void setName(String name) {
+		this.name = name;
 	}
-	
-	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		OWLNode node= new OWLNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
-		wsp.addFigure(node);
-		
-		List<Element> srcEles=XMLUtil.getSubElementByName(elm, "source");
-		for(int i=0;i<srcEles.size();i++){
-			PipeNode xmlNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(srcEles.get(i)),wsp);
-			xmlNode.connectTo(node.getInputPort());
-		}
-		
-		Element xslElm=XMLUtil.getFirstSubElementByName(elm, "owlsource");
-		PipeNode xslNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(xslElm),wsp);
-		xslNode.connectTo(node.getOWLPort());
-		
-		return node;
-    }
+
+	public String getSyntax() {
+		return syntax;
+	}
+
+	public void setSyntax(String syntax) {
+		this.syntax = syntax;
+	}
+
+	public String getConfig() {
+		return config;
+	}
+
+	public void setConfig(String config) {
+		this.config = config;
+	}
 }

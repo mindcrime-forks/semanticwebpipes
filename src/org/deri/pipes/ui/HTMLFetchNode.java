@@ -41,7 +41,7 @@ package org.deri.pipes.ui;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import org.deri.execeng.rdf.HTMLFetchBox;
+import org.deri.pipes.rdf.HTMLFetchBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;

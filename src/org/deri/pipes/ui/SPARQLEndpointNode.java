@@ -40,7 +40,7 @@ package org.deri.pipes.ui;
 
 import java.net.URLEncoder;
 
-import org.deri.execeng.utils.XMLUtil;
+import org.deri.pipes.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

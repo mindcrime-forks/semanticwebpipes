@@ -36,70 +36,74 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
+package org.deri.pipes.rdf;
 
-import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.Port;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-/**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
- *
- */
-public class OWLNode extends InOutNode{
-	final Logger logger = LoggerFactory.getLogger(OWLNode.class);
-	Port owlPort= null;
-	public OWLNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
-		wnd.setTitle("OWL Reasoner");
-        tagName="OWL";
-	}
-	
-	protected void initialize(){
-		super.initialize();
-		owlPort =createPort(PipePortType.RDFIN,"left");
-	}
-	
-	public Port getOWLPort(){
-		return owlPort;
-	}
-	
-	@Override
-	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
-			srcCode =super.getSrcCode(doc, config);
-	    	srcCode.appendChild(getConnectedCode(doc,"owlsource",owlPort,config));
-	    	return srcCode;
+
+public class RDFUtils {
+	static Logger logger = LoggerFactory.getLogger(RDFUtils.class);
+	public static Connection getConnection(){
+    	String virtuosoDriverClass = "virtuoso.jdbc3.Driver";
+		Connection conn = null;
+		try{
+			Class.forName(virtuosoDriverClass);
+	    	conn = DriverManager.getConnection("jdbc:virtuoso://localhost:1112/DATABASE=Demo/UID=dba/PWD=dba/");
 		}
-		return null;
-    }
-	
-	@Override
-	public void reset(boolean recursive){
-		super.reset(recursive);
-		if(recursive) reset(owlPort,recursive);
+		catch(ClassNotFoundException e){
+			logger.warn("Could not load virtuoso driver (not in classpath) "+virtuosoDriverClass,e);
+		}
+		catch(SQLException e){
+			logger.debug("Exception in opening connection",e);
+		}
+		return conn;
+	}
+	public static void loadNamedGraph(String url,String graphName){
+		query("SPARQL LOAD <"+url+"> INTO graph <"+graphName+">");
+	}
+
+	public static void clearNamedGraph(String graph){
+		query("SPARQL CLEAR GRAPH <"+graph+">");
+	}
+
+	public static void dropNamedGraph(String graph){
+		query("SPARQL DROP GRAPH <"+graph+">");
 	}
 	
-	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		OWLNode node= new OWLNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
-		wsp.addFigure(node);
-		
-		List<Element> srcEles=XMLUtil.getSubElementByName(elm, "source");
-		for(int i=0;i<srcEles.size();i++){
-			PipeNode xmlNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(srcEles.get(i)),wsp);
-			xmlNode.connectTo(node.getInputPort());
+	public static ResultSet query(String query){
+		//DataSource ds = (DataSource)new InitialContext().lookup("java:comp/env/jdbc/Demo");
+		Connection conn = getConnection();
+		Statement stmt = null;
+		ResultSet rs=null;
+		logger.debug("query "+query);
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(query);		
 		}
-		
-		Element xslElm=XMLUtil.getFirstSubElementByName(elm, "owlsource");
-		PipeNode xslNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(xslElm),wsp);
-		xslNode.connectTo(node.getOWLPort());
-		
-		return node;
-    }
+		catch(SQLException e){
+			logger.debug("query Exception"+e);
+		}
+		finally { 
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} 
+				catch (SQLException ex) {
+				}
+			}
+			if (conn != null) {
+				try {
+				conn.close();
+				} catch (SQLException ex) {
+				}
+			}
+		}
+		return rs;
+	}
 }

@@ -46,7 +46,7 @@ import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.deri.execeng.utils.XMLUtil;
+import org.deri.pipes.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
