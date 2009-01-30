@@ -337,7 +337,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 					Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
 					if(((Textbox)hbox.getFirstChild().getNextSibling()).getValue().trim()!=""){
 						tmp=getConnectedCode(((Textbox)hbox.getLastChild()), paraPorts.get(hbox.getUuid()));											
-						//TODO : encoding url fragments here?
+						//TODO : encoding location fragments here?
 						
 						if(tmp.indexOf('}')>=0)
 							tmp=URLEncoder.encode(tmp,"UTF-8");

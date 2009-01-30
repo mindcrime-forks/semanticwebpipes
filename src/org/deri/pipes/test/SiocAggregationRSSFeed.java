@@ -59,7 +59,7 @@ public class SiocAggregationRSSFeed {
 	final Logger logger = LoggerFactory.getLogger(SiocAggregationRSSFeed.class);
 	static final String SindiceURLQuery="PREFIX ss: <http://sindice.com/vocab/search#> " +
 										" PREFIX fields: <http://sindice.com/vocab/fields#> " +
-										"SELECT ?url WHERE {?p ss:link ?url.?p fields:format \"RDF\"}";
+										"SELECT ?location WHERE {?p ss:link ?location.?p fields:format \"RDF\"}";
 	static final String MessageQuery="PREFIX sioc: <http://rdfs.org/sioc/ns#> " +
 									 "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
 									 "PREFIX dcterms: <http://purl.org/dc/terms/> " + 
@@ -79,7 +79,7 @@ public class SiocAggregationRSSFeed {
 			TupleQueryResult urlResults=sindiceBuff.prepareTupleQuery(QueryLanguage.SPARQL,SindiceURLQuery).evaluate();
 			RepositoryConnection rdfBuff=Utils.createTripleBuffer();
 			while (urlResults.hasNext()) {
-				Utils.loadRDF(urlResults.next().getValue("url").stringValue(),rdfBuff);
+				Utils.loadRDF(urlResults.next().getValue("location").stringValue(),rdfBuff);
 			}	
 			TupleQueryResult results=rdfBuff.prepareTupleQuery(QueryLanguage.SPARQL,MessageQuery.replace("SHA1EMAIL", args[0])).evaluate();
 			ByteArrayOutputStream resultBuff =new ByteArrayOutputStream();;

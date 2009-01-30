@@ -115,7 +115,7 @@ public class SesameMemoryBuffer extends ExecBuffer {
 			InputStream in = openConnection(url, format);
 			load(in,url,format);
 		}catch(Exception e){
-			logger.warn("error loading url ["+url+"]",e);
+			logger.warn("error loading location ["+url+"]",e);
 		}
 	}
 	

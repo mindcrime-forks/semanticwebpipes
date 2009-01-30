@@ -82,7 +82,8 @@ public class SelectBox extends AbstractMerge {
 	final Logger logger = LoggerFactory.getLogger(SelectBox.class);
 
     private ArrayList<String> graphNames =new ArrayList<String>();
-    private String selectQuery;    
+    private String query;    
+
 	SesameTupleBuffer resultBuffer;   //TODO: this isn't written out.
 	
 	public void stream(ExecBuffer outputBuffer){
@@ -105,7 +106,7 @@ public class SelectBox extends AbstractMerge {
        mergeInputs(tmp);
        
        try{   
-    	   resultBuffer=new SesameTupleBuffer(((tmp.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, selectQuery)).evaluate()));
+    	   resultBuffer=new SesameTupleBuffer(((tmp.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate()));
        }
        catch(Exception e){ 
     	   logger.warn("error during execution",e);
@@ -115,10 +116,10 @@ public class SelectBox extends AbstractMerge {
     
     @Override
     public void initialize(PipeContext context, Element element){    
-    	
+    	//TODO: add bean methods for get/set/add source.
     	List<Element> sources=XMLUtil.getSubElementByName(element, "source");
-    	selectQuery=XMLUtil.getTextFromFirstSubEleByName(element, "query");
-    	if((sources.size()<=0)&&(selectQuery==null)){
+    	query=XMLUtil.getTextFromFirstSubEleByName(element, "query");
+    	if((sources.size()<=0)&&(query==null)){
 			logger.warn("SELECT operator syntax error at "+element.toString());			
 		}
     	
@@ -131,4 +132,12 @@ public class SelectBox extends AbstractMerge {
     	}
     	
      }
+	public String getQuery() {
+		return query;
+	}
+
+	public void setQuery(String query) {
+		this.query = query;
+	}
+
 }

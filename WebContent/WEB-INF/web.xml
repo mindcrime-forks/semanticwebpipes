@@ -49,7 +49,7 @@
   
   <servlet>
 		<servlet-name>pipes</servlet-name>
-		<servlet-class>org.deri.execeng.endpoints.Pipes</servlet-class>
+		<servlet-class>org.deri.pipes.endpoints.Pipes</servlet-class>
   </servlet>  
   
 	<servlet-mapping>

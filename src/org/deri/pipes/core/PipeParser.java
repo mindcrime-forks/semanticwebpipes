@@ -193,22 +193,21 @@ public class PipeParser {
 		if(refid!=null){
 		    return refid;	
 		}else{
-			Element tmp=XMLUtil.getFirstSubElement(source);	    		
-			if(tmp==null){
+			Element sourceElement=XMLUtil.getFirstSubElement(source);
+			String id = null;
+			final Operator operator;
+			if(sourceElement==null){
+				TextBox textbox = new TextBox();
 				String format = source.getAttribute("format");
+				textbox.setFormat(format);
 				String textData = XMLUtil.getTextData(source);
-				final Operator operator;
-				if(format!=null){
-					operator = new TextBox(textData,format);
-				}else{
-					operator = new TextBox(textData);
-				}
-				return addOperator(operator);
+				textbox.setText(textData);
+				operator = textbox;
 			}else{
-				String id = tmp.getAttribute("id");
-				Operator operator = parseOperator(tmp);
-				return addOperator(id,operator);
+				id = sourceElement.getAttribute("id");
+				operator = parseOperator(sourceElement);
 			}
+			return addOperator(id,operator);
 	    }
 	}
 

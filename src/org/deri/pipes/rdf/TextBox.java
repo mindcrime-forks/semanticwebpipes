@@ -51,33 +51,10 @@ public class TextBox implements Operator{
 	private ExecBuffer buffer=null;
 	private boolean isExecuted=false;
 	private String text=null;
+
 	private int format=0;
 	public static final int RDFXML=0;
-	public static final int SPARQLXML=1;
-	
-	public TextBox(String text){
-		this(text,null);
-	}
-	
-	public TextBox(String text,String format){
-		this.text=text;
-		this.format = parseFormat(format);
-	}	
-	
-	private int parseFormat(String formatStr) {
-		if(formatStr==null){
-			logger.debug("format not specified, using default format "+RDFXML_FORMAT);
-			return RDFXML;
-		}
-		if(formatStr.equalsIgnoreCase(RDFXML_FORMAT)){
-			return RDFXML;
-		}else if(formatStr.equalsIgnoreCase(SPARQL_FORMAT)){
-			return SPARQLXML;
-		}else{
-			logger.warn("unknown format ["+formatStr+"], using"+RDFXML_FORMAT);
-			return RDFXML;
-		}
-	}
+	public static final int SPARQLXML=1;	
 
 	public ExecBuffer getExecBuffer(){
 		return buffer;
@@ -94,6 +71,7 @@ public class TextBox implements Operator{
 	public boolean isExecuted(){
 	   	    return isExecuted;
 	}
+	
 	
 	public void execute(){
 		ExecBuffer execBuffer = newExecBuffer(format);
@@ -121,6 +99,45 @@ public class TextBox implements Operator{
 		}
 
 	}
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public String getFormat() {
+		switch(format){
+		case RDFXML:
+			return RDFXML_FORMAT;
+		case SPARQLXML:
+			return SPARQL_FORMAT;
+		default:
+			logger.warn("unknown format ["+format+"], using "+RDFXML_FORMAT);
+			return RDFXML_FORMAT;
+		}
+	}
+
+	public void setFormat(String format) {
+		this.format = parseFormat(format);
+	}
+	
+	private int parseFormat(String formatStr) {
+		if(formatStr==null){
+			logger.debug("format not specified, using default format "+RDFXML_FORMAT);
+			return RDFXML;
+		}
+		if(formatStr.equalsIgnoreCase(RDFXML_FORMAT)){
+			return RDFXML;
+		}else if(formatStr.equalsIgnoreCase(SPARQL_FORMAT)){
+			return SPARQLXML;
+		}else{
+			logger.warn("unknown format ["+formatStr+"], using "+RDFXML_FORMAT);
+			return RDFXML;
+		}
+	}
+
 
 	@Override
 	public void initialize(PipeContext context, Element element) {

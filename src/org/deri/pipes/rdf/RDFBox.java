@@ -47,7 +47,7 @@ import org.w3c.dom.Element;
 
 public abstract class RDFBox implements Operator {
 	Logger logger = LoggerFactory.getLogger(RDFBox.class);
-	protected SesameMemoryBuffer buffer;
+	protected ExecBuffer buffer;
 	protected boolean isExecuted=false;
 	protected PipeContext context;
 	

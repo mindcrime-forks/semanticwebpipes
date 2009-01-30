@@ -59,7 +59,7 @@ import com.hp.hpl.jena.reasoner.ReasonerRegistry;
  */
 public class OWLBox extends AbstractMerge{
 	final Logger logger = LoggerFactory.getLogger(OWLBox.class);
-	 String owlOpID = null;
+	 String owlsource = null;
      
      public ExecBuffer getExecBuffer(){
     	 return buffer;
@@ -71,10 +71,10 @@ public class OWLBox extends AbstractMerge{
     	 mergeInputs();
     	 
     	 //create a Jena Model containing input RDF data for reasoning from merged Sesame buffer
-    	 Model data =createJenaModel(buffer);
+    	 Model data =createJenaModel((SesameMemoryBuffer)buffer);
     	 
-    	 //create a Jena Model containing OWL schema from <owlsource> tag parsed into operator with ID owlOpID
-    	 Operator operator = context.getOperatorExecuted(owlOpID);
+    	 //create a Jena Model containing OWL schema from <owlsource> tag parsed into operator with ID owlsource
+    	 Operator operator = context.getOperatorExecuted(owlsource);
 		Model schema =createJenaModel((SesameMemoryBuffer)operator.getExecBuffer());
     	 
     	 //create default Jena reasoner and infer implicit RDF triples
@@ -84,7 +84,7 @@ public class OWLBox extends AbstractMerge{
     	 
     	 //write inferred triples back to opearator's buffer
     	 buffer = new SesameMemoryBuffer();
-    	 writeJenaModel(infmodel, buffer);
+    	 writeJenaModel(infmodel, (SesameMemoryBuffer)buffer);
     	 
     	 isExecuted=true;
      }   
@@ -106,18 +106,18 @@ public class OWLBox extends AbstractMerge{
     	super.initialize(context,element); 
    		Element owlSrc =XMLUtil.getFirstSubElementByName(element, "owlsource");
     	
-      	setOwlOpID(context.getPipeParser().getSourceOperatorId(owlSrc));
-      	if (null==owlOpID){
+      	setOwlsource(context.getPipeParser().getSourceOperatorId(owlSrc));
+      	if (null==owlsource){
       		logger.warn("no owlsource found for element "+owlSrc);
       		//TODO : Handling error of lacking OWL data source 	
       	}  		
      }
 
-	public String getOwlOpID() {
-		return owlOpID;
+	public String setOwlsource() {
+		return owlsource;
 	}
 
-	public void setOwlOpID(String owlOpID) {
-		this.owlOpID = owlOpID;
+	public void setOwlsource(String owlOpID) {
+		this.owlsource = owlOpID;
 	} 
 }

@@ -38,17 +38,16 @@
  */
 package org.deri.pipes.rdf;
 
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.xml.transform.stream.StreamSource;
 
-import org.deri.pipes.core.PipeContext;
-import org.deri.pipes.utils.XMLUtil;
+import org.deri.pipes.utils.MappedStreamSource;
 import org.deri.pipes.utils.XSLTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 /**
  * The Fetch operator is used to fetch data from an URI in RDF/XML or SPARQL-RESULT/XML . There is an optional attribute &quot;accept&quot; which determines the HTTP accept header for the request. Allowed value are :&quot;rdfxml&quot; and &quot;sparqlxml&quot;.
 <pre>
@@ -78,71 +77,48 @@ Example:
  </pre>
  *
  */
-public class HTMLFetchBox extends RDFBox {
+public class HTMLFetchBox extends FetchBox {
+	public static final String RDFA = "RDFa";
+	public static final String HREVIEW = "hReview";
+	public static final String HCARD = "hCard";
+	public static final String XFN = "XFN";
+	public static final String HCAL = "hCal";
+	public static final String DC = "DC";
 	final Logger logger = LoggerFactory.getLogger(HTMLFetchBox.class);
 	//fuller says: WARNING WARNING WARNING MEMORY LEAKS FOLLOW IN STATIC HASHTABLES
-	private static Hashtable<String,StreamSource> xsltFile=new Hashtable<String,StreamSource>();
-	private static Hashtable<String,String> formats=new Hashtable<String,String>();
+	private static Hashtable<String,MappedStreamSource> xsltFile=new Hashtable<String,MappedStreamSource>();
 	private static String xsltPath=XSLTUtil.getBaseURL()+"/xslt/";
-	static{		
-		xsltFile.put("DC", new StreamSource(xsltPath+"dc-extract.xsl"));
-		formats.put("DC", "Dublin Core");
-	
-		xsltFile.put("hCal", new StreamSource(xsltPath+"glean-hcal.xsl"));
-		formats.put("hCal", "hCalendar");
-		
-		xsltFile.put("XFN", new StreamSource(xsltPath+"grokXFN.xsl"));
-		formats.put("XFN", "XHTML Friends Network");
-		
-		xsltFile.put("hCard", new StreamSource(xsltPath+"hcard2rdf.xsl"));
-		formats.put("hCard", "hCard");
-		
-		xsltFile.put("hReview", new StreamSource(xsltPath+"hreview2rdfxml.xsl"));
-		formats.put("hReview", "hReview");
-		
-		xsltFile.put("RDFa",new StreamSource(xsltPath+"RDFa2RDFXML.xsl"));
-		formats.put("RDFa", "RDFa");
+	static{
+		xsltFile.put(DC, MappedStreamSource.newInstance(DC,xsltPath+"dc-extract.xsl","Dublin Core"));
+		xsltFile.put(HCAL,MappedStreamSource.newInstance(HCAL,xsltPath+"glean-hcal.xsl","hCalendar"));
+		xsltFile.put(XFN, MappedStreamSource.newInstance(XFN, xsltPath+"grokXFN.xsl","XHTML Friends Network"));
+		xsltFile.put(HCARD,MappedStreamSource.newInstance(HCARD,xsltPath+"hcard2rdf.xsl",HCARD));
+		xsltFile.put(HREVIEW,MappedStreamSource.newInstance(HREVIEW,xsltPath+"hreview2rdfxml.xsl",HREVIEW));
+		xsltFile.put(RDFA,MappedStreamSource.newInstance(RDFA,xsltPath+"RDFa2RDFXML.xsl",RDFA));
 	}
 	
-	private String url = null;
 	private String format = null;
 		
-	public static Hashtable<String,String >getFormats(){
-		return formats;
+	public static Collection<String>getFormats(){
+		return xsltFile.keySet();
 	}
 	@Override
 	public void execute() {
 		buffer=new SesameMemoryBuffer();
 		if(!isExecuted){
 			Enumeration<String> k = xsltFile.keys();
-			StreamSource stream=new StreamSource(url);
+			StreamSource stream=new StreamSource(location);
 		    while (k.hasMoreElements()) {
 		    	String key=k.nextElement();
 		    	if(format.indexOf(key)>=0){
-		    		StringBuffer textBuff=XSLTUtil.transform(stream, xsltFile.get(key));
-		    		buffer.loadFromText(textBuff.toString(), url);
+		    		StringBuffer textBuff=XSLTUtil.transform(stream, xsltFile.get(key).getStreamSource());
+		    		((SesameMemoryBuffer)buffer).loadFromText(textBuff.toString(), location);
 		    	}
 		    }
 			isExecuted=true;
 		}
 	}
 	
-	public void  initialize(PipeContext context,Element element){
-		super.setContext(context);
-    	setUrl(XMLUtil.getTextFromFirstSubEleByName(element, "location"));
-		setFormat(element.getAttribute("format"));
-    	
-    	if((null!=url)&&(url.trim().length()>0)){
-    		logger.warn("location missing for HTMLFetchBox "+element);
-    	}
-    	
-    }
-	public String getUrl() {
-		return url;
-	}
-	public void setUrl(String url) {
-		this.url = url;
-	}
 	public String getFormat() {
 		return format;
 	}

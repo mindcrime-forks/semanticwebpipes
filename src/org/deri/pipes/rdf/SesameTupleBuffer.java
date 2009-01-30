@@ -46,6 +46,7 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.MutableTupleQueryResult;
 import org.openrdf.query.resultio.QueryResultIO;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class SesameTupleBuffer extends ExecBuffer{
@@ -105,7 +106,7 @@ public class SesameTupleBuffer extends ExecBuffer{
 			}
 		}
 		catch(Exception e){
-			logger.warn("problem loading from url ["+url+"]",e);
+			logger.warn("problem loading from location ["+url+"]",e);
 		}
 	}
 
@@ -138,5 +139,13 @@ public class SesameTupleBuffer extends ExecBuffer{
 		}catch(Exception e){
 			logger.warn("sreaming error",e);
 		}
+	}
+
+	@Override
+	public RepositoryConnection getConnection() {
+		if(true){
+			throw new RuntimeException("getConnection not implemented for SesameTupleBuffer");
+		}
+		return null;
 	}
 }

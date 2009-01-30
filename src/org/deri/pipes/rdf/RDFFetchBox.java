@@ -49,30 +49,17 @@ import org.w3c.dom.Element;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
-public class RDFFetchBox extends RDFBox {
+public class RDFFetchBox extends FetchBox {
 	final Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
-	private String url=null;
 	private RDFFormat format=null;		
 	
 	public void execute(){
 		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-		rdfBuffer.loadFromURL(url,format);			
+		rdfBuffer.loadFromURL(location,format);			
 		buffer=rdfBuffer;
 		isExecuted=true;
 	}
     
-
-	@Override
-	public void initialize(PipeContext context, Element element) {
-    	setUrl(XMLUtil.getTextFromFirstSubEleByName(element, "location"));
-    	
-    	if((null==url)&&(url.trim().length()==0)){
-    		logger.warn("Missing location attribute for element "+element);
-    	}
-    	String attrFormat = element.getAttribute("format");
-    	setFormat(attrFormat);
-	}
-
 
 	public void setFormat(String attrFormat) {
 		if(null==attrFormat){
@@ -84,13 +71,13 @@ public class RDFFetchBox extends RDFBox {
 	}
 
 
-	public String getUrl() {
-		return url;
+	public String getLocation() {
+		return location;
 	}
 
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setLocation(String url) {
+		this.location = url;
 	}
 
 

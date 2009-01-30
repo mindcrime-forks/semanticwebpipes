@@ -48,6 +48,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.openrdf.repository.RepositoryConnection;
+
 
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
@@ -55,7 +57,6 @@ import java.net.URLConnection;
  */
 
 public abstract class ExecBuffer {
-	 public static StringBuffer log= new StringBuffer();
      public abstract void stream(ExecBuffer outputBuffer);
      public abstract void stream(ExecBuffer outputBuffer,String context);
      public abstract void stream(OutputStream output);
@@ -71,6 +72,6 @@ public abstract class ExecBuffer {
     	 urlConnection.connect();
     	 return urlConnection.getInputStream();
      }
-
+	public abstract RepositoryConnection getConnection();
 
 }

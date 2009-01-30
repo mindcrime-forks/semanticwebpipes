@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.ui;
 
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -54,11 +55,10 @@ public class HTMLFetchNode extends FetchNode{
 	public HTMLFetchNode(int x,int y){
 		super(PipePortType.RDFOUT,x,y,200,110,"HTML Fetch","htmlfetch");
 		Vbox vbox=new Vbox();
-		Enumeration<String> keys=HTMLFetchBox.getFormats().keys();
 		Hbox hbox=new Hbox();
 		int count=0;
-		while (keys.hasMoreElements()) {
-	    	String key=keys.nextElement();
+		Collection<String> keys=HTMLFetchBox.getFormats();
+		for(String key : keys) {
 	    	Checkbox checkbox=new Checkbox(key);
 	    	checkboxes.put(key,checkbox);
 	    	hbox.appendChild(checkbox);
@@ -73,18 +73,16 @@ public class HTMLFetchNode extends FetchNode{
 	
 	public String getFormat(){
 		String format="";
-		Enumeration<String> keys=HTMLFetchBox.getFormats().keys();
-		while (keys.hasMoreElements()) {
-	    	String key=keys.nextElement();
+		Collection<String> keys=HTMLFetchBox.getFormats();
+		for(String key : keys) {
 	    	if(checkboxes.get(key).isChecked()) format+=key+"|";
 		}
 		return format;
 	}
 	
 	public void setFormat(String format){
-		Enumeration<String> keys=HTMLFetchBox.getFormats().keys();
-		while (keys.hasMoreElements()) {
-	    	String key=keys.nextElement();
+		Collection<String> keys=HTMLFetchBox.getFormats();
+		for(String key : keys) {
 	    	if(format.indexOf(key)>=0) checkboxes.get(key).setChecked(true);
 		}
 	}

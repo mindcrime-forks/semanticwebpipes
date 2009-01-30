@@ -47,34 +47,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-public class TupleQueryResultFetchBox implements Operator {
+public class TupleQueryResultFetchBox extends FetchBox implements Operator {
 	final Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchBox.class);
 	private ExecBuffer buffer=null;
-	private boolean isExecuted=false;
-	private String url=null;
 	private TupleQueryResultFormat format=TupleQueryResultFormat.SPARQL;
-	
-	public ExecBuffer getExecBuffer(){
-		return buffer;
-	}
-	
-	public void stream(ExecBuffer outputBuffer){
-   	   buffer.stream(outputBuffer);
-    }
-	
-	public void stream(ExecBuffer outputBuffer,String context){
-	   	   buffer.stream(outputBuffer,context);
-	}
-	
-	public boolean isExecuted(){
-	   	    return isExecuted;
-	}
-	
+		
 	public void execute(){				
-		buffer=new SesameTupleBuffer(url,format);			
+		buffer=new SesameTupleBuffer(location,format);			
 		isExecuted=true;
 	}
 	public static TupleQueryResultFormat formatOf(String format){
+		if(format == null){
+			return TupleQueryResultFormat.SPARQL;
+		}
 		if (TupleQueryResultFormat.SPARQL.getName().equalsIgnoreCase(format)) 
 			return TupleQueryResultFormat.SPARQL;
 		else if(TupleQueryResultFormat.JSON.getName().equalsIgnoreCase(format))
@@ -88,32 +73,9 @@ public class TupleQueryResultFetchBox implements Operator {
     	return buffer.toString(); 
     }
     
-	@Override
-	public void initialize(PipeContext context, Element element) {
-		setUrl(XMLUtil.getTextFromFirstSubEleByName(element, "location"));
-    	
-    	if((null!=url)&&url.trim().length()>0){
-     	}else{
-    		logger.warn("location attibute not set:"+element.toString());
-    	}
-   		if(element.getAttribute("format")!=null){
-			setFormat(element.getAttribute("format"));
-		}
-		else{	
-			setFormat(TupleQueryResultFormat.SPARQL);
-		}
-	}
 
 	public void setFormat(String fmt) {
 		setFormat(formatOf(fmt));
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
 	}
 
 	public TupleQueryResultFormat getFormat() {

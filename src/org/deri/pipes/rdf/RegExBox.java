@@ -116,13 +116,10 @@ public class RegExBox extends AbstractMerge{
    		}
      } 
      
-     public RepositoryConnection getConnection(){
-		 return buffer.getConnection();
-	 }
      
      public class ReplaceHandler extends RDFInserter{
   		public ReplaceHandler(RegExBox regexBox){
-  			super(regexBox.getConnection());
+  			super(buffer.getConnection());
   		}
   		
 

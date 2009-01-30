@@ -177,12 +177,12 @@
 	     workspace.createFigure(x,y,figureType);
     }
     
-    ListModel model = new SimpleListModel(org.deri.execeng.endpoints.PipeManager.getPipeList().toArray());
-    Object[] items=org.deri.execeng.endpoints.PipeManager.getPipeList().toArray();
-    RowRenderer rowRenderer = new org.deri.execeng.endpoints.PipeListRenderer(workspace,deleteWin);
-     /* ListModel model = new SimpleListModel(org.deri.execeng.endpoints.PipeManager.getPipeList().toArray());
-    Object[] items=org.deri.execeng.endpoints.PipeManager.getPipeList().toArray();
-    RowRenderer rowRenderer = new org.deri.execeng.endpoints.PipeListRenderer(pipeid,pipename,pipesyntax,debugView,debugViewArea,deleteWin);*/
+    ListModel model = new SimpleListModel(org.deri.pipes.endpoints.PipeManager.getPipeList().toArray());
+    Object[] items=org.deri.pipes.endpoints.PipeManager.getPipeList().toArray();
+    RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(workspace,deleteWin);
+     /* ListModel model = new SimpleListModel(org.deri.pipes.endpoints.PipeManager.getPipeList().toArray());
+    Object[] items=org.deri.pipes.endpoints.PipeManager.getPipeList().toArray();
+    RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(pipeid,pipename,pipesyntax,debugView,debugViewArea,deleteWin);*/
     </zscript>
      	      	
 	      	<separator bar="false"/>
@@ -323,7 +323,7 @@
     </zscript> 	
 <zscript>
 <![CDATA[
-    import org.deri.execeng.endpoints.PipeManager;	
+    import org.deri.pipes.endpoints.PipeManager;	
     String tmpPass;
     void checkB4Save(){
        if(PipeManager.isExist(pipeid.value))
