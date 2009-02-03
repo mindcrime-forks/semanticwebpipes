@@ -88,23 +88,6 @@ public class ConstructBox extends AbstractMerge {
     	isExecuted=true;
     }
 
-    public void initialize(PipeContext context,Element element){   
-    	super.setContext(context);
-    	List<Element> sources=XMLUtil.getSubElementByName(element, "source");
-    	this.setConstructQuery(XMLUtil.getTextFromFirstSubEleByName(element, "query"));
-    	if((sources.size()==0)&&(query==null)){
-			logger.warn("Construct operator syntax error at "+element);
-		    return;
-		}
-    	for(int i=0;i<sources.size();i++){
-    		Element source = sources.get(i);
-			String opID=context.getPipeParser().getSourceOperatorId(source);
-    		if (null!=opID){
-    			addSource(opID);
-   // 	   	    graphNames.add(source.getAttribute("uri"));
-    		}
-    	}    	
-     }
 
 	public String getConstructQuery() {
 		return query;

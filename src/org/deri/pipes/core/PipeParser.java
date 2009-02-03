@@ -140,7 +140,7 @@ public class PipeParser {
 				logger.debug("output "+obj.toString());
 				if(obj instanceof Operator){
 					Operator operator = (Operator)obj;
-					operator.initialize(pipeContext,element);
+				//	operator.initialize(pipeContext,element);
 					return operator;
 				}else{
 					logger.warn("Could not create operator for "+opClassName);

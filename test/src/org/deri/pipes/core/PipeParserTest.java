@@ -1,5 +1,6 @@
 package org.deri.pipes.core;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -56,7 +57,7 @@ public class PipeParserTest extends TestCase {
 		SourceConverter.registerAliases(xstream);
 		xstream.autodetectAnnotations(true);
 //		if(false){
-		testSource(xstream, "pipe1.xml");
+		testSource(xstream, "pipe5.xml");
 		if(false){
 		testSource(xstream, "pipe2.xml");
 		testSource(xstream, "pipe3.xml");
@@ -68,13 +69,16 @@ public class PipeParserTest extends TestCase {
 //		XMLAssert.assertXMLEqual(new InputStreamReader(getClass().getResourceAsStream(controlXml)), new StringReader(xstream.toXML(o)));
 	}
 
-	private void testSource(XStream xstream, String controlXml) {
+	private void testSource(XStream xstream, String controlXml) throws Exception{
 		InputStream in = getClass().getResourceAsStream(controlXml);
 		ProcessingPipe pipe = (ProcessingPipe) xstream.fromXML(in);
 		PipeContext context = new PipeContext();
 		context.setXstream(xstream);
 		context.setHttpClient(new HttpClient());
-		pipe.execute(context);
+		ExecBuffer result = pipe.execute(context);
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		result.stream(bout);
+		System.out.println("output: "+bout.toString("UTF-8"));
 		System.out.println(xstream.toXML(pipe));
 	}
 }

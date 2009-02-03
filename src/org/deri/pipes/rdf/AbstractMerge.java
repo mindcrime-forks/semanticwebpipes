@@ -56,9 +56,6 @@ public abstract class AbstractMerge extends RDFBox {
 	protected void mergeInputs(PipeContext context){
 		mergeInputs(buffer,context);
 	}
-	void addSource(String src){
-		throw new RuntimeException("remove this method");
-	}
 	
 	protected void mergeInputs(ExecBuffer buffer, PipeContext context){
 		for(Source src : source){
@@ -73,14 +70,4 @@ public abstract class AbstractMerge extends RDFBox {
 	   	}
 	}
 	
-	public void initialize(PipeContext context, Element element){
-		setContext(context);
-  		List<Element> sources=XMLUtil.getSubElementByName(element, "source");
-  		for(int i=0;i<sources.size();i++){
-     		String opID=context.getPipeParser().getSourceOperatorId(sources.get(i));
-     		if (null!=opID){
-     	//		addSource(opID);
-     		}
-     	}  		
-    }
 }

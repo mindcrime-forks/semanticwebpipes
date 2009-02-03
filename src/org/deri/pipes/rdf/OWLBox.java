@@ -102,18 +102,6 @@ public class OWLBox extends AbstractMerge{
     	 model.write(writer);
     	 buffer.loadFromText(writer.getBuffer().toString());
      }
-     
-     @Override
-     public void initialize(PipeContext context, Element element){
-    	super.initialize(context,element); 
-   		Element owlSrc =XMLUtil.getFirstSubElementByName(element, "owlsource");
-    	
-      	setOwlsource(context.getPipeParser().getSourceOperatorId(owlSrc));
-      	if (null==owlsource){
-      		logger.warn("no owlsource found for element "+owlSrc);
-      		//TODO : Handling error of lacking OWL data source 	
-      	}  		
-     }
 
 	public String setOwlsource() {
 		return owlsource;

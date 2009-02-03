@@ -139,10 +139,4 @@ public class TextBox implements Operator{
 			return RDFXML;
 		}
 	}
-
-
-	@Override
-	public void initialize(PipeContext context, Element element) {
-		// nothing to do here?
-	}
 }

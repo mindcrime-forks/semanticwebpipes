@@ -50,11 +50,4 @@ public interface Operator extends Stream{
      public ExecBuffer getExecBuffer();
      public void execute(PipeContext context);
      public boolean isExecuted();
-     /**
-      * Initialize this operator from the dom element. Beware
-      * this method may be changed or removed in subsequent releases.
-      * @param context
-      * @param element
-      */
-     public void initialize(PipeContext context, Element element);
 }

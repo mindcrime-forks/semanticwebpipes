@@ -109,8 +109,8 @@ public class HTMLFetchBox extends FetchBox {
 	}
 	@Override
 	public void execute(PipeContext context) {
-		buffer=new SesameMemoryBuffer();
 		if(!isExecuted){
+			buffer=new SesameMemoryBuffer();
 			Enumeration<String> k = xsltFile.keys();
 			StreamSource stream=new StreamSource(location);
 		    while (k.hasMoreElements()) {

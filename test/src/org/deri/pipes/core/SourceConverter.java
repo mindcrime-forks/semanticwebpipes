@@ -10,6 +10,7 @@ import org.deri.pipes.rdf.HTMLFetchBox;
 import org.deri.pipes.rdf.PatchExecutorBox;
 import org.deri.pipes.rdf.PatchGeneratorBox;
 import org.deri.pipes.rdf.RDFFetchBox;
+import org.deri.pipes.rdf.RegExBox;
 import org.deri.pipes.rdf.SameAsBox;
 import org.deri.pipes.rdf.SelectBox;
 import org.deri.pipes.rdf.SimpleMixBox;
@@ -24,7 +25,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 public class SourceConverter implements Converter {
 
 	static Map<String,Class> MAPPINGS = new HashMap<String,Class>();
-	static{
+	static{ //TODO: move these back to properties file
 		MAPPINGS.put("simplemix",SimpleMixBox.class);
 		MAPPINGS.put("source",Source.class);
 		MAPPINGS.put("code",Source.class);
@@ -38,9 +39,10 @@ public class SourceConverter implements Converter {
 		MAPPINGS.put("patch-generator",PatchGeneratorBox.class);
 		MAPPINGS.put("construct",ConstructBox.class);
 		MAPPINGS.put("htmlfetch", HTMLFetchBox.class);
-
-
+		MAPPINGS.put("regex", RegExBox.class);
+		MAPPINGS.put("rule",RegExBox.Rule.class);
 	}
+	
 	@Override
 	public void marshal(Object arg0, HierarchicalStreamWriter writer,
 			MarshallingContext context) {

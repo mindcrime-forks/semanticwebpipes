@@ -18,11 +18,6 @@ public class Source implements Operator {
 	}
 
 	@Override
-	public void initialize(PipeContext context, Element element) {
-		delegate.initialize(context, element);
-	}
-
-	@Override
 	public boolean isExecuted() {
 		return delegate.isExecuted();
 	}

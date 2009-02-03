@@ -121,26 +121,7 @@ public class SelectBox extends AbstractMerge {
 		}
    	   isExecuted=true;
     }
-    
-    @Override
-    public void initialize(PipeContext context, Element element){    
-    	//TODO: add bean methods for get/set/add source.
-    	List<Element> sources=XMLUtil.getSubElementByName(element, "source");
-    	query=XMLUtil.getTextFromFirstSubEleByName(element, "query");
-    	if((sources.size()<=0)&&(query==null)){
-			logger.warn("SELECT operator syntax error at "+element.toString());			
-		}
-    	
-    	for(int i=0;i<sources.size();i++){
-    		String opID=context.getPipeParser().getSourceOperatorId(sources.get(i));
-    		if (null!=opID){
-    			addSource(opID);
-    			graphNames.add(sources.get(i).getAttribute("uri"));
-    		}
-    	}
-    	
-     }
-	public String getQuery() {
+   	public String getQuery() {
 		return query;
 	}
 

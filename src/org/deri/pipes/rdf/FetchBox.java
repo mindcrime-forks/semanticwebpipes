@@ -11,22 +11,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 public abstract class FetchBox extends RDFBox {
 	private transient Logger logger = LoggerFactory.getLogger(FetchBox.class);
 	protected String location = null;
-
-	public FetchBox() {
-		super();
-	}
-
-	public void initialize(PipeContext context, Element element) {
-		setContext(context);
-		setLocation(XMLUtil.getTextFromFirstSubEleByName(element, "location"));
-		if((null==location)||(location.trim().length()==0)){
-			logger.warn("location missing for FetchBox "+element);
-		}
-		setFormat(element.getAttribute("format"));
-		
-		
-	}
-
+	
 	public String getLocation() {
 		return location;
 	}

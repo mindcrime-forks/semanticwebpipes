@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.rdf;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.deri.pipes.core.PipeContext;
@@ -58,6 +59,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
@@ -65,19 +68,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
  */
 public class RegExBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(RegExBox.class);
-	 ArrayList<String> types,regexes,replacements;
-     
-     public ArrayList<String> getTypes(){
-    	 return types;
-     }
-     
-     public ArrayList<String> getRegexes(){
-    	 return regexes;
-     }
-    
-     public ArrayList<String> getReplacements(){
-    	 return replacements;
-     }
+	private List<Rule> rules = new ArrayList<Rule>();
      
      public void execute(PipeContext context){
     	 //merge all input sourceOperators to Sesame buffer
@@ -94,30 +85,7 @@ public class RegExBox extends AbstractMerge{
     	     	 
     	 isExecuted=true;
      }   
-         
-     @Override
-     public void initialize(PipeContext context,Element element){
-    	super.initialize(context,element); 
-   		List<Element> ruleEles =XMLUtil.getSubElementByName(
-   				                       XMLUtil.getFirstSubElementByName(element, "rules"),"rule");
-   		types =new ArrayList<String>();
-   		regexes= new ArrayList<String>();
-   		replacements= new ArrayList<String>();
-   		for(int i=0;i<ruleEles.size();i++){
-   			String typeAttribute = ruleEles.get(i).getAttribute("type");
-			if(typeAttribute.equalsIgnoreCase("uri")
-   			   ||typeAttribute.equalsIgnoreCase("literal")){
-   				
-   				types.add(ruleEles.get(i).getAttribute("type").toLowerCase());
-   				regexes.add(XMLUtil.getTextFromFirstSubEleByName(ruleEles.get(i),"regex"));
-   				replacements.add(XMLUtil.getTextFromFirstSubEleByName(ruleEles.get(i),"replacement"));
-   			}   			   
-   			else{
-   				logger.warn("'type' attribute of <rule> tag must be 'uri' or 'literal', not ["+typeAttribute+"]");
-   			}
-   			   
-   		}
-     } 
+          
      
      
      public class ReplaceHandler extends RDFInserter{
@@ -132,30 +100,47 @@ public class RegExBox extends AbstractMerge{
   			Resource sub =st.getSubject();
   			URI pred=st.getPredicate();
   			Value obj=st.getObject();
-  			for(int i=0;i<getTypes().size();i++){	  			
-	  			if(getTypes().get(i)=="uri"){
+  			for(Rule rule : rules){	  			
+	  			if("uri".equals(rule.type)){
 	  				if(sub instanceof URI){
-	  					sub=replace((URI)sub,i);
+	  					sub=replace((URI)sub,rule);
 	  				}
-	  				pred=replace(pred,i); 
+	  				pred=replace(pred,rule); 
 	  				if(obj instanceof URI){
-	  					obj=replace((URI)obj,i);
+	  					obj=replace((URI)obj,rule);
 	  				}
 	  			}
 	  			else
 	  				if(obj instanceof Literal){
-	  					obj=replace((Literal)obj,i);
+	  					obj=replace((Literal)obj,rule);
 	  				}
   			}	
   			super.handleStatement(new StatementImpl(sub,pred,obj));
   		}	
   		
-  		public URI replace(URI uri,int i){
-  			return new URIImpl(uri.toString().replaceAll(getRegexes().get(i), getReplacements().get(i)));
+  		public URI replace(URI uri,Rule rule){
+  			return new URIImpl(uri.toString().replaceAll(rule.regex, rule.replacement));
   		}
   		
-  		public Literal replace(Literal literal,int i){
-  			return new LiteralImpl(literal.stringValue().replaceAll(getRegexes().get(i), getReplacements().get(i)));
+  		public Literal replace(Literal literal,Rule rule){
+  			return new LiteralImpl(literal.stringValue().replaceAll(rule.regex, rule.replacement));
   		}
+     }
+     public void addRule(Rule rule){
+    	 rules.add(rule);
+     }
+     public List<Rule> getRules(){
+    	 return Collections.unmodifiableList(rules);
+     }
+     
+     @XStreamAlias("rule")
+	public
+     static class Rule{
+    	 @XStreamAsAttribute
+    	 String type;
+    	 @XStreamAsAttribute
+    	 String regex;
+    	 @XStreamAsAttribute
+    	 String replacement;
      }
 }

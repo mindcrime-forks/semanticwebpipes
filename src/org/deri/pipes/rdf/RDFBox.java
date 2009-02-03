@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.rdf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
@@ -55,18 +56,21 @@ public abstract class RDFBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(RDFBox.class);
 	protected transient ExecBuffer buffer;
 	protected transient boolean isExecuted=false;
-	protected transient PipeContext context;
 	@XStreamImplicit
-	protected List<Source> source;
+	protected List<Source> source = new ArrayList<Source>();
 	
 	public void stream(ExecBuffer outputBuffer){
-	   if((buffer!=null)&&(outputBuffer!=null))	
-		   buffer.stream(outputBuffer);
-	   else{
-		   logger.debug("check "+(buffer==null));
-	   }
+		stream(outputBuffer,null);
     }
 	public void stream(ExecBuffer outputBuffer,String uri){
+		if(this.buffer == null){
+			logger.info("Cannot stream - own buffer is null");
+			return;
+		}
+	   if(outputBuffer==null){
+		   logger.warn("Cannot stream - output buffer is null");
+		   return;
+	   }
 		if((null!=uri)&&(uri.trim().length()>0)){
 			buffer.stream(outputBuffer,uri.trim());
 		}else{
@@ -78,19 +82,16 @@ public abstract class RDFBox implements Operator {
    	 	return buffer;
     }
 	
-	public boolean isExecuted(){
+	public final boolean isExecuted(){
 	   	return isExecuted;
 	}
 	
     public String toString(){
     	return buffer.toString(); 
     }
-	/**
-	 * Set the pipe context.
-	 * @param context
-	 */
-	void setContext(PipeContext context){
-		this.context = context;
+    
+	void addSource(Source source){
+		this.source.add(source);
 	}
 
 

@@ -2,8 +2,31 @@
 <parameters>
 </parameters>
 <code>
+<simplemix>
+<source>
+<construct>
+<source>
+<rdffetch format="RDF/XML">
+<location><![CDATA[http://torrez.us/services/ics2rdf/?ical=http%3A%2F%2Fwww.google.com%2Fcalendar%2Fical%2Fwesterr%2540gmail.com%2Fprivate-af099272d661b65eada38e30d964e213%2Fbasic.ics+]]></location>
+</rdffetch>
+</source>
+<query>
+<![CDATA[
+CONSTRUCT {?baseurl <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.ict-romulus.eu/MashupBuilder/iCalRdf> . ?baseurl <http://www.w3.org/2002/12/cal/icaltzd#summary> ?summary . ?baseurl <http://www.w3.org/2002/12/cal/icaltzd#dtstart> ?startDate} where {?baseurl <http://www.w3.org/2002/12/cal/icaltzd#summary> ?summary . ?baseurl <http://www.w3.org/2002/12/cal/icaltzd#dtstart> ?startDate}
+]]></query>
+</construct>
+</source>
+</simplemix>
+</code>
+<!--  
+<pipe>
+<parameters>
+</parameters>
+<code>
 <htmlfetch format="RDFa|">
 <location><![CDATA[http://www.w3.org/2001/sw/grddl-wg/td/hCardFabien-RDFa.html]]></location>
 </htmlfetch>
 </code>
+</pipe>
+-->
 </pipe>

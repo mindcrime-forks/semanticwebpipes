@@ -98,8 +98,6 @@ public class ForLoopBox extends RDFBox{
 	private transient Logger logger = LoggerFactory.getLogger(ForLoopBox.class);
     private Source sourcelist;
     private Source forloop;
-    private String srcListID=null;
-    private String pipeCode=null;
         
     public ExecBuffer getExecBuffer(){
    	    return buffer;
@@ -148,45 +146,5 @@ public class ForLoopBox extends RDFBox{
    	   isExecuted=true;
     }
     
-        
-    public void initialize(PipeContext context, Element element){
-    	super.setContext(context);
-    	StringWriter  strWriter =new StringWriter(); 
-		try{
-			java.util.Properties props = 
-			org.apache.xml.serializer.OutputPropertiesFactory.getDefaultMethodProperties(org.apache.xml.serializer.Method.XML);
-			org.apache.xml.serializer.Serializer ser = org.apache.xml.serializer.SerializerFactory.getSerializer(props);
-			ser.setWriter(strWriter);
-			ser.asDOMSerializer().serialize((Element)(XMLUtil.getFirstChildByType(
-							                   			XMLUtil.getFirstSubElementByName(element,"forloop"),
-							                               Node.ELEMENT_NODE)));
-		}
-		catch(java.io.IOException e){
-			logger.warn("problem during initialize",e);
-		}
-		setPipeCode(strWriter.toString());
-    	
-    	Element srcListEle=XMLUtil.getFirstSubElementByName(element,"sourcelist");
-    	setSrcListID(context.getPipeParser().getSourceOperatorId(srcListEle));
-      	if (null==srcListID){
-      		logger.warn("<sourcelist> element must be set !!!");
-      		//TODO : Handling error of lacking data set for FOR LOOP 	
-      	}  
-     }
 
-	public String getSrcListID() {
-		return srcListID;
-	}
-
-	public void setSrcListID(String srcListID) {
-		this.srcListID = srcListID;
-	}
-
-	public String getPipeCode() {
-		return pipeCode;
-	}
-
-	public void setPipeCode(String pipeCode) {
-		this.pipeCode = pipeCode;
-	}
 }

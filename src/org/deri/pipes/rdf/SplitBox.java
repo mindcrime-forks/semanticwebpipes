@@ -84,7 +84,7 @@ public class SplitBox implements Operator{
 			buffer.stream(outputBuffer,context);
 	}
 
-	public void initialize(PipeContext context,Element element){
+/*	public void initialize(PipeContext context,Element element){
 		this.context = context;
         Element inputSrc =XMLUtil.getFirstSubElement(element);
       	inputOpID=context.getPipeParser().getSourceOperatorId(inputSrc);
@@ -93,5 +93,5 @@ public class SplitBox implements Operator{
       		//TODO : Handling error of lacking OWL data source 	
       	}
 	}
-          
+*/          
 }

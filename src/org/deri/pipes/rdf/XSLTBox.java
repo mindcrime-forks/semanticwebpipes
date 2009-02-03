@@ -90,7 +90,6 @@ public class XSLTBox implements Operator {
 
 	@Override
 	public ExecBuffer getExecBuffer() {
-		// TODO Auto-generated method stub
 		return buffer;
 	}
 
@@ -104,7 +103,6 @@ public class XSLTBox implements Operator {
 	@Override
 	public void stream(ExecBuffer buffer) {
 		logger.error("not implemented");
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -114,24 +112,7 @@ public class XSLTBox implements Operator {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void initialize(PipeContext context, Element element) {
-		this.setContext(context);
-		xmlStrID=context.getPipeParser().getSourceOperatorId(XMLUtil.getFirstSubElement(
-				XMLUtil.getFirstSubElementByName(element, "xmlsource")));
-		xslStrID=context.getPipeParser().getSourceOperatorId(XMLUtil.getFirstSubElement(
-				XMLUtil.getFirstSubElementByName(element, "xslsource")));
-		if (null==xmlStrID){
-			logger.warn("<sourcelist> element must be set !!!");
-			//TODO : Handling error of lacking xml source for XSLT transformation 	
-		}
-		if (null==xslStrID){
-			logger.warn("<sourcelist> element must be set !!!");
-			//TODO : Handling error of lacking xml source for XSLT transformation 	
-		}
-	}
-
+	
 	public void setContext(PipeContext context) {
 		this.context = context;
 	}	
