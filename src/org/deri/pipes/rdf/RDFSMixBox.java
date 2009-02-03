@@ -37,12 +37,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.rdf;
-import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 /**
  * 

@@ -52,7 +52,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * The Fetch operator is used to fetch data from an URI in RDF/XML or SPARQL-RESULT/XML . There is an optional attribute &quot;accept&quot; which determines the HTTP accept header for the request. Allowed value are :&quot;rdfxml&quot; and &quot;sparqlxml&quot;.
 <pre>

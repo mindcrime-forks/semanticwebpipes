@@ -38,28 +38,21 @@
  */
 package org.deri.pipes.rdf;
 
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
-import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.core.Source;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
-import org.deri.pipes.utils.XMLUtil;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * The FOR operator will  invoke a parameterized pipe multiple times and merge the resulting outputs of each invocation. The &lt;sourcelist&gt; specifies an operator that ouputs a SPARQL result set. For each result in the set, the variable  values will be subtituted into the parametrized pipe specified in &lt;forloop&gt; and the pipe will be invoked.
 <pre>

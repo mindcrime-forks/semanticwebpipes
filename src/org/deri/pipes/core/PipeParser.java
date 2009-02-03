@@ -41,7 +41,6 @@
  */
 package org.deri.pipes.core;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 import org.apache.xerces.parsers.DOMParser;

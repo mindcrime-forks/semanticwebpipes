@@ -42,15 +42,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.core.Source;
 import org.deri.pipes.model.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 public abstract class RDFBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(RDFBox.class);

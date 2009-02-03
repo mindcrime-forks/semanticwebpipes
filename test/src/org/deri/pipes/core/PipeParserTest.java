@@ -2,33 +2,18 @@ package org.deri.pipes.core;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.io.Writer;
-import java.util.HashMap;
+
+import junit.framework.TestCase;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.deri.pipes.model.Operator;
-import org.deri.pipes.rdf.ForLoopBox;
-import org.deri.pipes.rdf.PatchExecutorBox;
-import org.deri.pipes.rdf.RDFBox;
-import org.deri.pipes.rdf.RDFFetchBox;
-import org.deri.pipes.rdf.SameAsBox;
-import org.deri.pipes.rdf.SelectBox;
-import org.deri.pipes.rdf.SimpleMixBox;
 
-import com.thoughtworks.xstream.MarshallingStrategy;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
-import com.thoughtworks.xstream.mapper.Mapper;
-
-import junit.framework.TestCase;
 
 public class PipeParserTest extends TestCase {
 	public void testXStreamParser() throws Exception{

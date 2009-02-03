@@ -38,20 +38,11 @@
  */
 package org.deri.pipes.core;
 
-import info.aduna.lang.FileFormat;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 
 import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zkoss.util.logging.Log;
 
 
 /**

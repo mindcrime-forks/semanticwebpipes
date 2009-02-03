@@ -47,8 +47,6 @@ import java.sql.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
-
 public class RDFUtils {
 	private static Logger logger = LoggerFactory.getLogger(RDFUtils.class);
 	public static Connection getConnection(){

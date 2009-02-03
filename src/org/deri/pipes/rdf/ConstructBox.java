@@ -38,19 +38,12 @@
  */
 package org.deri.pipes.rdf;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.XMLUtil;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.repository.util.RDFInserter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * The Construct query is used to create expected triples by using SPARQL-CONSTRUCT query on specified RDF sourceOperators. The output of this operator is the result of a SPARQL-CONSTRUCT query executed on the one or more sourceOperators. Each RDF Source can be either a constant (directly input as RDF/XML) or another Pipe operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the source data will be placed into an named graph with attribute's value as graph name.
 <pre>

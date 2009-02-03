@@ -39,7 +39,6 @@
 package org.deri.pipes.ui;
 
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.deri.pipes.rdf.HTMLFetchBox;

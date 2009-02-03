@@ -38,17 +38,13 @@
  */
 package org.deri.pipes.rdf;
 
-import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.XMLUtil;
 import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *

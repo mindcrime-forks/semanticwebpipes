@@ -2,7 +2,6 @@ package org.deri.pipes.core;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.deri.pipes.model.Operator;
 

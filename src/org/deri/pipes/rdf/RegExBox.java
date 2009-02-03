@@ -43,7 +43,6 @@ import java.util.List;
 
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.XMLUtil;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -52,16 +51,13 @@ import org.openrdf.model.Value;
 import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.util.RDFInserter;
 import org.openrdf.rio.RDFHandlerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *

@@ -38,18 +38,12 @@
  */
 package org.deri.pipes.rdf;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.core.Source;
-import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 public abstract class AbstractMerge extends RDFBox {
 	private transient Logger logger = LoggerFactory.getLogger(AbstractMerge.class);

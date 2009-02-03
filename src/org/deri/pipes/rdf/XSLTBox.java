@@ -45,11 +45,9 @@ import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.model.XMLStreamBuffer;
-import org.deri.pipes.utils.XMLUtil;
 import org.deri.pipes.utils.XSLTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 public class XSLTBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(XSLTBox.class);
 	String xmlStrID,xslStrID;

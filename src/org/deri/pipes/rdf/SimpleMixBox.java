@@ -41,7 +41,6 @@ import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 /**
  * The MIX operator is used to merge triples from multiple RDF sourceOperators. Each RDF Source can be either a constant (directly input as RDF/XML) or another Pipe operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the sourcedata will be placed into an named graph with attribute's value as graph name.
 <pre>

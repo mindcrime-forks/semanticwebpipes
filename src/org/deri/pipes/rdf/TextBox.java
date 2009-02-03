@@ -45,7 +45,6 @@ import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 public class TextBox implements Operator{
 	private static final String SPARQL_FORMAT = "sparqlxml";
 	private static final String RDFXML_FORMAT = "rdfxml";

@@ -40,7 +40,6 @@ package org.deri.pipes.model;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
-import org.w3c.dom.Element;
 
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org

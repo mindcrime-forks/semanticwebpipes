@@ -1,8 +1,6 @@
 package org.deri.pipes.core;
 
 import org.deri.pipes.model.Operator;
-import org.deri.pipes.rdf.RDFFetchBox;
-import org.w3c.dom.Element;
 
 public class Source implements Operator {
 
