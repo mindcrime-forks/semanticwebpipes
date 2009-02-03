@@ -45,18 +45,36 @@ import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+@XStreamAlias("text")
 public class TextBox implements Operator{
 	private static final String SPARQL_FORMAT = "sparqlxml";
 	private static final String RDFXML_FORMAT = "rdfxml";
 	final static Logger logger = LoggerFactory.getLogger(TextBox.class);
-	private ExecBuffer buffer=null;
-	private boolean isExecuted=false;
-	private String text=null;
+	private transient ExecBuffer buffer=null;
+	private transient boolean isExecuted=false;
+	private String content=null;
+	@XStreamAsAttribute
+	private String format= RDFXML_FORMAT;
+	/**
+	 * Default constructor
+	 */
+	public TextBox(){
+	}
+	/**
+	 * Construct a content box to use RDFXML content.
+	 * @param rdfxml
+	 */
+	public TextBox(String rdfxml){
+		this(rdfxml,RDFXML_FORMAT);
+	}
 
-	private int format=0;
-	public static final int RDFXML=0;
-	public static final int SPARQLXML=1;	
-
+	public TextBox(String text, String format) {
+		this.content = text;
+		this.format = format;
+	}
 	public ExecBuffer getExecBuffer(){
 		return buffer;
 	}
@@ -76,11 +94,11 @@ public class TextBox implements Operator{
 	
 	public void execute(PipeContext context){
 		ExecBuffer execBuffer = newExecBuffer(format);
-		// execBuffer.loadFromText(text); // would be nice?			
+		// execBuffer.loadFromText(content); // would be nice?			
 		if(execBuffer instanceof SesameMemoryBuffer){
-			((SesameMemoryBuffer)execBuffer).loadFromText(text);
+			((SesameMemoryBuffer)execBuffer).loadFromText(content);
 		}else if(execBuffer instanceof SesameTupleBuffer){
-			((SesameTupleBuffer)execBuffer).loadFromText(text);
+			((SesameTupleBuffer)execBuffer).loadFromText(content);
 		}else{
 			throw new RuntimeException("Wrong buffer, expected SesameMemoryBuffer or SesameTupleBuffer not "+execBuffer.getClass());
 		}
@@ -88,54 +106,31 @@ public class TextBox implements Operator{
 		isExecuted=true;
 	}
 	
-	static ExecBuffer newExecBuffer(int format){
-		switch (format){
-		case RDFXML:
-			return new SesameMemoryBuffer();
-		case SPARQLXML:
-			return new SesameTupleBuffer();
-		default:
-			logger.warn("unexpected format ["+format+"] using rdfxml");
+	static ExecBuffer newExecBuffer(String format){
+		if(RDFXML_FORMAT.equals(format)){
 			return new SesameMemoryBuffer();
 		}
+		if(SPARQL_FORMAT.equals(format)){
+			return new SesameTupleBuffer();
+		}
+		logger.warn("unexpected format ["+format+"] using "+RDFXML_FORMAT);
+		return new SesameMemoryBuffer();
 
 	}
-	public String getText() {
-		return text;
+	public String getContent() {
+		return content;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setContent(String text) {
+		this.content = text;
 	}
 
 	public String getFormat() {
-		switch(format){
-		case RDFXML:
-			return RDFXML_FORMAT;
-		case SPARQLXML:
-			return SPARQL_FORMAT;
-		default:
-			logger.warn("unknown format ["+format+"], using "+RDFXML_FORMAT);
-			return RDFXML_FORMAT;
-		}
+		return format;
 	}
 
 	public void setFormat(String format) {
-		this.format = parseFormat(format);
+		this.format = format;
 	}
 	
-	private int parseFormat(String formatStr) {
-		if(formatStr==null){
-			logger.debug("format not specified, using default format "+RDFXML_FORMAT);
-			return RDFXML;
-		}
-		if(formatStr.equalsIgnoreCase(RDFXML_FORMAT)){
-			return RDFXML;
-		}else if(formatStr.equalsIgnoreCase(SPARQL_FORMAT)){
-			return SPARQLXML;
-		}else{
-			logger.warn("unknown format ["+formatStr+"], using "+RDFXML_FORMAT);
-			return RDFXML;
-		}
-	}
 }

@@ -1,10 +1,28 @@
 package org.deri.pipes.core;
 
 import org.deri.pipes.model.Operator;
-
+/**
+ * Proxy implemenation of Operator. The class was introduced
+ * to support serialization using XStream with existing xml format.
+ * @author robful
+ *
+ */
 public class Source implements Operator {
 
 	private Operator delegate;
+	
+	/**
+	 * Default Constructor.
+	 */
+	public Source(){
+	}
+	/**
+	 * Create a Source to use the given delegate.
+	 * @param delegate
+	 */
+	public Source(Operator delegate){
+		this.delegate = delegate;
+	}
 	@Override
 	public void execute(PipeContext context) {
 		delegate.execute(null);
@@ -37,5 +55,6 @@ public class Source implements Operator {
 	public void setDelegate(Operator delegate) {
 		this.delegate = delegate;
 	}
+	
 
 }

@@ -17,30 +17,7 @@ import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 
 public class PipeParserTest extends TestCase {
 	public void testXStreamParser() throws Exception{
-		XStream xstream = new XStream(new PureJavaReflectionProvider(),
-			    new DomDriver() {
-			        public HierarchicalStreamWriter createWriter(Writer out) {
-			            return new PrettyPrintWriter(out) {
-			                protected void writeText(QuickWriter writer, String text) {
-			                	if(text==null || (text.indexOf('&')<0 && text.indexOf('<')<0)){
-			                		writer.write(text);
-			                	}else{
-			                    writer.write("<![CDATA[");
-			                    writer.write(text);
-			                    writer.write("]]>");
-			                	}
-			                }
-			            };
-			        }
-			    }
-			);
-		xstream.alias("pipe",ProcessingPipe.class);
-		xstream.registerLocalConverter(ProcessingPipe.class, "parameters", new ParameterConverter());
-		xstream.registerConverter(new SourceConverter());
-		//xstream normally uses 'reference' for references, we want refid
-		xstream.aliasSystemAttribute("refid", "reference");
-		SourceConverter.registerAliases(xstream);
-		xstream.autodetectAnnotations(true);
+		XStream xstream = new PipeParser().getXStreamSerializer();
 //		if(false){
 		testSource(xstream, "pipe5.xml");
 		if(false){
@@ -53,6 +30,8 @@ public class PipeParserTest extends TestCase {
 //		XMLUnit.setIgnoreWhitespace(true);
 //		XMLAssert.assertXMLEqual(new InputStreamReader(getClass().getResourceAsStream(controlXml)), new StringReader(xstream.toXML(o)));
 	}
+
+
 
 	private void testSource(XStream xstream, String controlXml) throws Exception{
 		InputStream in = getClass().getResourceAsStream(controlXml);

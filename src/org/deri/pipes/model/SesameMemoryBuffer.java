@@ -141,7 +141,7 @@ public class SesameMemoryBuffer extends ExecBuffer {
 
 	public void loadFromText(String text, String baseURL){
 		try{
-			String url = ((null!=baseURL)&(baseURL.trim().length()>0))?baseURL.trim():"http://pipes.deri.org/";
+			String url = ((null!=baseURL)&&(baseURL.trim().length()>0))?baseURL.trim():"http://pipes.deri.org/";
 			load(new StringReader(text),url, RDFFormat.RDFXML);
 		}
 		catch (Exception e) {
@@ -161,13 +161,18 @@ public class SesameMemoryBuffer extends ExecBuffer {
 		URIImpl uriImpl=((null!=uri)&&(uri.trim().length()>0))?(new URIImpl(uri.trim())):null;
 		try{
 			if(outputBuffer instanceof SesameMemoryBuffer){
+				
 				RepositoryConnection repositoryConnection = ((SesameMemoryBuffer)outputBuffer).getConnection();
-				RepositoryResult<Statement> repositoryResult = getConnection().getStatements(null, null, null, true);
-				List<Statement> statements = repositoryResult.asList();
-				if(uriImpl!=null) {
-					repositoryConnection.add(statements,uriImpl);
-				} else{
-					repositoryConnection.add(statements);
+				try{
+					RepositoryResult<Statement> repositoryResult = getConnection().getStatements(null, null, null, true);
+					List<Statement> statements = repositoryResult.asList();
+					if(uriImpl!=null) {
+						repositoryConnection.add(statements,uriImpl);
+					} else{
+						repositoryConnection.add(statements);
+					}
+				}finally{
+					repositoryConnection.close();
 				}
 			}else if(outputBuffer instanceof XMLStreamBuffer){
 				((XMLStreamBuffer)outputBuffer).setStreamSource(toXMLStringBuffer());

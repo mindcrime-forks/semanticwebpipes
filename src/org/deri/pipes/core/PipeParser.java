@@ -41,12 +41,14 @@
  */
 package org.deri.pipes.core;
 
+import java.io.Writer;
 import java.util.List;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.endpoints.PipeManager;
 import org.deri.pipes.endpoints.Pipes;
 import org.deri.pipes.model.Operator;
+import org.deri.pipes.rdf.SimpleMixBox;
 import org.deri.pipes.rdf.TextBox;
 import org.deri.pipes.utils.IDTool;
 import org.deri.pipes.utils.XMLUtil;
@@ -56,6 +58,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.core.util.QuickWriter;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -63,6 +72,7 @@ import org.xml.sax.InputSource;
 public class PipeParser {
 	final static Logger logger = LoggerFactory.getLogger(PipeParser.class);
 	PipeContext pipeContext = new PipeContext();
+	private XStream xstream;
 	
 	
 	/**
@@ -203,7 +213,7 @@ public class PipeParser {
 				String format = source.getAttribute("format");
 				textbox.setFormat(format);
 				String textData = XMLUtil.getTextData(source);
-				textbox.setText(textData);
+				textbox.setContent(textData);
 				operator = textbox;
 			}else{
 				id = sourceElement.getAttribute("id");
@@ -213,4 +223,43 @@ public class PipeParser {
 	    }
 	}
 
+	public static String serialize(SimpleMixBox fixture) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public XStream getXStreamSerializer() {
+		if(xstream == null){
+		  xstream =  createXStreamSerializer();
+		}
+		return xstream;
+	}
+
+	private XStream createXStreamSerializer() {
+		XStream xstream = new XStream(new PureJavaReflectionProvider(),
+			    new DomDriver() {
+			        public HierarchicalStreamWriter createWriter(Writer out) {
+			            return new PrettyPrintWriter(out) {
+			                protected void writeText(QuickWriter writer, String text) {
+			                	if(text==null || (text.indexOf('&')<0 && text.indexOf('<')<0)){
+			                		writer.write(text);
+			                	}else{
+			                    writer.write("<![CDATA[");
+			                    writer.write(text);
+			                    writer.write("]]>");
+			                	}
+			                }
+			            };
+			        }
+			    }
+			);
+		xstream.alias("pipe",ProcessingPipe.class);
+		xstream.registerLocalConverter(ProcessingPipe.class, "parameters", new ParameterConverter());
+		xstream.registerConverter(new SourceConverter());
+		//xstream normally uses 'reference' for references, we want refid
+		xstream.aliasSystemAttribute("refid", "reference");
+		SourceConverter.registerAliases(xstream);
+		xstream.autodetectAnnotations(true);
+		return xstream;
+	}
 }

@@ -14,6 +14,7 @@ import org.deri.pipes.rdf.RegExBox;
 import org.deri.pipes.rdf.SameAsBox;
 import org.deri.pipes.rdf.SelectBox;
 import org.deri.pipes.rdf.SimpleMixBox;
+import org.deri.pipes.rdf.TextBox;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -41,6 +42,7 @@ public class SourceConverter implements Converter {
 		MAPPINGS.put("htmlfetch", HTMLFetchBox.class);
 		MAPPINGS.put("regex", RegExBox.class);
 		MAPPINGS.put("rule",RegExBox.Rule.class);
+		MAPPINGS.put("text",TextBox.class);
 	}
 	
 	@Override
