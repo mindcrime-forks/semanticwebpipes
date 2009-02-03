@@ -36,70 +36,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
+package org.deri.pipes.core;
 
-import javax.xml.transform.stream.StreamSource;
+public class SourceList extends Source {
 
-import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
-import org.deri.pipes.model.Operator;
-import org.deri.pipes.model.SesameTupleBuffer;
-import org.deri.pipes.model.XMLStreamBuffer;
-import org.deri.pipes.utils.XSLTUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-public class XSLTBox implements Operator {
-	private transient Logger logger = LoggerFactory.getLogger(XSLTBox.class);
-	String xmlStrID,xslStrID;
-	private boolean isExecuted=false;
-	XMLStreamBuffer buffer;
-	private PipeContext context;
-	
-	@Override
-	public void execute(PipeContext context) {
-		if((null!=xmlStrID)&&(null!=xslStrID)){			
-			StreamSource xmlSrc=executeXMLOp(xmlStrID);
-			StreamSource xslSrc=executeXMLOp(xslStrID);
-			if((xmlSrc!=null)&&(xslSrc!=null)){
-				buffer=new XMLStreamBuffer();	
-			    buffer.setStreamSource(XSLTUtil.transform(xmlSrc,xslSrc));				
-			}
-	    }
-		isExecuted=true;
-	}
-	
-    private StreamSource executeXMLOp(String strID){
-    	
-    	Operator xmlOp=context.getOperatorExecuted(strID);
-		ExecBuffer xmlBuff=xmlOp.getExecBuffer();
-		
-		StreamSource xmlSrc=null;
-		if(xmlBuff instanceof XMLStreamBuffer) 
-			xmlSrc=((XMLStreamBuffer)xmlBuff).getStreamSource();
-		if((xmlBuff instanceof SesameTupleBuffer)||(xmlBuff instanceof SesameTupleBuffer)){ 
-			XMLStreamBuffer tmpBuff= new XMLStreamBuffer();
-			xmlBuff.stream(tmpBuff);
-			xmlSrc=tmpBuff.getStreamSource();
-		}
-		
-		return xmlSrc;
-    }
-    
-
-	@Override
-	public ExecBuffer getExecBuffer() {
-		return buffer;
-	}
-
-
-
-	@Override
-	public boolean isExecuted() {
-		return isExecuted;
-	}
-
-	
-	public void setContext(PipeContext context) {
-		this.context = context;
-	}	
 }

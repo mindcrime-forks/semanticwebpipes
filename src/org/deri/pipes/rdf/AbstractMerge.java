@@ -38,6 +38,9 @@
  */
 package org.deri.pipes.rdf;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.core.Source;
@@ -45,8 +48,17 @@ import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 public abstract class AbstractMerge extends RDFBox {
 	private transient Logger logger = LoggerFactory.getLogger(AbstractMerge.class);
+	@XStreamImplicit
+	protected List<Source> source = new ArrayList<Source>();
+   
+	void addSource(Source source){
+		this.source.add(source);
+	}
+
 	protected void mergeInputs(PipeContext context){
 		mergeInputs(buffer,context);
 	}
@@ -56,8 +68,9 @@ public abstract class AbstractMerge extends RDFBox {
 			if(!src.isExecuted()){
 				src.execute(context);
 			}
-	       	 if (src.getExecBuffer() instanceof SesameMemoryBuffer){
-	       		src.stream(buffer);
+	       	 ExecBuffer inputBuffer = src.getExecBuffer();
+			if (inputBuffer instanceof SesameMemoryBuffer){
+				inputBuffer.stream(buffer);
 	       	 }else{
 	       		logger.warn("Inappropriate input format, RDF is required!!!");
 	       	 }

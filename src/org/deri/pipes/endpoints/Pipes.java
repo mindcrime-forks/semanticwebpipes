@@ -53,6 +53,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.PipeParser;
+import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.Stream;
 import org.deri.pipes.rdf.RDFBox;
@@ -233,7 +234,7 @@ public class Pipes extends HttpServlet {
 			}
 			//logger.debug(syntax);
 			PipeParser pipeParser= new PipeParser();
-			Stream stream = pipeParser.parse(syntax);
+			Operator stream = pipeParser.parse(syntax);
 			if (stream instanceof RDFBox) {
 				((RDFBox) stream).execute(null);
 				return (SesameMemoryBuffer)((RDFBox) stream).getExecBuffer();

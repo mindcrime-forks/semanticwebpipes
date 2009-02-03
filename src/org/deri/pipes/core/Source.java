@@ -36,70 +36,53 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
+package org.deri.pipes.core;
 
-import javax.xml.transform.stream.StreamSource;
-
-import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.Operator;
-import org.deri.pipes.model.SesameTupleBuffer;
-import org.deri.pipes.model.XMLStreamBuffer;
-import org.deri.pipes.utils.XSLTUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-public class XSLTBox implements Operator {
-	private transient Logger logger = LoggerFactory.getLogger(XSLTBox.class);
-	String xmlStrID,xslStrID;
-	private boolean isExecuted=false;
-	XMLStreamBuffer buffer;
-	private PipeContext context;
+/**
+ * Proxy implemenation of Operator. The class was introduced
+ * to support serialization using XStream with existing xml format.
+ * @author robful
+ *
+ */
+public class Source implements Operator {
+
+	private Operator delegate;
 	
+	/**
+	 * Default Constructor.
+	 */
+	public Source(){
+	}
+	/**
+	 * Create a Source to use the given delegate.
+	 * @param delegate
+	 */
+	public Source(Operator delegate){
+		this.delegate = delegate;
+	}
 	@Override
 	public void execute(PipeContext context) {
-		if((null!=xmlStrID)&&(null!=xslStrID)){			
-			StreamSource xmlSrc=executeXMLOp(xmlStrID);
-			StreamSource xslSrc=executeXMLOp(xslStrID);
-			if((xmlSrc!=null)&&(xslSrc!=null)){
-				buffer=new XMLStreamBuffer();	
-			    buffer.setStreamSource(XSLTUtil.transform(xmlSrc,xslSrc));				
-			}
-	    }
-		isExecuted=true;
+		delegate.execute(null);
 	}
-	
-    private StreamSource executeXMLOp(String strID){
-    	
-    	Operator xmlOp=context.getOperatorExecuted(strID);
-		ExecBuffer xmlBuff=xmlOp.getExecBuffer();
-		
-		StreamSource xmlSrc=null;
-		if(xmlBuff instanceof XMLStreamBuffer) 
-			xmlSrc=((XMLStreamBuffer)xmlBuff).getStreamSource();
-		if((xmlBuff instanceof SesameTupleBuffer)||(xmlBuff instanceof SesameTupleBuffer)){ 
-			XMLStreamBuffer tmpBuff= new XMLStreamBuffer();
-			xmlBuff.stream(tmpBuff);
-			xmlSrc=tmpBuff.getStreamSource();
-		}
-		
-		return xmlSrc;
-    }
-    
 
 	@Override
 	public ExecBuffer getExecBuffer() {
-		return buffer;
+		return delegate.getExecBuffer();
 	}
-
-
 
 	@Override
 	public boolean isExecuted() {
-		return isExecuted;
+		return delegate.isExecuted();
 	}
 
+	public Operator getDelegate() {
+		return delegate;
+	}
+
+	public void setDelegate(Operator delegate) {
+		this.delegate = delegate;
+	}
 	
-	public void setContext(PipeContext context) {
-		this.context = context;
-	}	
+
 }

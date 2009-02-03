@@ -97,40 +97,31 @@ public class ForLoopBox extends RDFBox{
     }
     
     public void execute(PipeContext context){
+    	buffer=new SesameMemoryBuffer(); 
     	Operator operator = sourcelist;//context.getOperatorExecuted(srcListID);
-    	if (!(operator.getExecBuffer() instanceof SesameTupleBuffer)){
-    		logger.warn("sourcelist must contain Tuple set result, the FOR LOOP cannot not be executed, the input buffer is "+operator.getExecBuffer());    	
+ 		if (!(operator.getExecBuffer() instanceof SesameTupleBuffer)){
+    		logger.warn("sourcelist must contain Tuple set result, the FOR LOOP cannot not be executed, the input buffer is "+operator.getExecBuffer());   
     		return;
     	}
-    	
-    	buffer=new SesameMemoryBuffer(); 
+ 		SesameTupleBuffer tupleBuffer = (SesameTupleBuffer) operator.getExecBuffer();
+   	
     	try{
-    		TupleQueryResult tupleBuff=((SesameTupleBuffer)operator.getExecBuffer()).getTupleQueryResult();
-    		List<String> bindingNames=tupleBuff.getBindingNames();
-	    	while (tupleBuff.hasNext()) {
-	    	   String tmp=context.serialize(forloop);//pipeCode;	    	    
-			   BindingSet bindingSet = tupleBuff.next();		   
-			   for(int i=0;i<bindingNames.size();i++){				   
-			       tmp=tmp.replace("${{"+bindingNames.get(i)+"}}",
-			    		          bindingSet.getValue(bindingNames.get(i)).toString());
-			       try{
-						tmp=tmp.replace(URLEncoder.encode("${{" + bindingNames.get(i) + "}}","UTF-8"),
-												URLEncoder.encode(bindingSet.getValue(bindingNames.get(i)).stringValue(),"UTF-8"));						
-				   }
-				   catch(UnsupportedEncodingException e){
-						logger.warn("UTF-8 support is required by the JVM specification");
-				   }
+    		TupleQueryResult tupleQueryResult = tupleBuffer.getTupleQueryResult();
+			List<String> bindingNames=tupleQueryResult.getBindingNames();
+	    	while (tupleQueryResult.hasNext()) {
+	    	   String operatorXml=context.serialize(forloop);	    	    
+			   BindingSet bindingSet = tupleQueryResult.next();		   
+			   operatorXml = bindVariables(operatorXml, bindingNames, bindingSet);
+			   logger.debug("parsing:"+operatorXml);
+			   Operator op = context.parse(operatorXml);
+			   if(!op.isExecuted()){
+				   op.execute(context);	
 			   }
-//	    	   PipeParser parser = new PipeParser();
-			   logger.debug("parsing:"+tmp);
-			   Operator op = context.parse(tmp);//parser.parseCode(tmp); 
-			   if(op instanceof RDFBox){
-				   if(!(op.isExecuted())) {
-					   op.execute(null);					
-				   }
-				   if(op.getExecBuffer()!=null){
-					   op.stream(buffer);					   
-				   }
+			   ExecBuffer execBuffer = op.getExecBuffer();
+			   if(execBuffer instanceof SesameMemoryBuffer){
+				   execBuffer.stream(buffer);					   
+			   }else{
+				   logger.warn("Inappropriate input format, RDF is required!!!");
 			   }
 	    	}
     	}catch(QueryEvaluationException e){
@@ -138,6 +129,23 @@ public class ForLoopBox extends RDFBox{
     	}
    	   isExecuted=true;
     }
+
+	private String bindVariables(String operatorXml, List<String> bindingNames,
+			BindingSet bindingSet) {
+		for(int i=0;i<bindingNames.size();i++){				   
+		       String bindingName = bindingNames.get(i);
+				String bindingValue = bindingSet.getValue(bindingName).stringValue();
+				operatorXml=operatorXml.replace("${{"+bindingName+"}}",bindingValue);
+		       try{
+					operatorXml=operatorXml.replace(URLEncoder.encode("${{" + bindingName + "}}","UTF-8"),
+											URLEncoder.encode(bindingValue,"UTF-8"));						
+			   }
+			   catch(UnsupportedEncodingException e){
+					logger.warn("UTF-8 support is required by the JVM specification");
+			   }
+		   }
+		return operatorXml;
+	}
     
 
 }

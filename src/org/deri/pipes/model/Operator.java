@@ -45,7 +45,7 @@ import org.deri.pipes.core.PipeContext;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
-public interface Operator extends Stream{	
+public interface Operator{	
      public ExecBuffer getExecBuffer();
      public void execute(PipeContext context);
      public boolean isExecuted();

@@ -53,27 +53,7 @@ public abstract class RDFBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(RDFBox.class);
 	protected transient ExecBuffer buffer;
 	protected transient boolean isExecuted=false;
-	@XStreamImplicit
-	protected List<Source> source = new ArrayList<Source>();
 	
-	public void stream(ExecBuffer outputBuffer){
-		stream(outputBuffer,null);
-    }
-	public void stream(ExecBuffer outputBuffer,String uri){
-		if(this.buffer == null){
-			logger.info("Cannot stream - own buffer is null");
-			return;
-		}
-	   if(outputBuffer==null){
-		   logger.warn("Cannot stream - output buffer is null");
-		   return;
-	   }
-		if((null!=uri)&&(uri.trim().length()>0)){
-			buffer.stream(outputBuffer,uri.trim());
-		}else{
-			buffer.stream(outputBuffer);
-		}
-	}
 	
 	public ExecBuffer getExecBuffer(){
    	 	return buffer;
@@ -86,10 +66,6 @@ public abstract class RDFBox implements Operator {
     public String toString(){
     	return buffer.toString(); 
     }
-    
-	void addSource(Source source){
-		this.source.add(source);
-	}
 
 
 }

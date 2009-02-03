@@ -82,31 +82,18 @@ Example:
  */
 public class SelectBox extends AbstractMerge {
 	private transient Logger logger = LoggerFactory.getLogger(SelectBox.class);
+	private transient SesameTupleBuffer resultBuffer;   //TODO: this isn't written out.
 
-    private ArrayList<String> graphNames =new ArrayList<String>();
-    private String query;    
-
-	SesameTupleBuffer resultBuffer;   //TODO: this isn't written out.
-	
-	public void stream(ExecBuffer outputBuffer){
-		logger.error("Method not implemented");
-	  /* if((buffer!=null)&&(outputBuffer!=null))	
-		   buffer.streamming(outputBuffer);
-	   else{
-		   logger.debug("check"+(buffer==null));
-	   }*/
-    }
-	
-	public void stream(ExecBuffer outputBuffer,String uri){
-		logger.error("Method not implemented");
-	   	   //buffer.streamming(outputBuffer,uri);
-	}
-	
+    private String query;    	
 	    
-    public void execute(PipeContext context){              
-       SesameMemoryBuffer tmp= new SesameMemoryBuffer();
-       mergeInputs(tmp,context);
+    @Override
+	public ExecBuffer getExecBuffer() {
+		return resultBuffer;
+	}
+	public void execute(PipeContext context){              
 		resultBuffer=new SesameTupleBuffer();       
+		SesameMemoryBuffer tmp= new SesameMemoryBuffer();
+		mergeInputs(tmp,context);
 		try{   
 			RepositoryConnection conn = tmp.getConnection();
 			TupleQuery preparedQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
@@ -116,7 +103,7 @@ public class SelectBox extends AbstractMerge {
 		catch(Exception e){ 
 			logger.warn("error during execution",e);
 		}
-   	   isExecuted=true;
+		isExecuted=true;
     }
    	public String getQuery() {
 		return query;

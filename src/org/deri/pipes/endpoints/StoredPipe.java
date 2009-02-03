@@ -41,6 +41,7 @@ package org.deri.pipes.endpoints;
 import java.util.List;
 
 import org.deri.pipes.core.PipeParser;
+import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.Stream;
 import org.deri.pipes.utils.XMLUtil;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ import org.w3c.dom.Element;
  */
 public class StoredPipe{
 	private transient Logger logger = LoggerFactory.getLogger(StoredPipe.class);
-	public static Stream loadStream(Element element){
+	public static Operator loadOperator(Element element){
 		String syntax =PipeManager.getPipeSyntax(element.getTagName());
 		if (syntax==null) return null;
 		List<Element> parameters =XMLUtil.getSubElement(element);

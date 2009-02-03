@@ -70,18 +70,6 @@ public class SplitBox implements Operator{
 		return isExecuted;
 	}
 
-	@Override
-	public void stream(ExecBuffer outputBuffer) {
-		if (buffer!=null)
-			buffer.stream(outputBuffer);
-	}
-
-	@Override
-	public void stream(ExecBuffer outputBuffer, String context) {
-		if (buffer!=null)
-			buffer.stream(outputBuffer,context);
-	}
-
 /*	public void initialize(PipeContext context,Element element){
 		this.context = context;
         Element inputSrc =XMLUtil.getFirstSubElement(element);

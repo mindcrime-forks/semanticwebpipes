@@ -306,7 +306,7 @@ public class PipeEditor extends Workspace {
 		   syntax=populatePara(syntax);	
 		   //logger.debug(syntax);
 		   PipeParser parser= new PipeParser();	   
-		   Stream    stream= parser.parse(syntax);
+		   Operator    stream= parser.parse(syntax);
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
 		   if(stream instanceof RDFBox){
