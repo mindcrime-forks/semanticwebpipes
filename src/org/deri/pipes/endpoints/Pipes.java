@@ -55,7 +55,6 @@ import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.model.Stream;
 import org.deri.pipes.rdf.RDFBox;
 import org.deri.pipes.utils.XMLUtil;
 import org.deri.pipes.utils.XSLTUtil;

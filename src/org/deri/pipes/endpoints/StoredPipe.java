@@ -42,7 +42,6 @@ import java.util.List;
 
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.model.Operator;
-import org.deri.pipes.model.Stream;
 import org.deri.pipes.utils.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
