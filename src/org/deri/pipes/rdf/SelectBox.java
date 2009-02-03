@@ -43,8 +43,13 @@ import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.model.SesameMemoryBuffer;
+import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.utils.XMLUtil;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -79,7 +84,7 @@ Example:
  *
  */
 public class SelectBox extends AbstractMerge {
-	final Logger logger = LoggerFactory.getLogger(SelectBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(SelectBox.class);
 
     private ArrayList<String> graphNames =new ArrayList<String>();
     private String query;    
@@ -101,16 +106,19 @@ public class SelectBox extends AbstractMerge {
 	}
 	
 	    
-    public void execute(){              
+    public void execute(PipeContext context){              
        SesameMemoryBuffer tmp= new SesameMemoryBuffer();
-       mergeInputs(tmp);
-       
-       try{   
-    	   resultBuffer=new SesameTupleBuffer(((tmp.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate()));
-       }
-       catch(Exception e){ 
-    	   logger.warn("error during execution",e);
-       }
+       mergeInputs(tmp,context);
+		resultBuffer=new SesameTupleBuffer();       
+		try{   
+			RepositoryConnection conn = tmp.getConnection();
+			TupleQuery preparedQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+			TupleQueryResult result = preparedQuery.evaluate();
+			resultBuffer.copyBuffer(result);
+		}
+		catch(Exception e){ 
+			logger.warn("error during execution",e);
+		}
    	   isExecuted=true;
     }
     
@@ -126,7 +134,7 @@ public class SelectBox extends AbstractMerge {
     	for(int i=0;i<sources.size();i++){
     		String opID=context.getPipeParser().getSourceOperatorId(sources.get(i));
     		if (null!=opID){
-    			addStream(opID);
+    			addSource(opID);
     			graphNames.add(sources.get(i).getAttribute("uri"));
     		}
     	}

@@ -167,7 +167,7 @@ public class PipeNode extends ZKNode{
 			Element node=(Element)((PipeNode)port.getParent()).getSrcCode(parentElm.getOwnerDocument(),config);
 			if(node.getParentNode()!=null){
 				String refID=generateID();
-				node.setAttribute("ID", refID);
+				node.setAttribute("ID", refID); //TODO: check first does the id attribute already exist?
 				outElm.setAttribute("REFID", refID);
 			}
 			else

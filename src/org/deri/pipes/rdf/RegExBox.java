@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.utils.XMLUtil;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -56,12 +57,14 @@ import org.openrdf.rio.RDFHandlerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
 public class RegExBox extends AbstractMerge{
-	final Logger logger = LoggerFactory.getLogger(RegExBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(RegExBox.class);
 	 ArrayList<String> types,regexes,replacements;
      
      public ArrayList<String> getTypes(){
@@ -76,10 +79,10 @@ public class RegExBox extends AbstractMerge{
     	 return replacements;
      }
      
-     public void execute(){
-    	 //merge all input sources to Sesame buffer
+     public void execute(PipeContext context){
+    	 //merge all input sourceOperators to Sesame buffer
     	 SesameMemoryBuffer tmp= new SesameMemoryBuffer();
-    	 mergeInputs(tmp);
+    	 mergeInputs(tmp,context);
     	 
     	 buffer = new SesameMemoryBuffer();
     	 try{

@@ -36,7 +36,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
+package org.deri.pipes.model;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,13 +47,14 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.deri.pipes.core.ExecBuffer;
+import org.deri.pipes.utils.UrlLoader;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class XMLStreamBuffer extends ExecBuffer {
-	final Logger logger = LoggerFactory.getLogger(XMLStreamBuffer.class);
+	private transient Logger logger = LoggerFactory.getLogger(XMLStreamBuffer.class);
 	String url=null;
 	StringBuffer strBuff=null;
 	
@@ -109,7 +110,7 @@ public class XMLStreamBuffer extends ExecBuffer {
 		// TODO Auto-generated method stub
 		if(url!=null){
 			try {
-				InputStream in = openConnection(url, RDFFormat.RDFXML);
+				InputStream in = UrlLoader.openConnection(url, RDFFormat.RDFXML);
 				try{
 					IOUtils.copy(in, output);
 				}finally{

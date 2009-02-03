@@ -37,23 +37,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.rdf;
+import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.model.SesameMemoryBuffer;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
 public class SameAsBox extends AbstractMerge{ 
-	final Logger logger = LoggerFactory.getLogger(SameAsBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(SameAsBox.class);
 	
      
-     public void execute(){
+     public void execute(PipeContext context){
     	 buffer= new SesameMemoryBuffer();
-    	 mergeInputs();
+    	 mergeInputs(context);
     	 
     	 RepositoryConnection conn = buffer.getConnection();
     	 Repository rep = conn.getRepository();

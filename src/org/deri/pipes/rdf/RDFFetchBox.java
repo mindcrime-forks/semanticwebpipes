@@ -40,53 +40,43 @@ package org.deri.pipes.rdf;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.utils.XMLUtil;
 import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
 public class RDFFetchBox extends FetchBox {
-	final Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
-	private RDFFormat format=null;		
+	private transient Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
+	@XStreamAsAttribute
+	protected String format="RDF/XML";		
 	
-	public void execute(){
+	public void execute(PipeContext context){
 		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-		rdfBuffer.loadFromURL(location,format);			
+		rdfBuffer.loadFromURL(location,getRDFFormat());			
 		buffer=rdfBuffer;
 		isExecuted=true;
 	}
     
 
-	public void setFormat(String attrFormat) {
-		if(null==attrFormat){
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
+	public RDFFormat getRDFFormat() {
+		if(null==format){
     		logger.info("No format given, assuming rdfxml");
-			setFormat(RDFFormat.RDFXML);
+			return RDFFormat.RDFXML;
 		}else{	
-			setFormat(RDFFormat.valueOf(attrFormat));
+			return(RDFFormat.valueOf(format));
 		}
 	}
 
-
-	public String getLocation() {
-		return location;
-	}
-
-
-	public void setLocation(String url) {
-		this.location = url;
-	}
-
-
-	public RDFFormat getFormat() {
-		return format;
-	}
-
-
-	public void setFormat(RDFFormat format) {
-		this.format = format;
-	}
 }

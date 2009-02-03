@@ -1,0 +1,9 @@
+<pipe>
+<parameters>
+</parameters>
+<code>
+<htmlfetch format="RDFa|">
+<location><![CDATA[http://www.w3.org/2001/sw/grddl-wg/td/hCardFabien-RDFa.html]]></location>
+</htmlfetch>
+</code>
+</pipe>

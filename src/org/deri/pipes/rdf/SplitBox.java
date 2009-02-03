@@ -49,15 +49,15 @@ import org.w3c.dom.Element;
  *
  */
 public class SplitBox implements Operator{ 
-	final Logger logger = LoggerFactory.getLogger(SplitBox.class);
-	 ExecBuffer buffer;
+	private transient Logger logger = LoggerFactory.getLogger(SplitBox.class);
+	private transient ExecBuffer buffer;
 	 String inputOpID;
 	 protected boolean isExecuted=false;
 	private PipeContext context;
 
 
 	@Override
-	public void execute() {
+	public void execute(PipeContext context) {
 		buffer=context.getOperatorExecuted(inputOpID).getExecBuffer();
 		isExecuted = true;
 	}

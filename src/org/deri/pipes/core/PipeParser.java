@@ -138,15 +138,18 @@ public class PipeParser {
 				//initialize operator (PipeParser,Element)
 				Object obj= operatorClass.newInstance();
 				logger.debug("output "+obj.toString());
-				if((obj!=null)||(obj instanceof Operator)){
+				if(obj instanceof Operator){
 					Operator operator = (Operator)obj;
 					operator.initialize(pipeContext,element);
 					return operator;
+				}else{
+					logger.warn("Could not create operator for "+opClassName);
 				}
-				logger.debug("cant create Operator was: "+obj);
 			} catch (Exception e) {
 				logger.info("Could not parse element "+element,e);
 			}
+		}else{
+			logger.info("No mapped operator for element ["+lowerCaseTagName+"]");
 		}
 		
 		Operator operator=loadStoredOperator(element);

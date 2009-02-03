@@ -44,10 +44,15 @@ import java.util.Hashtable;
 
 import javax.xml.transform.stream.StreamSource;
 
+import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.utils.MappedStreamSource;
 import org.deri.pipes.utils.XSLTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * The Fetch operator is used to fetch data from an URI in RDF/XML or SPARQL-RESULT/XML . There is an optional attribute &quot;accept&quot; which determines the HTTP accept header for the request. Allowed value are :&quot;rdfxml&quot; and &quot;sparqlxml&quot;.
 <pre>
@@ -84,10 +89,10 @@ public class HTMLFetchBox extends FetchBox {
 	public static final String XFN = "XFN";
 	public static final String HCAL = "hCal";
 	public static final String DC = "DC";
-	final Logger logger = LoggerFactory.getLogger(HTMLFetchBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(HTMLFetchBox.class);
 	//fuller says: WARNING WARNING WARNING MEMORY LEAKS FOLLOW IN STATIC HASHTABLES
 	private static Hashtable<String,MappedStreamSource> xsltFile=new Hashtable<String,MappedStreamSource>();
-	private static String xsltPath=XSLTUtil.getBaseURL()+"/xslt/";
+	private static String xsltPath="file:WebContent/xslt/";//TODO: fix XSLTUtil.getBaseURL()+"/xslt/";
 	static{
 		xsltFile.put(DC, MappedStreamSource.newInstance(DC,xsltPath+"dc-extract.xsl","Dublin Core"));
 		xsltFile.put(HCAL,MappedStreamSource.newInstance(HCAL,xsltPath+"glean-hcal.xsl","hCalendar"));
@@ -96,14 +101,14 @@ public class HTMLFetchBox extends FetchBox {
 		xsltFile.put(HREVIEW,MappedStreamSource.newInstance(HREVIEW,xsltPath+"hreview2rdfxml.xsl",HREVIEW));
 		xsltFile.put(RDFA,MappedStreamSource.newInstance(RDFA,xsltPath+"RDFa2RDFXML.xsl",RDFA));
 	}
-	
+	@XStreamAsAttribute
 	private String format = null;
 		
 	public static Collection<String>getFormats(){
 		return xsltFile.keySet();
 	}
 	@Override
-	public void execute() {
+	public void execute(PipeContext context) {
 		buffer=new SesameMemoryBuffer();
 		if(!isExecuted){
 			Enumeration<String> k = xsltFile.keys();
@@ -111,7 +116,8 @@ public class HTMLFetchBox extends FetchBox {
 		    while (k.hasMoreElements()) {
 		    	String key=k.nextElement();
 		    	if(format.indexOf(key)>=0){
-		    		StringBuffer textBuff=XSLTUtil.transform(stream, xsltFile.get(key).getStreamSource());
+		    		StreamSource xsltStreamSource = xsltFile.get(key).getStreamSource();
+					StringBuffer textBuff=XSLTUtil.transform(stream, xsltStreamSource);
 		    		((SesameMemoryBuffer)buffer).loadFromText(textBuff.toString(), location);
 		    	}
 		    }

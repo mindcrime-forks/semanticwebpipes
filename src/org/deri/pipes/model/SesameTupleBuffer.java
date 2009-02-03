@@ -36,12 +36,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
+package org.deri.pipes.model;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.deri.pipes.core.ExecBuffer;
+import org.deri.pipes.utils.EmptyTupleQueryResult;
+import org.deri.pipes.utils.UrlLoader;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.MutableTupleQueryResult;
 import org.openrdf.query.resultio.QueryResultIO;
@@ -50,21 +53,31 @@ import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class SesameTupleBuffer extends ExecBuffer{
-	final Logger logger = LoggerFactory.getLogger(SesameTupleBuffer.class);
-	private MutableTupleQueryResult buffer=null;
+	private transient Logger logger = LoggerFactory.getLogger(SesameTupleBuffer.class);
+	private MutableTupleQueryResult buffer= null;
 
+	/**
+	 * Create a new empty TupleBuffer.
+	 */
 	public SesameTupleBuffer(){
+		reset();
 	}
 
-	public SesameTupleBuffer(String url,TupleQueryResultFormat format){
-		loadFromURL(url,format);
+	/**
+	 * Clear the result buffer.
+	 */
+	private void reset() {
+		try {
+			buffer = new MutableTupleQueryResult(new EmptyTupleQueryResult());
+		} catch (QueryEvaluationException e) {
+			// shouldn't happen with empty tuple query result.
+			throw new RuntimeException(e);
+		}
 	}
 
-	public SesameTupleBuffer(TupleQueryResult buffer){
-		copyBuffer(buffer);
-	}
 
 	public void copyBuffer(TupleQueryResult buffer){
+		reset();
 		try{
 			this.buffer=new MutableTupleQueryResult(buffer);
 		}
@@ -82,25 +95,30 @@ public class SesameTupleBuffer extends ExecBuffer{
 		}
 	}
 
+	public void load(InputStream in, TupleQueryResultFormat format){
+		try{
+			TupleQueryResult result = QueryResultIO.parse(in,format);
+			copyBuffer(result);
+		}
+		catch(Exception e){
+			logger.warn("problem loading from text",e);
+		}
+		
+	}
 
 	public void loadFromText(String text){
 		if (text==null) {
 			buffer=null;
 		}
-		try{
-			copyBuffer(QueryResultIO.parse(new ByteArrayInputStream(text.trim().getBytes()), TupleQueryResultFormat.SPARQL));
-		}
-		catch(Exception e){
-			logger.warn("problem loading from text",e);
-		}
+		load(new ByteArrayInputStream(text.trim().getBytes()), TupleQueryResultFormat.SPARQL);
 	}
 
 	public void loadFromURL(String url,TupleQueryResultFormat format){
 		if (url==null) buffer=null;
 		try{
-			InputStream in = openConnection(url, format);
+			InputStream in = UrlLoader.openConnection(url, format);
 			try{
-				copyBuffer(QueryResultIO.parse(in, format));
+				load(in, format);
 			}finally{
 				in.close();
 			}

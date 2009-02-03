@@ -43,26 +43,30 @@ import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Source;
 import org.deri.pipes.model.Operator;
+import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.utils.XMLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 public abstract class AbstractMerge extends RDFBox {
-	protected List<String> inputStreams = new ArrayList<String>();
-    
-	public void addStream(String str){
-   	    inputStreams.add(str);
-    }
-	
-	protected void mergeInputs(){
-		mergeInputs(buffer);
+	private transient Logger logger = LoggerFactory.getLogger(AbstractMerge.class);
+	protected void mergeInputs(PipeContext context){
+		mergeInputs(buffer,context);
+	}
+	void addSource(String src){
+		throw new RuntimeException("remove this method");
 	}
 	
-	protected void mergeInputs(ExecBuffer buffer){
-		for(int i=0;i<inputStreams.size();i++){
-	   		 Operator str=context.getOperatorExecuted(inputStreams.get(i));   
-	       	 if (str.getExecBuffer() instanceof SesameMemoryBuffer){
-	       		str.stream(buffer);
+	protected void mergeInputs(ExecBuffer buffer, PipeContext context){
+		for(Source src : source){
+			if(!src.isExecuted()){
+				src.execute(context);
+			}
+	       	 if (src.getExecBuffer() instanceof SesameMemoryBuffer){
+	       		src.stream(buffer);
 	       	 }else{
 	       		logger.warn("Inappropriate input format, RDF is required!!!");
 	       	 }
@@ -75,7 +79,7 @@ public abstract class AbstractMerge extends RDFBox {
   		for(int i=0;i<sources.size();i++){
      		String opID=context.getPipeParser().getSourceOperatorId(sources.get(i));
      		if (null!=opID){
-     			addStream(opID);
+     	//		addSource(opID);
      		}
      	}  		
     }

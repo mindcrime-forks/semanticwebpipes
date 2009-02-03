@@ -92,7 +92,7 @@ public class XSLTUtil {
 		Execution exec=Executions.getCurrent();
 		if(exec!=null)
 			return "http://"+exec.getServerName()+":"+exec.getServerPort()+exec.getContextPath();
-		if(Pipes.REQ!=null)
+		if(Pipes.REQ!=null)//fuller says this is wrong and dangerous.
 			return "http://"+Pipes.REQ.getServerName()+":"+Pipes.REQ.getServerPort()+Pipes.REQ.getContextPath();
 		return "";	
 	}

@@ -41,7 +41,10 @@ package org.deri.pipes.core;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpClient;
 import org.deri.pipes.model.Operator;
+
+import com.thoughtworks.xstream.XStream;
 /**
  * Operators belonging to a Pipe.
  * @author rfuller
@@ -49,7 +52,9 @@ import org.deri.pipes.model.Operator;
  */
 public class PipeContext {
 	Map <String,Operator> operators = new HashMap<String,Operator>();
+	XStream xstream;
 	PipeParser parser;
+	private transient HttpClient httpClient;
 	/**
 	 * Get the operator having this id.
 	 * @param id
@@ -97,8 +102,26 @@ public class PipeContext {
 	public Operator getOperatorExecuted(String id) {
 		Operator operator = getOperator(id);
 		if (operator != null && !operator.isExecuted()){
-    		operator.execute();
+    		operator.execute(this);
     	}
 		return operator;
+	}
+	public String serialize(Object o) {
+		return xstream.toXML(o);
+	}
+	public Operator parse(String tmp) {
+		return (Operator)xstream.fromXML(tmp);
+	}
+	public XStream getXstream() {
+		return xstream;
+	}
+	public void setXstream(XStream xstream) {
+		this.xstream = xstream;
+	}
+	public void setHttpClient(HttpClient httpClient) {
+		this.httpClient = httpClient;
+	}
+	public HttpClient getHttpClient(){
+		return httpClient;
 	}
 }

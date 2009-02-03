@@ -63,7 +63,7 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
- This operator produces a merge of all the sources smooshing URIs based on the owl:sameAs statement included in the sources themselves.
+ This operator produces a merge of all the sourceOperators smooshing URIs based on the owl:sameAs statement included in the sourceOperators themselves.
 <p>
 For example (see also http://pipes.deri.org:8080/pipes/Pipes/?id=smoosher?), let us consider two RDF files as input. The first one (published at http://bobwebsite.org/foaf.rdf ?) says:
 
@@ -96,7 +96,7 @@ where only one URI is used to address Bob as an entity (the shortest one).
  *
  */
 public class Smoosher {
-	final Logger logger = LoggerFactory.getLogger(Smoosher.class);
+	private transient Logger logger = LoggerFactory.getLogger(Smoosher.class);
 
 	private ArrayList<Resource> visitedNodes = new ArrayList<Resource>();
 	

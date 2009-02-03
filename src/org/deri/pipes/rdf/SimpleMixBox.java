@@ -37,18 +37,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.rdf;
+import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 /**
- * The MIX operator is used to merge triples from multiple RDF sources. Each RDF Source can be either a constant (directly input as RDF/XML) or another Pipe operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the sourcedata will be placed into an named graph with attribute's value as graph name.
+ * The MIX operator is used to merge triples from multiple RDF sourceOperators. Each RDF Source can be either a constant (directly input as RDF/XML) or another Pipe operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the sourcedata will be placed into an named graph with attribute's value as graph name.
 <pre>
 Note: Constant RDF/XML text has to be wrapped into a CDATA section
 
 Syntax template:
 
 &lt;simplemix&gt;
-&lt;source&gt;Enter one or more sources&lt;/source&gt;
+&lt;source&gt;Enter one or more sourceOperators&lt;/source&gt;
 ....
 &lt;/simplemix&gt;
 
@@ -85,11 +87,11 @@ Example (see http://pipes.deri.org:8080/pipes/Pipes/?id=simplemix )
  *
  */
 public class SimpleMixBox extends AbstractMerge{ 
-	final Logger logger = LoggerFactory.getLogger(SimpleMixBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(SimpleMixBox.class);
 	
-	 public void execute(){
+	 public void execute(PipeContext context){
     	 buffer= new SesameMemoryBuffer();
-    	 mergeInputs();
+    	 mergeInputs(context);
     	 isExecuted=true;
      }     
           

@@ -36,7 +36,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
+package org.deri.pipes.model;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +48,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
+import org.deri.pipes.utils.UrlLoader;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.Repository;
@@ -65,14 +66,14 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class SesameMemoryBuffer extends ExecBuffer {
-	final Logger logger = LoggerFactory.getLogger(SesameMemoryBuffer.class);
+	private transient Logger logger = LoggerFactory.getLogger(SesameMemoryBuffer.class);
 	Repository buffRepository=null;
 	public static final int NONE=0;
 	public static final int RDFS=1;
 	public static final int OWL=2;
 	private int reasoningType=NONE;
-	private Sail sail;
-	
+	private Sail sail = new MemoryStore();
+
 	public SesameMemoryBuffer(int reasoningType){
 		this.reasoningType=reasoningType;
 	}
@@ -82,22 +83,26 @@ public class SesameMemoryBuffer extends ExecBuffer {
 	}
 
 	public  RepositoryConnection getConnection(){
-		if(buffRepository==null){
-			sail=new MemoryStore();
-			switch (reasoningType){
-			case RDFS:
-				buffRepository =new SailRepository(
-						new ForwardChainingRDFSInferencer(sail));
-				break;
-			case NONE:
-			default:
-				buffRepository = new SailRepository(sail);
-			break;
-			}
-
-		}
 		try{
-			buffRepository.initialize();
+			if(buffRepository==null){
+				if(sail == null){
+					sail=new MemoryStore();
+				}
+				switch (reasoningType){
+				case RDFS:
+					logger.debug("using ForwardChainingRDFSInferencer" );
+					buffRepository =new SailRepository(
+							new ForwardChainingRDFSInferencer(sail));
+					break;
+				case NONE:
+				default:
+					logger.debug("using no inference" );
+					buffRepository = new SailRepository(sail);
+				break;
+				}
+				buffRepository.initialize();
+
+			}
 			return buffRepository.getConnection();
 		}
 		catch(RepositoryException e){
@@ -112,13 +117,13 @@ public class SesameMemoryBuffer extends ExecBuffer {
 
 	public void loadFromURL(String url,RDFFormat format){
 		try{
-			InputStream in = openConnection(url, format);
+			InputStream in = UrlLoader.openConnection(url, format);
 			load(in,url,format);
 		}catch(Exception e){
 			logger.warn("error loading location ["+url+"]",e);
 		}
 	}
-	
+
 	public void load(InputStream in, String url, RDFFormat format) throws RDFParseException, RepositoryException, IOException {
 		load(new InputStreamReader(in),url,format);
 	}
@@ -127,6 +132,7 @@ public class SesameMemoryBuffer extends ExecBuffer {
 			RDFFormat format) throws RDFParseException, RepositoryException, IOException {
 		RepositoryConnection conn=this.getConnection() ;
 		try{
+			logger.debug("loading from "+url);
 			conn.add(in, url, format);
 		}finally{
 			in.close();

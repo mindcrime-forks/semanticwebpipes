@@ -38,18 +38,26 @@
  */
 package org.deri.pipes.rdf;
 
+import java.util.List;
+
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Source;
 import org.deri.pipes.model.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 public abstract class RDFBox implements Operator {
-	Logger logger = LoggerFactory.getLogger(RDFBox.class);
-	protected ExecBuffer buffer;
-	protected boolean isExecuted=false;
-	protected PipeContext context;
+	private transient Logger logger = LoggerFactory.getLogger(RDFBox.class);
+	protected transient ExecBuffer buffer;
+	protected transient boolean isExecuted=false;
+	protected transient PipeContext context;
+	@XStreamImplicit
+	protected List<Source> source;
 	
 	public void stream(ExecBuffer outputBuffer){
 	   if((buffer!=null)&&(outputBuffer!=null))	

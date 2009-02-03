@@ -36,7 +36,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
+package org.deri.pipes.utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -47,8 +47,10 @@ import java.sql.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 public class RDFUtils {
-	static Logger logger = LoggerFactory.getLogger(RDFUtils.class);
+	private static Logger logger = LoggerFactory.getLogger(RDFUtils.class);
 	public static Connection getConnection(){
     	String virtuosoDriverClass = "virtuoso.jdbc3.Driver";
 		Connection conn = null;

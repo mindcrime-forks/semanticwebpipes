@@ -41,6 +41,7 @@ package org.deri.pipes.rdf;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.Operator;
+import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.utils.XMLUtil;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.slf4j.Logger;
@@ -48,12 +49,13 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 public class TupleQueryResultFetchBox extends FetchBox implements Operator {
-	final Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchBox.class);
 	private ExecBuffer buffer=null;
 	private TupleQueryResultFormat format=TupleQueryResultFormat.SPARQL;
 		
-	public void execute(){				
-		buffer=new SesameTupleBuffer(location,format);			
+	public void execute(PipeContext context){				
+		buffer=new SesameTupleBuffer();
+		((SesameTupleBuffer)buffer).loadFromURL(location,format);			
 		isExecuted=true;
 	}
 	public static TupleQueryResultFormat formatOf(String format){

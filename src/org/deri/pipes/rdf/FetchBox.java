@@ -6,8 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 public abstract class FetchBox extends RDFBox {
-	Logger logger = LoggerFactory.getLogger(FetchBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(FetchBox.class);
 	protected String location = null;
 
 	public FetchBox() {

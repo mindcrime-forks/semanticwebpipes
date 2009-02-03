@@ -46,7 +46,10 @@ import java.util.List;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.core.PipeParser;
+import org.deri.pipes.core.Source;
 import org.deri.pipes.model.Operator;
+import org.deri.pipes.model.SesameMemoryBuffer;
+import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.utils.XMLUtil;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
@@ -55,6 +58,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * The FOR operator will  invoke a parameterized pipe multiple times and merge the resulting outputs of each invocation. The &lt;sourcelist&gt; specifies an operator that ouputs a SPARQL result set. For each result in the set, the variable  values will be subtituted into the parametrized pipe specified in &lt;forloop&gt; and the pipe will be invoked.
 <pre>
@@ -90,8 +95,9 @@ Example (See also http://pipes.deri.org:8080/pipes/Pipes/?id=forloop  ): This pi
  *
  */
 public class ForLoopBox extends RDFBox{
-	final Logger logger = LoggerFactory.getLogger(ForLoopBox.class);
-   
+	private transient Logger logger = LoggerFactory.getLogger(ForLoopBox.class);
+    private Source sourcelist;
+    private Source forloop;
     private String srcListID=null;
     private String pipeCode=null;
         
@@ -99,10 +105,10 @@ public class ForLoopBox extends RDFBox{
    	    return buffer;
     }
     
-    public void execute(){
-    	Operator operator = context.getOperatorExecuted(srcListID);
+    public void execute(PipeContext context){
+    	Operator operator = sourcelist;//context.getOperatorExecuted(srcListID);
     	if (!(operator.getExecBuffer() instanceof SesameTupleBuffer)){
-    		logger.warn("sourcelist must contain Tuple set result, the FOR LOOP cannot not be executed");    	
+    		logger.warn("sourcelist must contain Tuple set result, the FOR LOOP cannot not be executed, the input buffer is "+operator.getExecBuffer());    	
     		return;
     	}
     	
@@ -111,7 +117,7 @@ public class ForLoopBox extends RDFBox{
     		TupleQueryResult tupleBuff=((SesameTupleBuffer)operator.getExecBuffer()).getTupleQueryResult();
     		List<String> bindingNames=tupleBuff.getBindingNames();
 	    	while (tupleBuff.hasNext()) {
-	    	   String tmp=pipeCode;	    	    
+	    	   String tmp=context.serialize(forloop);//pipeCode;	    	    
 			   BindingSet bindingSet = tupleBuff.next();		   
 			   for(int i=0;i<bindingNames.size();i++){				   
 			       tmp=tmp.replace("${{"+bindingNames.get(i)+"}}",
@@ -124,11 +130,12 @@ public class ForLoopBox extends RDFBox{
 						logger.warn("UTF-8 support is required by the JVM specification");
 				   }
 			   }
-	    	   PipeParser parser = new PipeParser();
-			   Operator op = parser.parseCode(tmp); 
+//	    	   PipeParser parser = new PipeParser();
+			   logger.debug("parsing:"+tmp);
+			   Operator op = context.parse(tmp);//parser.parseCode(tmp); 
 			   if(op instanceof RDFBox){
 				   if(!(op.isExecuted())) {
-					   op.execute();					
+					   op.execute(null);					
 				   }
 				   if(op.getExecBuffer()!=null){
 					   op.stream(buffer);					   

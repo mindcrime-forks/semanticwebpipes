@@ -43,6 +43,7 @@ import java.io.StringWriter;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.Operator;
+import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.utils.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,22 +54,23 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.reasoner.Reasoner;
 import com.hp.hpl.jena.reasoner.ReasonerRegistry;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
 public class OWLBox extends AbstractMerge{
-	final Logger logger = LoggerFactory.getLogger(OWLBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(OWLBox.class);
 	 String owlsource = null;
      
      public ExecBuffer getExecBuffer(){
     	 return buffer;
      }
      
-     public void execute(){
-    	 //merge all input sources to Sesame buffer
+     public void execute(PipeContext context){
+    	 //merge all input sourceOperators to Sesame buffer
     	 buffer= new SesameMemoryBuffer();
-    	 mergeInputs();
+    	 mergeInputs(context);
     	 
     	 //create a Jena Model containing input RDF data for reasoning from merged Sesame buffer
     	 Model data =createJenaModel((SesameMemoryBuffer)buffer);

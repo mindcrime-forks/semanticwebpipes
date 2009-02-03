@@ -310,13 +310,13 @@ public class PipeEditor extends Workspace {
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
 		   if(stream instanceof RDFBox){
-			   ((RDFBox) stream).execute();
+			   ((RDFBox) stream).execute(null);
 			   org.deri.pipes.core.ExecBuffer buff=((RDFBox)stream).getExecBuffer();
 			   textResult=buff.toString();
-			   if(buff instanceof org.deri.pipes.rdf.SesameMemoryBuffer){
+			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
 				   try{
 					   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
-			    		tuple=((((org.deri.pipes.rdf.SesameMemoryBuffer)buff).
+			    		tuple=((((org.deri.pipes.model.SesameMemoryBuffer)buff).
 			    				     getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
 			    	}
 			        catch(MalformedQueryException e){ 
@@ -329,8 +329,8 @@ public class PipeEditor extends Workspace {
 			      	  
 			        }
 			   }
-			   else if(buff instanceof org.deri.pipes.rdf.SesameTupleBuffer){
-				   tuple=((org.deri.pipes.rdf.SesameTupleBuffer)buff).getTupleQueryResult();
+			   else if(buff instanceof org.deri.pipes.model.SesameTupleBuffer){
+				   tuple=((org.deri.pipes.model.SesameTupleBuffer)buff).getTupleQueryResult();
 			   }
 		   }
 		   reloadTextDebug(textResult);
@@ -349,13 +349,13 @@ public class PipeEditor extends Workspace {
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
 		   if(op instanceof RDFBox){
-			   ((RDFBox) op).execute();
+			   ((RDFBox) op).execute(null);
 			   org.deri.pipes.core.ExecBuffer buff=((RDFBox)op).getExecBuffer();
 			   textResult=buff.toString();
-			   if(buff instanceof org.deri.pipes.rdf.SesameMemoryBuffer){
+			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
 				   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
 				   try{
-			    		tuple=((((org.deri.pipes.rdf.SesameMemoryBuffer)buff).
+			    		tuple=((((org.deri.pipes.model.SesameMemoryBuffer)buff).
 			    				     getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
 			    	}
 			        catch(Exception e){ 
@@ -363,13 +363,13 @@ public class PipeEditor extends Workspace {
 			        }
 			   }   
 		   }else if(op instanceof SelectBox){
-			   ((SelectBox) op).execute();
+			   ((SelectBox) op).execute(null);
 			   org.deri.pipes.core.ExecBuffer buff=((SelectBox)op).getExecBuffer();
 			   //textResult=buff.toString();
 			   
-			   if(buff instanceof org.deri.pipes.rdf.SesameTupleBuffer){
-				   tuple=((org.deri.pipes.rdf.SesameTupleBuffer)buff).getTupleQueryResult();
-				   textResult=((org.deri.pipes.rdf.SesameTupleBuffer)buff).toString();
+			   if(buff instanceof org.deri.pipes.model.SesameTupleBuffer){
+				   tuple=((org.deri.pipes.model.SesameTupleBuffer)buff).getTupleQueryResult();
+				   textResult=((org.deri.pipes.model.SesameTupleBuffer)buff).toString();
 			   }
 			   
 		   }

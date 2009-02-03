@@ -48,7 +48,7 @@ import org.w3c.dom.Element;
  */
 public interface Operator extends Stream{	
      public ExecBuffer getExecBuffer();
-     public void execute();
+     public void execute(PipeContext context);
      public boolean isExecuted();
      /**
       * Initialize this operator from the dom element. Beware

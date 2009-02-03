@@ -1,0 +1,13 @@
+<pipe>
+<parameters>
+</parameters>
+<code>
+<smoosher>
+<source>
+<rdffetch format="RDF/XML">
+<location><![CDATA[http://dbin.org/temp/sameAs1.rdf]]></location>
+</rdffetch>
+</source>
+</smoosher>
+</code>
+</pipe>

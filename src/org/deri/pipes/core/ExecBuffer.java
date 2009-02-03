@@ -49,6 +49,9 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.openrdf.repository.RepositoryConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zkoss.util.logging.Log;
 
 
 /**
@@ -57,21 +60,11 @@ import org.openrdf.repository.RepositoryConnection;
  */
 
 public abstract class ExecBuffer {
+	 Logger logger = LoggerFactory.getLogger(ExecBuffer.class);
      public abstract void stream(ExecBuffer outputBuffer);
      public abstract void stream(ExecBuffer outputBuffer,String context);
      public abstract void stream(OutputStream output);
      
-     protected static InputStream openConnection(String url, FileFormat format)
-     throws IOException, MalformedURLException {
-    	 URL netURL = new URL(url.trim());
-		URLConnection urlConnection = netURL.openConnection();
-		if(urlConnection instanceof HttpURLConnection){
-    	 HttpURLConnection httpURLConnection=(HttpURLConnection)urlConnection;
-    	 httpURLConnection.setRequestProperty("Accept", format.getDefaultMIMEType());
-		}
-    	 urlConnection.connect();
-    	 return urlConnection.getInputStream();
-     }
 	public abstract RepositoryConnection getConnection();
 
 }

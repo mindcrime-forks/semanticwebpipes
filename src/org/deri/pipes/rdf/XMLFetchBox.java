@@ -38,17 +38,19 @@
  */
 package org.deri.pipes.rdf;
 
+import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.Operator;
+import org.deri.pipes.model.XMLStreamBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class XMLFetchBox extends FetchBox implements Operator {
-	final Logger logger = LoggerFactory.getLogger(XMLFetchBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(XMLFetchBox.class);
 
 	XMLStreamBuffer buffer;
 	
 	@Override
-	public void execute() {
+	public void execute(PipeContext context) {
 		buffer = new XMLStreamBuffer(location);
 		isExecuted=true;
 	}

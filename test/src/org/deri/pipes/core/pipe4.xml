@@ -1,0 +1,22 @@
+<pipe>
+<parameters>
+</parameters>
+<code>
+<patch-executor>
+<source>
+<patch-generator>
+<source>
+<rdffetch format="RDF/XML">
+<location><![CDATA[http://dbin.org/temp/testFile0.rdf]]></location>
+</rdffetch>
+</source>
+</patch-generator>
+</source>
+<source>
+<rdffetch format="RDF/XML">
+<location><![CDATA[http://dbin.org/temp/testFile00.rdf]]></location>
+</rdffetch>
+</source>
+</patch-executor>
+</code>
+</pipe>

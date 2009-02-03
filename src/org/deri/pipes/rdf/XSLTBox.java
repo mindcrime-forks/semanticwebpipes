@@ -43,20 +43,22 @@ import javax.xml.transform.stream.StreamSource;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.Operator;
+import org.deri.pipes.model.SesameTupleBuffer;
+import org.deri.pipes.model.XMLStreamBuffer;
 import org.deri.pipes.utils.XMLUtil;
 import org.deri.pipes.utils.XSLTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 public class XSLTBox implements Operator {
-	final Logger logger = LoggerFactory.getLogger(XSLTBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(XSLTBox.class);
 	String xmlStrID,xslStrID;
 	private boolean isExecuted=false;
 	XMLStreamBuffer buffer;
 	private PipeContext context;
 	
 	@Override
-	public void execute() {
+	public void execute(PipeContext context) {
 		if((null!=xmlStrID)&&(null!=xslStrID)){			
 			StreamSource xmlSrc=executeXMLOp(xmlStrID);
 			StreamSource xslSrc=executeXMLOp(xslStrID);

@@ -37,23 +37,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.rdf;
+import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.revocations.Revoker;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
+@XStreamAlias("patch-generator")
 public class PatchGeneratorBox extends AbstractMerge{ 
-	final Logger logger = LoggerFactory.getLogger(PatchGeneratorBox.class);
+	private transient Logger logger = LoggerFactory.getLogger(PatchGeneratorBox.class);
 	
      
-     public void execute(){
+     public void execute(PipeContext context){
     	 buffer= new SesameMemoryBuffer();
-    	 mergeInputs();
+    	 mergeInputs(context);
     	 
     	 Repository rep = buffer.getConnection().getRepository();
     	 Revoker revoker = new Revoker();
