@@ -36,98 +36,58 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.deri.pipes.core;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.model.Operator;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.Factory;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+
 /**
- * Operators belonging to a Pipe.
- * @author rfuller
+ * @author robful
  *
  */
-public class PipeContext {
-	Map <String,Operator> operators = new HashMap<String,Operator>();
-	Map map = new HashMap();
+public class BypassCGLibConverter implements Converter {
 	XStream xstream;
-	PipeParser parser;
-	private transient HttpClient httpClient;
-	/**
-	 * Get the operator having this id.
-	 * @param id
-	 * @return The operator having the given id, or null if there is no such operator.
-	 */
-	public Operator getOperator(String id){
-		return operators.get(id);
-	}
-	/**
-	 * Add this operator into the context.
-	 * @param id
-	 * @param operator
-	 */
-	void addOperator(String id,Operator operator){
-		operators.put(id, operator);
-	}
-	/**
-	 * Whether the context contains an operator having this id.
-	 * @param id
-	 * @return true if there is an operator having this id, false otherwise.
-	 */
-	public boolean contains(String id) {
-		return operators.containsKey(id);
-	}
-	/**
-	 * Set the PipeParser.
-	 * @param parser
-	 */
-	void setPipeParser(PipeParser parser){
-		this.parser = parser;
-	}
-	/**
-	 * Get the PipeParser.
-	 * @return
-	 */
-	public PipeParser getPipeParser(){
-		return parser;
-	}
-
-	public String serialize(Object o) {
-		return getXstream().toXML(o);
-	}
-	public Operator parse(String tmp) {
-		return (Operator)xstream.fromXML(tmp);
-	}
-	public XStream getXstream() {
-		if(xstream == null){
-			xstream = new PipeParser().getXStreamSerializer();
-		}
-		return xstream;
-	}
-	public void setXstream(XStream xstream) {
+	BypassCGLibConverter(XStream xstream){
 		this.xstream = xstream;
 	}
-	public void setHttpClient(HttpClient httpClient) {
-		this.httpClient = httpClient;
-	}
-	public HttpClient getHttpClient(){
-		return httpClient;
-	}
-	/**
-	 * @param obj
-	 * @return
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.Converter#marshal(java.lang.Object, com.thoughtworks.xstream.io.HierarchicalStreamWriter, com.thoughtworks.xstream.converters.MarshallingContext)
 	 */
-	public Object get(Object obj) {
-		return map.get(obj);
+	@Override
+	public void marshal(Object arg0, HierarchicalStreamWriter arg1,
+			MarshallingContext arg2) {
+		Class<? extends Object> clazz = arg0.getClass();
+		Class<?> superclass = clazz.getSuperclass();
+		Converter converter = xstream.getConverterLookup().lookupConverterForType(superclass);
+		converter.marshal(arg0, arg1, arg2);
+
 	}
-	/**
-	 * @param obj
-	 * @param invoke
+
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.Converter#unmarshal(com.thoughtworks.xstream.io.HierarchicalStreamReader, com.thoughtworks.xstream.converters.UnmarshallingContext)
 	 */
-	public void put(Object key, Object value) {
-		map.put(key, value);
+	@Override
+	public Object unmarshal(HierarchicalStreamReader arg0,
+			UnmarshallingContext arg1) {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.ConverterMatcher#canConvert(java.lang.Class)
+	 */
+	@Override
+	public boolean canConvert(Class arg0) {
+		boolean assignableFrom = Factory.class.isAssignableFrom(arg0);
+		return assignableFrom;
+	}
+
 }

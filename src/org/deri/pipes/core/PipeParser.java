@@ -60,11 +60,14 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.CGLIBEnhancedConverter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
+import com.thoughtworks.xstream.mapper.CGLIBMapper;
+import com.thoughtworks.xstream.mapper.MapperWrapper;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -236,7 +239,7 @@ public class PipeParser {
 	}
 
 	private XStream createXStreamSerializer() {
-		XStream xstream = new XStream(new PureJavaReflectionProvider(),
+		XStream xstream = new XStream(new OperatorMemoizerProvider(),
 			    new DomDriver() {
 			        public HierarchicalStreamWriter createWriter(Writer out) {
 			            return new PrettyPrintWriter(out) {
@@ -252,7 +255,15 @@ public class PipeParser {
 			            };
 			        }
 			    }
-			);
+			){
+			@Override
+			 protected MapperWrapper wrapMapper(MapperWrapper next) {
+			        return new BypassCGLibMapper(next);
+			    }
+
+		};
+//		xstream.registerConverter(new CGLIBEnhancedConverter(xstream.getMapper(), xstream.getReflectionProvider()));
+		xstream.registerConverter(new BypassCGLibConverter(xstream));
 		xstream.alias("pipe",ProcessingPipe.class);
 		xstream.registerLocalConverter(ProcessingPipe.class, "parameters", new ParameterConverter());
 		xstream.registerConverter(new SourceConverter());

@@ -53,6 +53,8 @@ import org.deri.pipes.rdf.SameAsBox;
 import org.deri.pipes.rdf.SelectBox;
 import org.deri.pipes.rdf.SimpleMixBox;
 import org.deri.pipes.rdf.TextBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -62,25 +64,25 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class SourceConverter implements Converter {
-
-	static Map<String,Class> MAPPINGS = new HashMap<String,Class>();
+	Logger logger = LoggerFactory.getLogger(SourceConverter.class);
+	static Map<String,Class> ALIAS_MAPPINGS = new HashMap<String,Class>();
 	static{ //TODO: move these back to properties file
-		MAPPINGS.put("simplemix",SimpleMixBox.class);
-		MAPPINGS.put("source",Source.class);
-		MAPPINGS.put("code",Source.class);
-		MAPPINGS.put("sourcelist",Source.class);
-		MAPPINGS.put("rdffetch",RDFFetchBox.class);
-		MAPPINGS.put("for",ForLoopBox.class);
-		MAPPINGS.put("select",SelectBox.class);
-		MAPPINGS.put("smoosher",SameAsBox.class);
-		MAPPINGS.put("smoosher",SameAsBox.class);
-		MAPPINGS.put("patch-executor",PatchExecutorBox.class);
-		MAPPINGS.put("patch-generator",PatchGeneratorBox.class);
-		MAPPINGS.put("construct",ConstructBox.class);
-		MAPPINGS.put("htmlfetch", HTMLFetchBox.class);
-		MAPPINGS.put("regex", RegExBox.class);
-		MAPPINGS.put("rule",RegExBox.Rule.class);
-		MAPPINGS.put("text",TextBox.class);
+		ALIAS_MAPPINGS.put("simplemix",SimpleMixBox.class);
+		ALIAS_MAPPINGS.put("source",Source.class);
+		ALIAS_MAPPINGS.put("code",Source.class);
+		ALIAS_MAPPINGS.put("sourcelist",Source.class);
+		ALIAS_MAPPINGS.put("rdffetch",RDFFetchBox.class);
+		ALIAS_MAPPINGS.put("for",ForLoopBox.class);
+		ALIAS_MAPPINGS.put("select",SelectBox.class);
+		ALIAS_MAPPINGS.put("smoosher",SameAsBox.class);
+		ALIAS_MAPPINGS.put("smoosher",SameAsBox.class);
+		ALIAS_MAPPINGS.put("patch-executor",PatchExecutorBox.class);
+		ALIAS_MAPPINGS.put("patch-generator",PatchGeneratorBox.class);
+		ALIAS_MAPPINGS.put("construct",ConstructBox.class);
+		ALIAS_MAPPINGS.put("htmlfetch", HTMLFetchBox.class);
+		ALIAS_MAPPINGS.put("regex", RegExBox.class);
+		ALIAS_MAPPINGS.put("rule",RegExBox.Rule.class);
+		ALIAS_MAPPINGS.put("text",TextBox.class);
 	}
 	
 	@Override
@@ -89,7 +91,8 @@ public class SourceConverter implements Converter {
 		Source source = (Source)arg0;
 		Operator delegate = source.getDelegate();
 		if(delegate != null){
-			writer.startNode(getNodeForClass(delegate.getClass()));
+			Class delegateRealClass = BypassCGLibMapper.isCGLibEnhanced(delegate.getClass())?delegate.getClass().getSuperclass():delegate.getClass();
+			writer.startNode(getNodeForClass(delegateRealClass));
 			context.convertAnother(delegate);
 			writer.endNode();
 		}
@@ -97,8 +100,8 @@ public class SourceConverter implements Converter {
 	}
 
 	private String getNodeForClass(Class clazz) {
-		for(String key : MAPPINGS.keySet()){
-			if(clazz.equals(MAPPINGS.get(key))){
+		for(String key : ALIAS_MAPPINGS.keySet()){
+			if(clazz.equals(ALIAS_MAPPINGS.get(key))){
 				return key;
 			}
 		}
@@ -112,8 +115,13 @@ public class SourceConverter implements Converter {
 		if(reader.hasMoreChildren()){
 			reader.moveDown();
 			String nodeName = reader.getNodeName();
-			Object delegate = context.convertAnother(source, MAPPINGS.get(nodeName));
-			source.setDelegate((Operator)delegate);
+			Object delegate = context.convertAnother(source, ALIAS_MAPPINGS.get(nodeName));
+			if(delegate instanceof Operator){
+				Operator operator = (Operator)delegate;
+				source.setDelegate(operator);
+			}else{
+				logger.warn("Ignoring unexpected object in xml tree (was expecting Operator of some kind):"+nodeName);
+			}
 			reader.moveUp();
 		}
 		return source;
@@ -125,8 +133,8 @@ public class SourceConverter implements Converter {
 	}
 
 	public static void registerAliases(XStream xstream) {
-		for(String key : MAPPINGS.keySet()){
-			xstream.alias(key, MAPPINGS.get(key));
+		for(String key : ALIAS_MAPPINGS.keySet()){
+			xstream.alias(key, ALIAS_MAPPINGS.get(key));
 		}
 	}
 

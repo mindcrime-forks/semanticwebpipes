@@ -36,98 +36,43 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.deri.pipes.core;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.commons.httpclient.HttpClient;
+import org.deri.pipes.model.Memoizer;
 import org.deri.pipes.model.Operator;
 
-import com.thoughtworks.xstream.XStream;
+
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
+
 /**
- * Operators belonging to a Pipe.
- * @author rfuller
+ * @author robful
  *
  */
-public class PipeContext {
-	Map <String,Operator> operators = new HashMap<String,Operator>();
-	Map map = new HashMap();
-	XStream xstream;
-	PipeParser parser;
-	private transient HttpClient httpClient;
-	/**
-	 * Get the operator having this id.
-	 * @param id
-	 * @return The operator having the given id, or null if there is no such operator.
-	 */
-	public Operator getOperator(String id){
-		return operators.get(id);
+public class OperatorMemoizerProvider extends PureJavaReflectionProvider implements
+		ReflectionProvider {
+	List<Class> noMemoize = new ArrayList<Class>();
+
+	public OperatorMemoizerProvider(){
+		super();
+		noMemoize.add(ProcessingPipe.class);
+		noMemoize.add(Source.class);
 	}
-	/**
-	 * Add this operator into the context.
-	 * @param id
-	 * @param operator
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.reflection.ReflectionProvider#newInstance(java.lang.Class)
 	 */
-	void addOperator(String id,Operator operator){
-		operators.put(id, operator);
-	}
-	/**
-	 * Whether the context contains an operator having this id.
-	 * @param id
-	 * @return true if there is an operator having this id, false otherwise.
-	 */
-	public boolean contains(String id) {
-		return operators.containsKey(id);
-	}
-	/**
-	 * Set the PipeParser.
-	 * @param parser
-	 */
-	void setPipeParser(PipeParser parser){
-		this.parser = parser;
-	}
-	/**
-	 * Get the PipeParser.
-	 * @return
-	 */
-	public PipeParser getPipeParser(){
-		return parser;
+	@Override
+	public Object newInstance(Class cls) {
+		if(Operator.class.isAssignableFrom(cls) && !noMemoize.contains(cls)){
+			return Memoizer.getMemoizedInstance(cls);
+		}
+		return super.newInstance(cls);
 	}
 
-	public String serialize(Object o) {
-		return getXstream().toXML(o);
-	}
-	public Operator parse(String tmp) {
-		return (Operator)xstream.fromXML(tmp);
-	}
-	public XStream getXstream() {
-		if(xstream == null){
-			xstream = new PipeParser().getXStreamSerializer();
-		}
-		return xstream;
-	}
-	public void setXstream(XStream xstream) {
-		this.xstream = xstream;
-	}
-	public void setHttpClient(HttpClient httpClient) {
-		this.httpClient = httpClient;
-	}
-	public HttpClient getHttpClient(){
-		return httpClient;
-	}
-	/**
-	 * @param obj
-	 * @return
-	 */
-	public Object get(Object obj) {
-		return map.get(obj);
-	}
-	/**
-	 * @param obj
-	 * @param invoke
-	 */
-	public void put(Object key, Object value) {
-		map.put(key, value);
-	}
+
 }

@@ -94,36 +94,47 @@ public class ForLoopBox extends RDFBox{
         
     
     public ExecBuffer execute(PipeContext context){
-    	SesameMemoryBuffer buffer=new SesameMemoryBuffer(); 
-    	Operator operator = sourcelist;
- 		ExecBuffer operatorResult = operator.execute(context);
+    	if(sourcelist == null){
+    		logger.warn("sourcelist is null, cannot execute for loop");
+    		return new SesameMemoryBuffer();
+    	}
+    	if(forloop == null){
+    		logger.warn("forloop is null, cannot execute for loop");
+    		return new SesameMemoryBuffer();    		
+    	}
+ 		ExecBuffer operatorResult = sourcelist.execute(context);
 		if (!(operatorResult instanceof SesameTupleBuffer)){
     		logger.warn("sourcelist must contain Tuple set result, the FOR LOOP cannot not be executed, the input buffer is "+operatorResult);   
-    		return buffer;
+    		return new SesameMemoryBuffer();    		
     	}
  		SesameTupleBuffer tupleBuffer = (SesameTupleBuffer) operatorResult;
    	
-    	try{
-    		TupleQueryResult tupleQueryResult = tupleBuffer.getTupleQueryResult();
-			List<String> bindingNames=tupleQueryResult.getBindingNames();
-	    	while (tupleQueryResult.hasNext()) {
-	    	   String operatorXml=context.serialize(forloop);	    	    
-			   BindingSet bindingSet = tupleQueryResult.next();		   
-			   operatorXml = bindVariables(operatorXml, bindingNames, bindingSet);
-			   logger.debug("parsing:"+operatorXml);
-			   Operator op = context.parse(operatorXml);
-			   ExecBuffer execBuffer = op.execute(context);
-			   if(execBuffer instanceof SesameMemoryBuffer){
-				   execBuffer.stream(buffer);					   
-			   }else{
-				   logger.warn("Inappropriate input format, RDF is required!!!");
-			   }
-	    	}
-    	}catch(QueryEvaluationException e){
-    		logger.warn("error in for loop",e);
-    	}
-    	return buffer;
+ 		return executeForLoop(context, tupleBuffer);
     }
+
+	private ExecBuffer executeForLoop(PipeContext context,SesameTupleBuffer tupleBuffer) {
+		SesameMemoryBuffer buffer = new SesameMemoryBuffer();
+		try{
+ 			TupleQueryResult tupleQueryResult = tupleBuffer.getTupleQueryResult();
+ 			List<String> bindingNames=tupleQueryResult.getBindingNames();
+ 			while (tupleQueryResult.hasNext()) {
+ 				String operatorXml=context.serialize(forloop);	    	    
+ 				BindingSet bindingSet = tupleQueryResult.next();		   
+ 				operatorXml = bindVariables(operatorXml, bindingNames, bindingSet);
+ 				logger.debug("parsing:"+operatorXml);
+ 				Operator op = context.parse(operatorXml);
+ 				ExecBuffer execBuffer = op.execute(context);
+ 				if(execBuffer instanceof SesameMemoryBuffer){
+ 					execBuffer.stream(buffer);					   
+ 				}else{
+ 					logger.warn("Inappropriate input format, RDF is required!!!");
+ 				}
+ 			}
+ 		}catch(QueryEvaluationException e){
+ 			logger.warn("error in for loop",e);
+ 		}
+ 		return buffer;
+	}
 
 	private String bindVariables(String operatorXml, List<String> bindingNames,
 			BindingSet bindingSet) {
