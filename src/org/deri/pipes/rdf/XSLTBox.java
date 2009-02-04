@@ -51,27 +51,26 @@ import org.slf4j.LoggerFactory;
 public class XSLTBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(XSLTBox.class);
 	String xmlStrID,xslStrID;
-	private boolean isExecuted=false;
-	XMLStreamBuffer buffer;
-	private PipeContext context;
 	
 	@Override
-	public void execute(PipeContext context) {
+	public ExecBuffer execute(PipeContext context) {
+		XMLStreamBuffer buffer = new XMLStreamBuffer();
+		//TODO: log warnings.
 		if((null!=xmlStrID)&&(null!=xslStrID)){			
-			StreamSource xmlSrc=executeXMLOp(xmlStrID);
-			StreamSource xslSrc=executeXMLOp(xslStrID);
+			StreamSource xmlSrc=executeXMLOp(xmlStrID,context);
+			StreamSource xslSrc=executeXMLOp(xslStrID,context);
 			if((xmlSrc!=null)&&(xslSrc!=null)){
 				buffer=new XMLStreamBuffer();	
 			    buffer.setStreamSource(XSLTUtil.transform(xmlSrc,xslSrc));				
 			}
 	    }
-		isExecuted=true;
+		return buffer;
 	}
 	
-    private StreamSource executeXMLOp(String strID){
+    private StreamSource executeXMLOp(String strID, PipeContext context){
     	
-    	Operator xmlOp=context.getOperatorExecuted(strID);
-		ExecBuffer xmlBuff=xmlOp.getExecBuffer();
+    	Operator xmlOp=context.getOperator(strID);
+		ExecBuffer xmlBuff=xmlOp.execute(context);
 		
 		StreamSource xmlSrc=null;
 		if(xmlBuff instanceof XMLStreamBuffer) 
@@ -84,22 +83,6 @@ public class XSLTBox implements Operator {
 		
 		return xmlSrc;
     }
-    
-
-	@Override
-	public ExecBuffer getExecBuffer() {
-		return buffer;
-	}
 
 
-
-	@Override
-	public boolean isExecuted() {
-		return isExecuted;
-	}
-
-	
-	public void setContext(PipeContext context) {
-		this.context = context;
-	}	
 }

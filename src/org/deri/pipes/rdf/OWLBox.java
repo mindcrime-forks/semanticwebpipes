@@ -60,21 +60,18 @@ public class OWLBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(OWLBox.class);
 	 String owlsource = null;
      
-     public ExecBuffer getExecBuffer(){
-    	 return buffer;
-     }
-     
-     public void execute(PipeContext context){
+      
+     public ExecBuffer execute(PipeContext context){
     	 //merge all input sourceOperators to Sesame buffer
-    	 buffer= new SesameMemoryBuffer();
-    	 mergeInputs(context);
+    	 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
+    	 mergeInputs(buffer,context);
     	 
     	 //create a Jena Model containing input RDF data for reasoning from merged Sesame buffer
     	 Model data =createJenaModel((SesameMemoryBuffer)buffer);
     	 
     	 //create a Jena Model containing OWL schema from <owlsource> tag parsed into operator with ID owlsource
-    	 Operator operator = context.getOperatorExecuted(owlsource);
-		Model schema =createJenaModel((SesameMemoryBuffer)operator.getExecBuffer());
+    	 Operator operator = context.getOperator(owlsource);
+		Model schema =createJenaModel((SesameMemoryBuffer)operator.execute(context));
     	 
     	 //create default Jena reasoner and infer implicit RDF triples
     	 Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
@@ -84,8 +81,7 @@ public class OWLBox extends AbstractMerge{
     	 //write inferred triples back to opearator's buffer
     	 buffer = new SesameMemoryBuffer();
     	 writeJenaModel(infmodel, (SesameMemoryBuffer)buffer);
-    	 
-    	 isExecuted=true;
+    	 return buffer;
      }   
      
      private Model createJenaModel(SesameMemoryBuffer buffer){

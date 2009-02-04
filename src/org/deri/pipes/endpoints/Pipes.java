@@ -235,8 +235,7 @@ public class Pipes extends HttpServlet {
 			PipeParser pipeParser= new PipeParser();
 			Operator stream = pipeParser.parse(syntax);
 			if (stream instanceof RDFBox) {
-				((RDFBox) stream).execute(null);
-				return (SesameMemoryBuffer)((RDFBox) stream).getExecBuffer();
+				return (SesameMemoryBuffer)stream.execute(pipeParser.getPipeContext());
 
 			} else {
 				logger.debug("parsing error: stream was not an RDFBox");

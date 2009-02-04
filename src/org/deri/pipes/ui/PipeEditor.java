@@ -310,7 +310,7 @@ public class PipeEditor extends Workspace {
 		   String textResult=null;
 		   if(stream instanceof RDFBox){
 			   ((RDFBox) stream).execute(null);
-			   org.deri.pipes.core.ExecBuffer buff=((RDFBox)stream).getExecBuffer();
+			   org.deri.pipes.core.ExecBuffer buff=stream.execute(parser.getPipeContext());
 			   textResult=buff.toString();
 			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
 				   try{
@@ -347,9 +347,8 @@ public class PipeEditor extends Workspace {
 		   Operator    op= pipeParser.parseOperator(parser.getDocument().getDocumentElement());
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
+		   org.deri.pipes.core.ExecBuffer buff=op.execute(pipeParser.getPipeContext());
 		   if(op instanceof RDFBox){
-			   ((RDFBox) op).execute(null);
-			   org.deri.pipes.core.ExecBuffer buff=((RDFBox)op).getExecBuffer();
 			   textResult=buff.toString();
 			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
 				   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
@@ -362,8 +361,6 @@ public class PipeEditor extends Workspace {
 			        }
 			   }   
 		   }else if(op instanceof SelectBox){
-			   ((SelectBox) op).execute(null);
-			   org.deri.pipes.core.ExecBuffer buff=((SelectBox)op).getExecBuffer();
 			   //textResult=buff.toString();
 			   
 			   if(buff instanceof org.deri.pipes.model.SesameTupleBuffer){

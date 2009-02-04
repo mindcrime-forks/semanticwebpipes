@@ -82,16 +82,11 @@ Example:
  */
 public class SelectBox extends AbstractMerge {
 	private transient Logger logger = LoggerFactory.getLogger(SelectBox.class);
-	private transient SesameTupleBuffer resultBuffer;   //TODO: this isn't written out.
 
     private String query;    	
-	    
-    @Override
-	public ExecBuffer getExecBuffer() {
-		return resultBuffer;
-	}
-	public void execute(PipeContext context){              
-		resultBuffer=new SesameTupleBuffer();       
+
+	public ExecBuffer execute(PipeContext context){              
+		SesameTupleBuffer resultBuffer=new SesameTupleBuffer();       
 		SesameMemoryBuffer tmp= new SesameMemoryBuffer();
 		mergeInputs(tmp,context);
 		try{   
@@ -103,7 +98,7 @@ public class SelectBox extends AbstractMerge {
 		catch(Exception e){ 
 			logger.warn("error during execution",e);
 		}
-		isExecuted=true;
+		return resultBuffer;
     }
    	public String getQuery() {
 		return query;

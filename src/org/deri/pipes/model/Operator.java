@@ -46,7 +46,5 @@ import org.deri.pipes.core.PipeContext;
  *
  */
 public interface Operator{	
-     public ExecBuffer getExecBuffer();
-     public void execute(PipeContext context);
-     public boolean isExecuted();
+     public ExecBuffer execute(PipeContext context);
 }

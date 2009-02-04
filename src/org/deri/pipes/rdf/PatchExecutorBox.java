@@ -37,6 +37,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.rdf;
+import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.revocations.RevokationFilter;
@@ -104,9 +105,9 @@ public class PatchExecutorBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(PatchExecutorBox.class);
 	 
 	 
-     public void execute(PipeContext context){
-    	 buffer= new SesameMemoryBuffer();
-    	 mergeInputs(context);
+     public ExecBuffer execute(PipeContext context){
+    	 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
+    	 mergeInputs(buffer,context);
     	 
     	 Repository rep = buffer.getConnection().getRepository();
     	 RevokationFilter revFilter = new RevokationFilter();
@@ -115,7 +116,6 @@ public class PatchExecutorBox extends AbstractMerge{
 		 } catch (RepositoryException e) {
 			logger.warn("problem executing revocation filter",e);
 		 }    	 
-    	 
-    	 isExecuted=true;
+    	 return buffer;
      }     
 }

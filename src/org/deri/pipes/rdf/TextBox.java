@@ -53,8 +53,6 @@ public class TextBox implements Operator{
 	private static final String SPARQL_FORMAT = "sparqlxml";
 	private static final String RDFXML_FORMAT = "rdfxml";
 	final static Logger logger = LoggerFactory.getLogger(TextBox.class);
-	private transient ExecBuffer buffer=null;
-	private transient boolean isExecuted=false;
 	private String content=null;
 	@XStreamAsAttribute
 	private String format= RDFXML_FORMAT;
@@ -75,24 +73,9 @@ public class TextBox implements Operator{
 		this.content = text;
 		this.format = format;
 	}
-	public ExecBuffer getExecBuffer(){
-		return buffer;
-	}
-	
-	public void stream(ExecBuffer outputBuffer){
-   	   buffer.stream(outputBuffer);
-    }
-	
-	public void stream(ExecBuffer outputBuffer,String context){
-	   	   buffer.stream(outputBuffer,context);
-	}
-	
-	public boolean isExecuted(){
-	   	    return isExecuted;
-	}
 	
 	
-	public void execute(PipeContext context){
+	public ExecBuffer execute(PipeContext context){
 		ExecBuffer execBuffer = newExecBuffer(format);
 		// execBuffer.loadFromText(content); // would be nice?			
 		if(execBuffer instanceof SesameMemoryBuffer){
@@ -102,8 +85,7 @@ public class TextBox implements Operator{
 		}else{
 			throw new RuntimeException("Wrong buffer, expected SesameMemoryBuffer or SesameTupleBuffer not "+execBuffer.getClass());
 		}
-		buffer=execBuffer;
-		isExecuted=true;
+		return execBuffer;
 	}
 	
 	static ExecBuffer newExecBuffer(String format){

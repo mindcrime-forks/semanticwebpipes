@@ -37,6 +37,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.rdf;
+import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
@@ -85,9 +86,9 @@ WHERE
 public class RDFSMixBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(RDFSMixBox.class);
           
-     public void execute(PipeContext context){
-    	 buffer= new SesameMemoryBuffer(SesameMemoryBuffer.RDFS);
-    	 mergeInputs(context);    	 
-    	 isExecuted=true;
+     public ExecBuffer execute(PipeContext context){
+    	 SesameMemoryBuffer buffer= new SesameMemoryBuffer(SesameMemoryBuffer.RDFS);
+    	 mergeInputs(buffer,context);   
+    	 return buffer;
      }     
 }

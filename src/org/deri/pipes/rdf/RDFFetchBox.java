@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.rdf;
 
+import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.openrdf.rio.RDFFormat;
@@ -54,11 +55,10 @@ public class RDFFetchBox extends FetchBox {
 	@XStreamAsAttribute
 	protected String format="RDF/XML";		
 	
-	public void execute(PipeContext context){
+	public ExecBuffer execute(PipeContext context){
 		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
 		rdfBuffer.loadFromURL(location,getRDFFormat());			
-		buffer=rdfBuffer;
-		isExecuted=true;
+		return rdfBuffer;
 	}
     
 

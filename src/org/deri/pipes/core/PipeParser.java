@@ -262,4 +262,11 @@ public class PipeParser {
 		xstream.autodetectAnnotations(true);
 		return xstream;
 	}
+
+	/**
+	 * @return
+	 */
+	public PipeContext getPipeContext() {
+		return pipeContext;
+	}
 }

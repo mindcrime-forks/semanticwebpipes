@@ -5,16 +5,13 @@ import java.util.Map;
 
 import org.deri.pipes.model.Operator;
 
-public class ProcessingPipe {
+public class ProcessingPipe implements Operator{
 	List<Map<String,String>> parameters;
 	List<Operator> code;
 	public ExecBuffer execute(PipeContext context) {
 		ExecBuffer result = null;
 		for(Operator operator : code){
-			if(!operator.isExecuted()){
-				operator.execute(context);
-			}
-			result = operator.getExecBuffer();
+			result = operator.execute(context);
 		}
 		return result;
 	}

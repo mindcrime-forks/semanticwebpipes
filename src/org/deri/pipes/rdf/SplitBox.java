@@ -48,26 +48,12 @@ import org.slf4j.LoggerFactory;
  */
 public class SplitBox implements Operator{ 
 	private transient Logger logger = LoggerFactory.getLogger(SplitBox.class);
-	private transient ExecBuffer buffer;
 	 String inputOpID;
-	 protected boolean isExecuted=false;
-	private PipeContext context;
 
 
 	@Override
-	public void execute(PipeContext context) {
-		buffer=context.getOperatorExecuted(inputOpID).getExecBuffer();
-		isExecuted = true;
-	}
-
-	@Override
-	public ExecBuffer getExecBuffer() {
-		return buffer;
-	}
-
-	@Override
-	public boolean isExecuted() {
-		return isExecuted;
+	public ExecBuffer execute(PipeContext context) {
+		return context.getOperator(inputOpID).execute(context);
 	}
 
 /*	public void initialize(PipeContext context,Element element){

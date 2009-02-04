@@ -92,18 +92,16 @@ public class ForLoopBox extends RDFBox{
     private Source sourcelist;
     private Source forloop;
         
-    public ExecBuffer getExecBuffer(){
-   	    return buffer;
-    }
     
-    public void execute(PipeContext context){
-    	buffer=new SesameMemoryBuffer(); 
-    	Operator operator = sourcelist;//context.getOperatorExecuted(srcListID);
- 		if (!(operator.getExecBuffer() instanceof SesameTupleBuffer)){
-    		logger.warn("sourcelist must contain Tuple set result, the FOR LOOP cannot not be executed, the input buffer is "+operator.getExecBuffer());   
-    		return;
+    public ExecBuffer execute(PipeContext context){
+    	SesameMemoryBuffer buffer=new SesameMemoryBuffer(); 
+    	Operator operator = sourcelist;
+ 		ExecBuffer operatorResult = operator.execute(context);
+		if (!(operatorResult instanceof SesameTupleBuffer)){
+    		logger.warn("sourcelist must contain Tuple set result, the FOR LOOP cannot not be executed, the input buffer is "+operatorResult);   
+    		return buffer;
     	}
- 		SesameTupleBuffer tupleBuffer = (SesameTupleBuffer) operator.getExecBuffer();
+ 		SesameTupleBuffer tupleBuffer = (SesameTupleBuffer) operatorResult;
    	
     	try{
     		TupleQueryResult tupleQueryResult = tupleBuffer.getTupleQueryResult();
@@ -114,10 +112,7 @@ public class ForLoopBox extends RDFBox{
 			   operatorXml = bindVariables(operatorXml, bindingNames, bindingSet);
 			   logger.debug("parsing:"+operatorXml);
 			   Operator op = context.parse(operatorXml);
-			   if(!op.isExecuted()){
-				   op.execute(context);	
-			   }
-			   ExecBuffer execBuffer = op.getExecBuffer();
+			   ExecBuffer execBuffer = op.execute(context);
 			   if(execBuffer instanceof SesameMemoryBuffer){
 				   execBuffer.stream(buffer);					   
 			   }else{
@@ -127,7 +122,7 @@ public class ForLoopBox extends RDFBox{
     	}catch(QueryEvaluationException e){
     		logger.warn("error in for loop",e);
     	}
-   	   isExecuted=true;
+    	return buffer;
     }
 
 	private String bindVariables(String operatorXml, List<String> bindingNames,

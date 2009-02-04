@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.rdf;
 
+import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.openrdf.query.QueryLanguage;
@@ -68,8 +69,8 @@ public class ConstructBox extends AbstractMerge {
     private String query;
 
    
-    public void execute(PipeContext context){
-    	buffer= new SesameMemoryBuffer();
+    public ExecBuffer execute(PipeContext context){
+    	SesameMemoryBuffer buffer= new SesameMemoryBuffer();
     	SesameMemoryBuffer tmp=new SesameMemoryBuffer();
     	mergeInputs(tmp,context);
     	try{    	  
@@ -78,7 +79,7 @@ public class ConstructBox extends AbstractMerge {
     	catch(Exception e){
     		logger.warn("problem executing construct box",e);
     	}
-    	isExecuted=true;
+    	return buffer;
     }
 
 

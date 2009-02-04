@@ -51,21 +51,5 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 public abstract class RDFBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(RDFBox.class);
-	protected transient ExecBuffer buffer;
-	protected transient boolean isExecuted=false;
-	
-	
-	public ExecBuffer getExecBuffer(){
-   	 	return buffer;
-    }
-	
-	public final boolean isExecuted(){
-	   	return isExecuted;
-	}
-	
-    public String toString(){
-    	return buffer.toString(); 
-    }
-
 
 }

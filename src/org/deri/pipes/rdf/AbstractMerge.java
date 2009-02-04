@@ -58,17 +58,10 @@ public abstract class AbstractMerge extends RDFBox {
 	void addSource(Source source){
 		this.source.add(source);
 	}
-
-	protected void mergeInputs(PipeContext context){
-		mergeInputs(buffer,context);
-	}
 	
 	protected void mergeInputs(ExecBuffer buffer, PipeContext context){
 		for(Source src : source){
-			if(!src.isExecuted()){
-				src.execute(context);
-			}
-	       	 ExecBuffer inputBuffer = src.getExecBuffer();
+	       	 ExecBuffer inputBuffer = src.execute(context);
 			if (inputBuffer instanceof SesameMemoryBuffer){
 				inputBuffer.stream(buffer);
 	       	 }else{

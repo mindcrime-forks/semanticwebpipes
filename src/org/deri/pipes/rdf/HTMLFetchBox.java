@@ -44,6 +44,7 @@ import java.util.Hashtable;
 
 import javax.xml.transform.stream.StreamSource;
 
+import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.utils.MappedStreamSource;
@@ -107,23 +108,21 @@ public class HTMLFetchBox extends FetchBox {
 		return xsltFile.keySet();
 	}
 	@Override
-	public void execute(PipeContext context) {
-		if(!isExecuted){
-			buffer=new SesameMemoryBuffer();
-			Enumeration<String> k = xsltFile.keys();
-			StreamSource stream=new StreamSource(location);
-		    while (k.hasMoreElements()) {
-		    	String key=k.nextElement();
-		    	if(format.indexOf(key)>=0){
-		    		StreamSource xsltStreamSource = xsltFile.get(key).getStreamSource();
-					StringBuffer textBuff=XSLTUtil.transform(stream, xsltStreamSource);
-		    		((SesameMemoryBuffer)buffer).loadFromText(textBuff.toString(), location);
-		    	}
-		    }
-			isExecuted=true;
+	public ExecBuffer execute(PipeContext context) {
+		SesameMemoryBuffer buffer=new SesameMemoryBuffer();
+		Enumeration<String> k = xsltFile.keys();
+		StreamSource stream=new StreamSource(location);
+		while (k.hasMoreElements()) {
+			String key=k.nextElement();
+			if(format.indexOf(key)>=0){
+				StreamSource xsltStreamSource = xsltFile.get(key).getStreamSource();
+				StringBuffer textBuff=XSLTUtil.transform(stream, xsltStreamSource);
+				((SesameMemoryBuffer)buffer).loadFromText(textBuff.toString(), location);
+			}
 		}
+		return buffer;
 	}
-	
+
 	public String getFormat() {
 		return format;
 	}

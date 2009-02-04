@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.openrdf.model.Literal;
@@ -66,26 +67,25 @@ public class RegExBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(RegExBox.class);
 	private List<Rule> rules = new ArrayList<Rule>();
      
-     public void execute(PipeContext context){
+     public ExecBuffer execute(PipeContext context){
     	 //merge all input sourceOperators to Sesame buffer
     	 SesameMemoryBuffer tmp= new SesameMemoryBuffer();
     	 mergeInputs(tmp,context);
     	 
-    	 buffer = new SesameMemoryBuffer();
+    	 SesameMemoryBuffer buffer = new SesameMemoryBuffer();
     	 try{
-			 tmp.getConnection().export(new ReplaceHandler(this));
+			 tmp.getConnection().export(new ReplaceHandler(this,buffer));
 		 }
 		 catch(Exception e){
 			 logger.warn("problem executing",e);
 		 }
-    	     	 
-    	 isExecuted=true;
+		 return buffer;
      }   
           
      
      
      public class ReplaceHandler extends RDFInserter{
-  		public ReplaceHandler(RegExBox regexBox){
+  		public ReplaceHandler(RegExBox regexBox, SesameMemoryBuffer buffer){
   			super(buffer.getConnection());
   		}
   		

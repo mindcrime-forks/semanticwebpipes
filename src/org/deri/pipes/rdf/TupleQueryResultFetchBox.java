@@ -48,13 +48,12 @@ import org.slf4j.LoggerFactory;
 
 public class TupleQueryResultFetchBox extends FetchBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchBox.class);
-	private ExecBuffer buffer=null;
 	private TupleQueryResultFormat format=TupleQueryResultFormat.SPARQL;
 		
-	public void execute(PipeContext context){				
-		buffer=new SesameTupleBuffer();
-		((SesameTupleBuffer)buffer).loadFromURL(location,format);			
-		isExecuted=true;
+	public ExecBuffer execute(PipeContext context){				
+		SesameTupleBuffer buffer=new SesameTupleBuffer();
+		buffer.loadFromURL(location,format);		
+		return buffer;
 	}
 	public static TupleQueryResultFormat formatOf(String format){
 		if(format == null){
@@ -68,11 +67,6 @@ public class TupleQueryResultFetchBox extends FetchBox implements Operator {
 			return TupleQueryResultFormat.BINARY;
 		return null;
 	}
-	
-    public String toString(){
-    	return buffer.toString(); 
-    }
-    
 
 	public void setFormat(String fmt) {
 		setFormat(formatOf(fmt));

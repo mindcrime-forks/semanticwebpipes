@@ -93,19 +93,7 @@ public class PipeContext {
 	public PipeParser getPipeParser(){
 		return parser;
 	}
-	/**
-	 * Get the named operator having first tested that
-	 * the execute() method was called, or executing.
-	 * @param id
-	 * @return the operator having been executed.
-	 */
-	public Operator getOperatorExecuted(String id) {
-		Operator operator = getOperator(id);
-		if (operator != null && !operator.isExecuted()){
-    		operator.execute(this);
-    	}
-		return operator;
-	}
+
 	public String serialize(Object o) {
 		return xstream.toXML(o);
 	}

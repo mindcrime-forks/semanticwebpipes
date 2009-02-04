@@ -62,18 +62,8 @@ public class Source implements Operator {
 		this.delegate = delegate;
 	}
 	@Override
-	public void execute(PipeContext context) {
-		delegate.execute(null);
-	}
-
-	@Override
-	public ExecBuffer getExecBuffer() {
-		return delegate.getExecBuffer();
-	}
-
-	@Override
-	public boolean isExecuted() {
-		return delegate.isExecuted();
+	public ExecBuffer execute(PipeContext context) {
+		return delegate.execute(context);
 	}
 
 	public Operator getDelegate() {

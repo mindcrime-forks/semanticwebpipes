@@ -37,6 +37,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.rdf;
+import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.openrdf.repository.Repository;
@@ -52,9 +53,9 @@ public class SameAsBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(SameAsBox.class);
 	
      
-     public void execute(PipeContext context){
-    	 buffer= new SesameMemoryBuffer();
-    	 mergeInputs(context);
+     public ExecBuffer execute(PipeContext context){
+    	 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
+    	 mergeInputs(buffer,context);
     	 
     	 RepositoryConnection conn = buffer.getConnection();
     	 Repository rep = conn.getRepository();
@@ -65,7 +66,6 @@ public class SameAsBox extends AbstractMerge{
 		} catch (RepositoryException e) {
 			logger.warn("problem smooshing",e);
 		}
-    	 
-    	 isExecuted=true;
+    	return buffer;
      }     
 }
