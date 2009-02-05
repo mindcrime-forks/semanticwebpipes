@@ -57,19 +57,13 @@ import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
  */
 public class OperatorMemoizerProvider extends PureJavaReflectionProvider implements
 		ReflectionProvider {
-	List<Class> noMemoize = new ArrayList<Class>();
 
-	public OperatorMemoizerProvider(){
-		super();
-		noMemoize.add(Pipe.class);
-		noMemoize.add(Source.class);
-	}
 	/* (non-Javadoc)
 	 * @see com.thoughtworks.xstream.converters.reflection.ReflectionProvider#newInstance(java.lang.Class)
 	 */
 	@Override
 	public Object newInstance(Class cls) {
-		if(Operator.class.isAssignableFrom(cls) && !noMemoize.contains(cls)){
+		if(Operator.class.isAssignableFrom(cls)){
 			return Memoizer.getMemoizedInstance(cls);
 		}
 		return super.newInstance(cls);

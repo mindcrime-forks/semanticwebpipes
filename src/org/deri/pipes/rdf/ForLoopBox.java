@@ -40,6 +40,7 @@ package org.deri.pipes.rdf;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
@@ -117,23 +118,38 @@ public class ForLoopBox extends RDFBox{
 		try{
  			TupleQueryResult tupleQueryResult = tupleBuffer.getTupleQueryResult();
  			List<String> bindingNames=tupleQueryResult.getBindingNames();
+ 			int maxConcurrent = 10;
+ 			List<Operator> execJobs = new ArrayList<Operator>();
  			while (tupleQueryResult.hasNext()) {
  				String operatorXml=context.getEngine().serialize(forloop);	    	    
  				BindingSet bindingSet = tupleQueryResult.next();		   
  				operatorXml = bindVariables(operatorXml, bindingNames, bindingSet);
  				logger.debug("parsing:"+operatorXml);
  				Operator op = context.getEngine().parse(operatorXml);
- 				ExecBuffer execBuffer = op.execute(context);
- 				if(execBuffer instanceof SesameMemoryBuffer){
- 					execBuffer.stream(buffer);					   
- 				}else{
- 					logger.warn("Inappropriate input format, RDF is required!!!");
+ 				execJobs.add(op);
+ 				if(execJobs.size() == maxConcurrent){
+ 					executeJobsConcurrentlyAndClearList(context, buffer,execJobs);
  				}
  			}
+			executeJobsConcurrentlyAndClearList(context, buffer,execJobs);
  		}catch(QueryEvaluationException e){
  			logger.warn("error in for loop",e);
  		}
  		return buffer;
+	}
+
+	private void executeJobsConcurrentlyAndClearList(Context context,
+			SesameMemoryBuffer buffer, List<Operator> execJobs)
+			throws InterruptedException {
+		if(execJobs.size()==0){
+			return;
+		}
+		try{
+			ExecBuffer execBuffer = context.getEngine().execute(execJobs, context);
+			execBuffer.stream(buffer);
+		}finally{
+			execJobs.clear();
+		}
 	}
 
 	private String bindVariables(String operatorXml, List<String> bindingNames,
