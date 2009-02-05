@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deri.pipes.core.Operator;
-import org.deri.pipes.core.ProcessingPipe;
+import org.deri.pipes.core.Pipe;
 import org.deri.pipes.model.Memoizer;
 
 
@@ -61,7 +61,7 @@ public class OperatorMemoizerProvider extends PureJavaReflectionProvider impleme
 
 	public OperatorMemoizerProvider(){
 		super();
-		noMemoize.add(ProcessingPipe.class);
+		noMemoize.add(Pipe.class);
 		noMemoize.add(Source.class);
 	}
 	/* (non-Javadoc)

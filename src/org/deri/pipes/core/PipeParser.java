@@ -164,8 +164,8 @@ public class PipeParser {
 
 		};
 		xstream.registerConverter(new BypassCGLibConverter(xstream));
-		xstream.alias("pipe",ProcessingPipe.class);
-		xstream.registerLocalConverter(ProcessingPipe.class, "parameters", new ParameterConverter());
+		xstream.alias("pipe",Pipe.class);
+		xstream.registerLocalConverter(Pipe.class, "parameters", new ParameterConverter());
 		xstream.registerConverter(new SourceConverter());
 		//xstream normally uses 'reference' for references, we want refid
 		xstream.aliasSystemAttribute("REFID", "reference");

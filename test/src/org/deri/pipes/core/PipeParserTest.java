@@ -37,7 +37,7 @@ public class PipeParserTest extends TestCase {
 
 	private void testSource(Engine engine, String controlXml) throws Exception{
 		InputStream in = getClass().getResourceAsStream(controlXml);
-		ProcessingPipe pipe = (ProcessingPipe) engine.parse(in);
+		Pipe pipe = (Pipe) engine.parse(in);
 		Context context = engine.newContext();
 		long time = timedExecute(pipe, context);
 		long repeat = timedExecute(pipe, context);
@@ -47,7 +47,7 @@ public class PipeParserTest extends TestCase {
 
 
 
-	private long timedExecute(ProcessingPipe pipe, Context context)
+	private long timedExecute(Pipe pipe, Context context)
 			throws Exception {
 		long start = System.currentTimeMillis();
 		ExecBuffer result = pipe.execute(context);
