@@ -57,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Executes operators in parallel using an ExecutorService.
  * @author robful
  *
  */
@@ -64,6 +65,20 @@ public class ThreadedExecutor {
 	Logger logger = LoggerFactory.getLogger(ThreadedExecutor.class);
 	private TimeUnit defaultTimeoutUnits = TimeUnit.SECONDS;
 	private long defaultTimeout = 60;
+	private final ExecutorService pool;
+	/**
+	 * Create a ThreadedExecutor which will use a new cached ThreadPool.
+	 */
+	public ThreadedExecutor(){
+		pool = Executors.newCachedThreadPool();
+	}
+	/**
+	 * Create a ThreadedExecutor which will use this ExecutorService.
+	 * @param pool
+	 */
+	public ThreadedExecutor(ExecutorService pool){
+		this.pool = pool;
+	}
 	/**
 	 * Execute the operators within the default timeout.
 	 * @param operators
@@ -84,10 +99,10 @@ public class ThreadedExecutor {
 	 * @throws InterruptedException
 	 */
 	public MultiExecBuffer execute(List<Operator> operators, Context context, long timeout, TimeUnit unit) throws InterruptedException{
-		//TODO: don't create the pool here
+		if(pool.isShutdown()){
+			throw new IllegalStateException("The executor has been shutdown");
+		}
 		List<ExecBuffer> buffers = new ArrayList<ExecBuffer>();
-		ExecutorService pool = Executors.newCachedThreadPool();
-		try{
 		List<Callable<ExecBuffer>> tasks = toCallable(operators,context);
 		//TODO: add a timeout
 		List<Future<ExecBuffer>> result = pool.invokeAll(tasks, timeout, unit);
@@ -98,9 +113,6 @@ public class ThreadedExecutor {
 				logger.warn("An execution error occurred",e);
 				buffers.add(null);
 			}
-		}
-		}finally{
-			pool.shutdown();
 		}
 		return new MultiExecBuffer(buffers);
 	}
@@ -125,6 +137,12 @@ public class ThreadedExecutor {
 			});
 		}
 		return callables;
-		
+	}
+	/**
+	 * Shutdown this executor releasing resources.
+	 */
+	public void shutdown(){
+		logger.debug("shutdown invoked");
+		pool.shutdown();
 	}
 }

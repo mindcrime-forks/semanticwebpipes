@@ -22,8 +22,8 @@ public class PipeParserTest extends TestCase {
 	public void testXStreamParser() throws Exception{
 		Engine env = Engine.defaultEngine();
 		System.out.println(env.getPipeParser().serializeToXML(SourceConverter.ALIAS_MAPPINGS));
-		if(false){
-		testSource(env, "pipe5.xml");
+		if(true){
+		testSource(env, "pipe1.xml");
 //		if(true){
 		testSource(env, "pipe2.xml");
 		testSource(env, "pipe3.xml");

@@ -45,6 +45,8 @@ import java.util.List;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.ThreadedExecutor;
 import org.deri.pipes.model.MultiExecBuffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The SemanticWebPipes engine, for parsing and executing pipes.
@@ -52,6 +54,7 @@ import org.deri.pipes.model.MultiExecBuffer;
  *
  */
 public class Engine {
+	Logger logger = LoggerFactory.getLogger(Engine.class);
 	private static Engine defaultEngine;
 	PipeParser parser;
 	ThreadedExecutor executor;
@@ -160,6 +163,20 @@ public class Engine {
 		return getPipeParser().serializeToXML(operator);
 	}
 
+	/**
+	 * Release any resources associated with this Engine.
+	 * If the defaultEngine is shutdown, a new defaultEngine
+	 * is created next time getDefaultEngine() is invoked.
+	 */
+	public void shutdown(){
+		logger.debug("Shutdown invoked");
+		if(this == defaultEngine){
+			defaultEngine = null;
+		}
+		if(this.executor != null){
+			this.executor.shutdown();
+		}
+	}
 
 
 }
