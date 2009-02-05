@@ -43,10 +43,10 @@ import java.util.ArrayList;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.Engine;
+import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.endpoints.Pipe;
 import org.deri.pipes.endpoints.PipeManager;
-import org.deri.pipes.model.Operator;
 import org.deri.pipes.rdf.RDFBox;
 import org.deri.pipes.rdf.SelectBox;
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;

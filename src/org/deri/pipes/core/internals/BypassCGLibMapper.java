@@ -39,8 +39,8 @@
 
 package org.deri.pipes.core.internals;
 
+import org.deri.pipes.core.Operator;
 import org.deri.pipes.model.Memoizer;
-import org.deri.pipes.model.Operator;
 
 import net.sf.cglib.proxy.Enhancer;
 

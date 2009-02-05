@@ -45,7 +45,6 @@ import java.util.List;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.ThreadedExecutor;
 import org.deri.pipes.model.MultiExecBuffer;
-import org.deri.pipes.model.Operator;
 
 /**
  * The SemanticWebPipes engine, for parsing and executing pipes.

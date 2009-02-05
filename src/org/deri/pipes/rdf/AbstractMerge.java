@@ -43,10 +43,10 @@ import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
+import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.ThreadedExecutor;
 import org.deri.pipes.model.MultiExecBuffer;
-import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

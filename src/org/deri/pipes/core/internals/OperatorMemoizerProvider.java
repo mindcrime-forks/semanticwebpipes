@@ -43,9 +43,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.ProcessingPipe;
 import org.deri.pipes.model.Memoizer;
-import org.deri.pipes.model.Operator;
 
 
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;

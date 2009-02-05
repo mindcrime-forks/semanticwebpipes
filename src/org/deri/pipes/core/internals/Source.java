@@ -40,7 +40,7 @@ package org.deri.pipes.core.internals;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
-import org.deri.pipes.model.Operator;
+import org.deri.pipes.core.Operator;
 /**
  * Proxy implemenation of Operator. The class was introduced
  * to support serialization using XStream with existing xml format.

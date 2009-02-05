@@ -53,8 +53,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.Engine;
+import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.PipeParser;
-import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.rdf.RDFBox;
 import org.deri.pipes.utils.XMLUtil;

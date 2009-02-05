@@ -51,8 +51,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
+import org.deri.pipes.core.Operator;
 import org.deri.pipes.model.MultiExecBuffer;
-import org.deri.pipes.model.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

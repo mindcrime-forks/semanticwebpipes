@@ -41,7 +41,7 @@ package org.deri.pipes.core.internals;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.deri.pipes.model.Operator;
+import org.deri.pipes.core.Operator;
 import org.deri.pipes.rdf.ConstructBox;
 import org.deri.pipes.rdf.ForLoopBox;
 import org.deri.pipes.rdf.HTMLFetchBox;

@@ -52,6 +52,7 @@ import net.sf.cglib.proxy.NoOp;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
+import org.deri.pipes.core.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -52,7 +52,6 @@ import org.deri.pipes.core.internals.OperatorMemoizerProvider;
 import org.deri.pipes.core.internals.SourceConverter;
 import org.deri.pipes.endpoints.PipeManager;
 import org.deri.pipes.endpoints.Pipes;
-import org.deri.pipes.model.Operator;
 import org.deri.pipes.rdf.SimpleMixBox;
 import org.deri.pipes.rdf.TextBox;
 import org.deri.pipes.utils.IDTool;

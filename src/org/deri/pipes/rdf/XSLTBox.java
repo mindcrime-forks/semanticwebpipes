@@ -42,7 +42,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
-import org.deri.pipes.model.Operator;
+import org.deri.pipes.core.Operator;
 import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.model.XMLStreamBuffer;
 import org.deri.pipes.utils.XSLTUtil;

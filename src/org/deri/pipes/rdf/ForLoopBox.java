@@ -44,8 +44,8 @@ import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
+import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.internals.Source;
-import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
 import org.openrdf.query.BindingSet;

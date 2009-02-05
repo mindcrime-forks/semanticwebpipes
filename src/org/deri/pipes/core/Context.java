@@ -43,7 +43,6 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.deri.pipes.core.internals.ThreadedExecutor;
-import org.deri.pipes.model.Operator;
 
 import com.thoughtworks.xstream.XStream;
 /**
