@@ -44,6 +44,7 @@ import java.util.List;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.model.MultiExecBuffer;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.OperatorExecutor;
 import org.deri.pipes.model.SesameMemoryBuffer;
@@ -80,27 +81,8 @@ public abstract class AbstractMerge extends RDFBox {
 	protected void mergeInputs(ExecBuffer buffer, PipeContext context) throws Exception{
 		List<Operator> operators = new ArrayList<Operator>();
 		operators.addAll(source);
-		mergeResults(context, operators, buffer);
-	}
-	/**
-	 * Merge the results of executing the inputs into the output buffer. Operators
-	 * are executed in parallel using the OperatorExecutor for the environment.
-	 * @param context the Execution context.
-	 * @param inputs The input operators.
-	 * @param output The output buffer for merging into.
-	 * @throws InterruptedException
-	 */
-	public static void mergeResults(PipeContext context, List<Operator> inputs,
-			ExecBuffer output) throws InterruptedException {
-		OperatorExecutor executor = context.getExecutor();
-		final List<ExecBuffer> results = executor.execute(inputs, context);
-		for(ExecBuffer input : results){
-			if(input == null){ // should throw an exception here, or have one thrown from the executor?
-				logger.warn("The returned exec buffer was null, some results may be missing, see log for details");
-				continue;
-			}
-			input.stream(output);
-	   	}
+		MultiExecBuffer result = context.getEngine().execute(operators, context);
+		result.stream(buffer);
 	}
 	
 }

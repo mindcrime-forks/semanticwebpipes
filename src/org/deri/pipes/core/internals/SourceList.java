@@ -38,7 +38,12 @@
  */
 package org.deri.pipes.core.internals;
 
-
+/**
+ * Marker for list of sources, included for compliance
+ * with v1 serialization.
+ * @author robful
+ *
+ */
 public class SourceList extends Source {
 
 }

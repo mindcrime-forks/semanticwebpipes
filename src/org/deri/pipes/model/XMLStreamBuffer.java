@@ -52,7 +52,7 @@ import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-public class XMLStreamBuffer extends ExecBuffer {
+public class XMLStreamBuffer implements ExecBuffer {
 	private transient Logger logger = LoggerFactory.getLogger(XMLStreamBuffer.class);
 	String url=null;
 	StringBuffer strBuff=null;

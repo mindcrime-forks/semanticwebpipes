@@ -52,7 +52,7 @@ import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-public class SesameTupleBuffer extends ExecBuffer{
+public class SesameTupleBuffer implements ExecBuffer{
 	private transient Logger logger = LoggerFactory.getLogger(SesameTupleBuffer.class);
 	private MutableTupleQueryResult buffer= null;
 

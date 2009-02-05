@@ -65,7 +65,7 @@ import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-public class SesameMemoryBuffer extends ExecBuffer {
+public class SesameMemoryBuffer implements ExecBuffer {
 	private transient Logger logger = LoggerFactory.getLogger(SesameMemoryBuffer.class);
 	Repository buffRepository=null;
 	public static final int NONE=0;

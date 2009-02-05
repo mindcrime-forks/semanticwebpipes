@@ -118,11 +118,11 @@ public class ForLoopBox extends RDFBox{
  			TupleQueryResult tupleQueryResult = tupleBuffer.getTupleQueryResult();
  			List<String> bindingNames=tupleQueryResult.getBindingNames();
  			while (tupleQueryResult.hasNext()) {
- 				String operatorXml=context.serialize(forloop);	    	    
+ 				String operatorXml=context.getEngine().serialize(forloop);	    	    
  				BindingSet bindingSet = tupleQueryResult.next();		   
  				operatorXml = bindVariables(operatorXml, bindingNames, bindingSet);
  				logger.debug("parsing:"+operatorXml);
- 				Operator op = context.getEnvironment().parse(operatorXml);
+ 				Operator op = context.getEngine().parse(operatorXml);
  				ExecBuffer execBuffer = op.execute(context);
  				if(execBuffer instanceof SesameMemoryBuffer){
  					execBuffer.stream(buffer);					   

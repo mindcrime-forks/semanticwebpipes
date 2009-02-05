@@ -65,7 +65,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class SourceConverter implements Converter {
 	Logger logger = LoggerFactory.getLogger(SourceConverter.class);
-	static Map<String,Class> ALIAS_MAPPINGS = new HashMap<String,Class>();
+	public static Map<String,Class> ALIAS_MAPPINGS = new HashMap<String,Class>();
 	static{ //TODO: move these back to properties file
 		ALIAS_MAPPINGS.put("simplemix",SimpleMixBox.class);
 		ALIAS_MAPPINGS.put("source",Source.class);

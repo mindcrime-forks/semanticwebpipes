@@ -42,7 +42,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.apache.xerces.parsers.DOMParser;
-import org.deri.pipes.core.Environment;
+import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.endpoints.Pipe;
 import org.deri.pipes.endpoints.PipeManager;
@@ -72,8 +72,8 @@ import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Textbox;
 public class PipeEditor extends Workspace {
-	//TODO: make environment a settable field
-	static Environment environment = Environment.defaultEnvironment();
+	//TODO: make engine a settable field
+	static Engine engine = Engine.defaultEngine();
 	final Logger logger = LoggerFactory.getLogger(PipeEditor.class);
 	private Textbox textDebugPanel,pipeid,pipename,password;
 	private Bandbox bdid;
@@ -307,13 +307,13 @@ public class PipeEditor extends Workspace {
 	public void debug(String syntax){
 		   syntax=populatePara(syntax);	
 		   //logger.debug(syntax);
-		   Operator    stream= environment.parse(syntax);
+		   Operator    stream= engine.parse(syntax);
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
 		   try{
 		   if(stream instanceof RDFBox){
 			   ((RDFBox) stream).execute(null);
-			   org.deri.pipes.core.ExecBuffer buff=stream.execute(environment.newContext());
+			   org.deri.pipes.core.ExecBuffer buff=stream.execute(engine.newContext());
 			   textResult=buff.toString();
 			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
 					   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
@@ -338,10 +338,10 @@ public class PipeEditor extends Workspace {
 		syntax=populatePara(syntax);
 		 //logger.debug(syntax);
 		try {
-		   Operator op= environment.parse(syntax);;
+		   Operator op= engine.parse(syntax);;
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
-		   org.deri.pipes.core.ExecBuffer buff=op.execute(environment.newContext());
+		   org.deri.pipes.core.ExecBuffer buff=op.execute(engine.newContext());
 		   if(op instanceof RDFBox){
 			   textResult=buff.toString();
 			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){

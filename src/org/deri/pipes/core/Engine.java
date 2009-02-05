@@ -40,16 +40,20 @@
 package org.deri.pipes.core;
 
 import java.io.InputStream;
+import java.util.List;
 
+import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.model.MultiExecBuffer;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.OperatorExecutor;
 
 /**
+ * The SemanticWebPipes engine, for parsing and executing pipes.
  * @author robful
  *
  */
-public class Environment {
-	private static Environment defaultEnvironment;
+public class Engine {
+	private static Engine defaultEngine;
 	PipeParser parser;
 	OperatorExecutor executor;
 
@@ -87,6 +91,31 @@ public class Environment {
 	public Operator parse(String xml) {
 		return (Operator)getPipeParser().parse(xml);
 	}
+	/**
+	 * Execute the pipe contained in this xml.
+	 * @param xml
+	 * @return
+	 * @throws Exception
+	 */
+	public ExecBuffer execute(String xml) throws Exception{
+		Operator parsedObject = getPipeParser().parse(xml);
+		return executeOperator(parsedObject);
+	}
+
+	private ExecBuffer executeOperator(Object parsedObject) throws Exception {
+		Operator operator = (Operator)parsedObject;
+		return operator.execute(newContext());
+	}
+	/**
+	 * Execute the pipe contained in this xml input stream.
+	 * @param xml
+	 * @return
+	 * @throws Exception
+	 */
+	public ExecBuffer execute(InputStream in) throws Exception{
+		Object parsedObject = getPipeParser().parse(in);
+		return executeOperator(parsedObject);
+	}
 
 	/**
 	 * @return
@@ -98,11 +127,11 @@ public class Environment {
 	/**
 	 * @return
 	 */
-	public static Environment defaultEnvironment() {
-		if(defaultEnvironment == null){
-			defaultEnvironment = new Environment();
+	public static Engine defaultEngine() {
+		if(defaultEngine == null){
+			defaultEngine = new Engine();
 		}
-		return defaultEnvironment;
+		return defaultEngine;
 	}
 
 	/**
@@ -111,6 +140,25 @@ public class Environment {
 	 */
 	public Operator parse(InputStream in) {
 		return (Operator) getPipeParser().parse(in);
+	}
+
+	/**
+	 * @param inputs
+	 * @param context
+	 * @return
+	 * @throws InterruptedException 
+	 */
+	public MultiExecBuffer execute(List<Operator> inputs, PipeContext context) throws InterruptedException {
+		return getExecutor().execute(inputs,context);
+	}
+
+	/**
+	 * Serialize this operator to XML.
+	 * @param operator
+	 * @return
+	 */
+	public String serialize(Operator operator) {
+		return getPipeParser().serializeToXML(operator);
 	}
 
 

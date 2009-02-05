@@ -39,6 +39,7 @@
 
 package org.deri.pipes.model;
 
+import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.rdf.TextBox;
@@ -61,15 +62,15 @@ public class MemoizerTest extends TestCase {
 		assertEquals("Wrong result",expected,result);
 	}
 	public void testSerialization()throws Exception{
+		Engine engine = Engine.defaultEngine();
 		TextBox t = new TextBox();
 		String content = "foo bar";
 		t.setContent(content);
 		TextBox text = (TextBox)Memoizer.getMemoizedInstance(TextBox.class);
 		text.setContent(content);
-		PipeContext context = new PipeContext();
 //		text.execute(context);
-		String s = context.serialize(text);
-		String expected = context.serialize(t);
+		String s = engine.serialize(text);
+		String expected = engine.serialize(t);
 		assertEquals("Wrong serialization",expected,s);
 	}
 	static class X implements Operator{

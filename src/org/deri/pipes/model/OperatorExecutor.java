@@ -69,7 +69,7 @@ public class OperatorExecutor {
 	 * @return the ExecBuffers from executions.
 	 * @throws InterruptedException 
 	 */
-	public List<ExecBuffer> execute(List<Operator> operators, PipeContext context) throws InterruptedException{
+	public MultiExecBuffer execute(List<Operator> operators, PipeContext context) throws InterruptedException{
 		return execute(operators,context,defaultTimeout ,defaultTimeoutUnits);
 	}
 	/**
@@ -81,7 +81,7 @@ public class OperatorExecutor {
 	 * @return
 	 * @throws InterruptedException
 	 */
-	public List<ExecBuffer> execute(List<Operator> operators, PipeContext context, long timeout, TimeUnit unit) throws InterruptedException{
+	public MultiExecBuffer execute(List<Operator> operators, PipeContext context, long timeout, TimeUnit unit) throws InterruptedException{
 		//TODO: don't create the pool here
 		List<ExecBuffer> buffers = new ArrayList<ExecBuffer>();
 		ExecutorService pool = Executors.newCachedThreadPool();
@@ -100,7 +100,7 @@ public class OperatorExecutor {
 		}finally{
 			pool.shutdown();
 		}
-		return buffers;
+		return new MultiExecBuffer(buffers);
 	}
 
 	/**

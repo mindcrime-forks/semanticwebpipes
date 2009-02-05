@@ -46,7 +46,7 @@ import java.io.OutputStream;
  *
  */
 
-public abstract class ExecBuffer {
+public interface ExecBuffer {
      public abstract void stream(ExecBuffer outputBuffer);
      public abstract void stream(ExecBuffer outputBuffer,String context);
      public abstract void stream(OutputStream output);

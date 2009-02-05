@@ -8,8 +8,10 @@ import java.io.Writer;
 import junit.framework.TestCase;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.deri.pipes.core.internals.SourceConverter;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamer;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
@@ -18,10 +20,11 @@ import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 
 public class PipeParserTest extends TestCase {
 	public void testXStreamParser() throws Exception{
-		Environment env = Environment.defaultEnvironment();
-//		if(false){
+		Engine env = Engine.defaultEngine();
+		System.out.println(env.getPipeParser().serializeToXML(SourceConverter.ALIAS_MAPPINGS));
+		if(false){
 		testSource(env, "pipe5.xml");
-		if(true){
+//		if(true){
 		testSource(env, "pipe2.xml");
 		testSource(env, "pipe3.xml");
 		testSource(env, "pipe4.xml");
@@ -32,10 +35,10 @@ public class PipeParserTest extends TestCase {
 
 
 
-	private void testSource(Environment environment, String controlXml) throws Exception{
+	private void testSource(Engine engine, String controlXml) throws Exception{
 		InputStream in = getClass().getResourceAsStream(controlXml);
-		ProcessingPipe pipe = (ProcessingPipe) environment.parse(in);
-		PipeContext context = environment.newContext();
+		ProcessingPipe pipe = (ProcessingPipe) engine.parse(in);
+		PipeContext context = engine.newContext();
 		long time = timedExecute(pipe, context);
 		long repeat = timedExecute(pipe, context);
 		System.out.println("timing was original:"+time+", repeat:"+repeat);

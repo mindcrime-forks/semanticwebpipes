@@ -36,92 +36,78 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.core;
 
-import java.util.HashMap;
-import java.util.Map;
+package org.deri.pipes.model;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.model.Operator;
-import org.deri.pipes.model.OperatorExecutor;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.thoughtworks.xstream.XStream;
+import org.deri.pipes.core.ExecBuffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * Operators belonging to a Pipe.
- * @author rfuller
+ * A collection of ExecBuffers.
+ * @author robful
  *
  */
-public class PipeContext {
-	Map <String,Operator> operators = new HashMap<String,Operator>();
-	Map map = new HashMap();
-	private transient HttpClient httpClient;
-	private Engine engine;
+public class MultiExecBuffer implements ExecBuffer{
+	Logger logger = LoggerFactory.getLogger(ExecBuffer.class);
+	List<ExecBuffer> buffers = new ArrayList<ExecBuffer>();
+	public MultiExecBuffer(List<ExecBuffer> buffers){
+		this.buffers.addAll(buffers);
+	}
+	
 	/**
-	 * Default constructor.
+	 * Streams each buffer in sequence to the output buffer.
+	 * Logs a warning if any buffer is null.
 	 */
-	public PipeContext(){
-		
-	}
-	/**
-	 * Create a PipeContext for this engine.
-	 * @param engine
-	 */
-	public PipeContext(Engine engine){
-		this.engine = engine;
-	}
-	/**
-	 * Get the operator having this id.
-	 * @param id
-	 * @return The operator having the given id, or null if there is no such operator.
-	 */
-	public Operator getOperator(String id){
-		return operators.get(id);
-	}
-	/**
-	 * Add this operator into the context.
-	 * @param id
-	 * @param operator
-	 */
-	void addOperator(String id,Operator operator){
-		operators.put(id, operator);
-	}
-	/**
-	 * Whether the context contains an operator having this id.
-	 * @param id
-	 * @return true if there is an operator having this id, false otherwise.
-	 */
-	public boolean contains(String id) {
-		return operators.containsKey(id);
-	}
-
-	public void setHttpClient(HttpClient httpClient) {
-		this.httpClient = httpClient;
-	}
-	public HttpClient getHttpClient(){
-		return httpClient;
-	}
-	/**
-	 * @param obj
-	 * @return
-	 */
-	public Object get(Object obj) {
-		return map.get(obj);
-	}
-	/**
-	 * @param obj
-	 * @param invoke
-	 */
-	public void put(Object key, Object value) {
-		map.put(key, value);
-	}
-
-	/**
-	 * @return
-	 */
-	public Engine getEngine() {
-		if(engine == null){
-			engine = new Engine();
+	@Override
+	public void stream(ExecBuffer outputBuffer) {
+		for(ExecBuffer buffer : buffers){
+			if(buffer == null){
+				logger.warn("A null buffer was included in the results");
+			}else{
+				buffer.stream(outputBuffer);
+			}
 		}
-		return engine;
+	}
+
+	/**
+	 * Streams each buffer in sequence to the output buffer.
+	 * Logs a warning if any buffer is null.
+	 */
+	@Override
+	public void stream(ExecBuffer outputBuffer, String context) {
+		for(ExecBuffer buffer : buffers){
+			if(buffer == null){
+				logger.warn("A null buffer was included in the results");
+			}else{
+				buffer.stream(outputBuffer,context);
+			}
+		}
+	}
+
+	/**
+	 * Streams each buffer in sequence to the output stream.
+	 * Logs a warning if any buffer is null.
+	 */
+	@Override
+	public void stream(OutputStream output) {
+		for(ExecBuffer buffer : buffers){
+			if(buffer == null){
+				logger.warn("A null buffer was included in the results");
+			}else{
+				buffer.stream(output);
+			}
+		}
+	}
+	/**
+	 * Get a reference to the list of ExecBuffers.
+	 * @return The underlying ExecBuffers
+	 */
+	public List<ExecBuffer> getExecBuffers(){
+		return buffers;
 	}
 }

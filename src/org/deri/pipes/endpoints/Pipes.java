@@ -52,7 +52,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xerces.parsers.DOMParser;
-import org.deri.pipes.core.Environment;
+import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
@@ -70,8 +70,8 @@ import edu.mit.simile.babel.BabelWriter;
 import edu.mit.simile.babel.exhibit.ExhibitJsonWriter;
 import edu.mit.simile.babel.exhibit.ExhibitJsonpWriter;
 public class Pipes extends HttpServlet {
-	//TODO: make environment a field.
-	static Environment environment = new Environment();
+	//TODO: make engine a field.
+	static Engine engine = new Engine();
 	static Logger logger = LoggerFactory.getLogger(Pipes.class);
   public static HttpServletRequest  REQ=null;
   public static Pipes instance;
@@ -235,9 +235,9 @@ public class Pipes extends HttpServlet {
 				}
 			}
 			//logger.debug(syntax);
-			Operator stream = environment.parse(syntax);
+			Operator stream = engine.parse(syntax);
 			if (stream instanceof RDFBox) {
-				return (SesameMemoryBuffer)stream.execute(environment.newContext());
+				return (SesameMemoryBuffer)stream.execute(engine.newContext());
 
 			} else {
 				logger.debug("parsing error: stream was not an RDFBox");
