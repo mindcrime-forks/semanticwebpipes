@@ -74,7 +74,7 @@ public class Pipes extends HttpServlet {
 	//TODO: make engine a field.
 	static Engine engine = Engine.defaultEngine();
 	static Logger logger = LoggerFactory.getLogger(Pipes.class);
-  public static ThreadLocal<HttpServletRequest>  REQ= new ThreadLocal<HttpServletRequest>();
+  private static ThreadLocal<HttpServletRequest>  REQ= new ThreadLocal<HttpServletRequest>();
   public static Pipes instance;
   public void doGet(HttpServletRequest req, HttpServletResponse res)
                                throws ServletException, IOException {
@@ -274,8 +274,18 @@ public class Pipes extends HttpServlet {
 	}
    
     public static Pipes getInstance(){
-    	if (instance!= null) return instance;
-    	return new Pipes(); 
+    	if (instance == null){
+    		instance = new Pipes();
+    	}
+    	return instance;
+    }
+
+    /**
+     * Get the current HTTP Request.
+     * @return
+     */
+    public static HttpServletRequest getCurrentRequest(){
+    	return REQ.get();
     }
     
 

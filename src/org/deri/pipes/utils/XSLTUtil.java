@@ -91,9 +91,10 @@ public class XSLTUtil {
 	}
 	public static String getBaseURL(){
 		Execution exec=Executions.getCurrent();
-		if(exec!=null)
+		if(exec!=null){
 			return "http://"+exec.getServerName()+":"+exec.getServerPort()+exec.getContextPath();
-		HttpServletRequest request = Pipes.REQ.get();
+		}
+		HttpServletRequest request = Pipes.getCurrentRequest();
 		if(request != null){
 			return "http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 		}
