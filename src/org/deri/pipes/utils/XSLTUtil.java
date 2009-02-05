@@ -39,6 +39,7 @@
 package org.deri.pipes.utils;
 import java.io.StringWriter;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -92,8 +93,10 @@ public class XSLTUtil {
 		Execution exec=Executions.getCurrent();
 		if(exec!=null)
 			return "http://"+exec.getServerName()+":"+exec.getServerPort()+exec.getContextPath();
-		if(Pipes.REQ!=null)//fuller says this is wrong and dangerous.
-			return "http://"+Pipes.REQ.getServerName()+":"+Pipes.REQ.getServerPort()+Pipes.REQ.getContextPath();
+		HttpServletRequest request = Pipes.REQ.get();
+		if(request != null){
+			return "http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+		}
 		return "";	
 	}
 }

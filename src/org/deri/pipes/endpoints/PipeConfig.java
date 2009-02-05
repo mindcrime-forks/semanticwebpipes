@@ -47,6 +47,9 @@ public class PipeConfig {
 	private String syntax = null;
 	private String config=null;
 
+	public PipeConfig(){
+		
+	}
 	public String getId() {
 		return id;
 	}

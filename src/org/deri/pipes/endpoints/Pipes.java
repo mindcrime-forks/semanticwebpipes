@@ -53,6 +53,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.Engine;
+import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.model.SesameMemoryBuffer;
@@ -71,11 +72,10 @@ import edu.mit.simile.babel.exhibit.ExhibitJsonWriter;
 import edu.mit.simile.babel.exhibit.ExhibitJsonpWriter;
 public class Pipes extends HttpServlet {
 	//TODO: make engine a field.
-	static Engine engine = new Engine();
+	static Engine engine = Engine.defaultEngine();
 	static Logger logger = LoggerFactory.getLogger(Pipes.class);
-  public static HttpServletRequest  REQ=null;
+  public static ThreadLocal<HttpServletRequest>  REQ= new ThreadLocal<HttpServletRequest>();
   public static Pipes instance;
-  public static String OP_MAP="operatormapping.properties";
   public void doGet(HttpServletRequest req, HttpServletResponse res)
                                throws ServletException, IOException {
 	  instance =this;
@@ -83,7 +83,8 @@ public class Pipes extends HttpServlet {
 	  String acceptHeaderValue = getMimeHeader(req.getHeader("Accept") + "",format + "");	
 	  
 	  res.setStatus(HttpServletResponse.SC_OK);
-	  REQ=req; 	
+	  REQ.set(req);
+	  try{
 	 RDFFormat rdfFormat=RDFFormat.forMIMEType(acceptHeaderValue); 
 	 if (rdfFormat!=null) {
 		  res.setContentType(acceptHeaderValue); 
@@ -195,9 +196,10 @@ public class Pipes extends HttpServlet {
 
 
 				} catch (Exception e) {
-					logger.debug("Exception during HTML query form creation.");
+					String msg = "Exception during HTML query form creation.";
+					logger.warn(msg,e);
 		            outputString = outputString.replace("$query_form$", "");
-		            outputString = outputString.replace("$error_messages$", "");
+		            outputString = outputString.replace("$error_messages$",msg);
 					//logger.info(e);
 				}
 			}	
@@ -207,6 +209,9 @@ public class Pipes extends HttpServlet {
 			outputWriter.write(outputString);
 			
 		}
+	  }finally{
+		  REQ.remove();
+	  }
 	}
   
   	public SesameMemoryBuffer getRDFBuffer(HttpServletRequest req, HttpServletResponse res){
@@ -214,7 +219,7 @@ public class Pipes extends HttpServlet {
   		String syntax = PipeManager.getPipeSyntax(pipeid);
 		if (syntax == null) {
 			logger.info("Syntax was null for pipeid=["+pipeid+"]");
-			return null;
+			return new SesameMemoryBuffer();
 		}
 		DOMParser parser = new DOMParser();
 		try{
@@ -236,17 +241,17 @@ public class Pipes extends HttpServlet {
 			}
 			//logger.debug(syntax);
 			Operator stream = engine.parse(syntax);
-			if (stream instanceof RDFBox) {
-				return (SesameMemoryBuffer)stream.execute(engine.newContext());
-
+			ExecBuffer result = stream.execute(engine.newContext());
+			if (result instanceof SesameMemoryBuffer) {
+				return (SesameMemoryBuffer)result;
 			} else {
-				logger.debug("parsing error: stream was not an RDFBox");
+				logger.debug("parsing error: stream did not return a SesameMemoryBuffer");
 			}
 		}catch (Exception e) {				
 			logger.debug("Problem executing pipe from syntax:"+syntax);
 			logger.error("Couldn't execute pipes from syntax (see debug for syntax)",e);
 		}
-  		return null;
+  		return new SesameMemoryBuffer();
   	}
   	
     private String getMimeHeader(String accept,String format){
@@ -273,26 +278,7 @@ public class Pipes extends HttpServlet {
     	return new Pipes(); 
     }
     
-    public static Properties getOperatorProps(){ 
-	    Properties prop = new Properties();
-		try
-		{
-			if(Executions.getCurrent()!=null)
-				prop.load(new FileInputStream(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+OP_MAP)));
-			else{
-				if(getInstance()!=null){
-					logger.debug("servlet "+((getInstance()!=null)?getInstance().getServletInfo():"null"));
-					logger.debug(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP));
-					prop.load(new FileInputStream(getInstance().getServletContext().getRealPath("/WEB-INF/"+OP_MAP)));
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			logger.info("Could not read operator properties",e);
-		}
-		return prop;
-    }
+
     
     public String getServletInfo() {
         return "Semantic PipeConfig End Points";
