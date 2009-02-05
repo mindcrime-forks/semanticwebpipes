@@ -36,20 +36,83 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
 
-import java.util.ArrayList;
-import java.util.List;
+package org.deri.pipes.core;
 
-import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.internals.Source;
+import java.io.InputStream;
+
 import org.deri.pipes.model.Operator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.deri.pipes.model.OperatorExecutor;
 
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
+/**
+ * @author robful
+ *
+ */
+public class Environment {
+	private static Environment defaultEnvironment;
+	PipeParser parser;
+	OperatorExecutor executor;
 
-public abstract class RDFBox implements Operator {
-	private transient Logger logger = LoggerFactory.getLogger(RDFBox.class);
+	/**
+	 * @return
+	 */
+	public PipeParser getPipeParser() {
+		if(parser == null){
+			parser = new PipeParser();
+		}
+		return parser;
+	}
+
+	/**
+	 * @return
+	 */
+	public OperatorExecutor getExecutor() {
+		if(executor == null){
+			executor = new OperatorExecutor();
+		}
+		return executor;
+	}
+	/**
+	 * Set the PipeParser.
+	 * @param parser
+	 */
+	void setPipeParser(PipeParser parser){
+		this.parser = parser;
+	}
+	/**
+	 * Parse the XML returning the defined operator.
+	 * @param xml
+	 * @return
+	 */
+	public Operator parse(String xml) {
+		return (Operator)getPipeParser().parse(xml);
+	}
+
+	/**
+	 * @return
+	 */
+	public PipeContext newContext() {
+		return new PipeContext(this);
+	}
+
+	/**
+	 * @return
+	 */
+	public static Environment defaultEnvironment() {
+		if(defaultEnvironment == null){
+			defaultEnvironment = new Environment();
+		}
+		return defaultEnvironment;
+	}
+
+	/**
+	 * @param in
+	 * @return
+	 */
+	public Operator parse(InputStream in) {
+		return (Operator) getPipeParser().parse(in);
+	}
+
+
 
 }

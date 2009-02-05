@@ -52,7 +52,7 @@ public class SplitBox implements Operator{
 
 
 	@Override
-	public ExecBuffer execute(PipeContext context) {
+	public ExecBuffer execute(PipeContext context) throws Exception {
 		return context.getOperator(inputOpID).execute(context);
 	}
 

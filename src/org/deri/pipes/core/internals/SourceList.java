@@ -36,43 +36,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.deri.pipes.core;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.deri.pipes.model.Memoizer;
-import org.deri.pipes.model.Operator;
+package org.deri.pipes.core.internals;
 
 
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
-
-/**
- * @author robful
- *
- */
-public class OperatorMemoizerProvider extends PureJavaReflectionProvider implements
-		ReflectionProvider {
-	List<Class> noMemoize = new ArrayList<Class>();
-
-	public OperatorMemoizerProvider(){
-		super();
-		noMemoize.add(ProcessingPipe.class);
-		noMemoize.add(Source.class);
-	}
-	/* (non-Javadoc)
-	 * @see com.thoughtworks.xstream.converters.reflection.ReflectionProvider#newInstance(java.lang.Class)
-	 */
-	@Override
-	public Object newInstance(Class cls) {
-		if(Operator.class.isAssignableFrom(cls) && !noMemoize.contains(cls)){
-			return Memoizer.getMemoizedInstance(cls);
-		}
-		return super.newInstance(cls);
-	}
-
+public class SourceList extends Source {
 
 }

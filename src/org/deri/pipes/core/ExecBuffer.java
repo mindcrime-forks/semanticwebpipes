@@ -40,10 +40,6 @@ package org.deri.pipes.core;
 
 import java.io.OutputStream;
 
-import org.openrdf.repository.RepositoryConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
@@ -51,11 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 
 public abstract class ExecBuffer {
-	 Logger logger = LoggerFactory.getLogger(ExecBuffer.class);
      public abstract void stream(ExecBuffer outputBuffer);
      public abstract void stream(ExecBuffer outputBuffer,String context);
      public abstract void stream(OutputStream output);
-     
-	public abstract RepositoryConnection getConnection();
-
 }

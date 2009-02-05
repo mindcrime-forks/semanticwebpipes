@@ -36,43 +36,49 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.core;
 
+package org.deri.pipes.core.internals;
+
+import org.deri.pipes.model.Memoizer;
 import org.deri.pipes.model.Operator;
+
+import net.sf.cglib.proxy.Enhancer;
+
+import com.thoughtworks.xstream.mapper.Mapper;
+import com.thoughtworks.xstream.mapper.MapperWrapper;
+
 /**
- * Proxy implemenation of Operator. The class was introduced
- * to support serialization using XStream with existing xml format.
  * @author robful
  *
  */
-public class Source implements Operator {
+public class BypassCGLibMapper extends MapperWrapper {
+	private static String DEFAULT_NAMING_MARKER = "$$EnhancerByCGLIB$$";
 
-	private Operator delegate;
+	/**
+	 * @param wrapped
+	 */
+	public BypassCGLibMapper(Mapper wrapped) {
+		super(wrapped);
+	}
 	
-	/**
-	 * Default Constructor.
-	 */
-	public Source(){
+	 public String serializedClass(Class type) {
+	        return isCGLibEnhanced(type) 
+	            ? super.serializedClass(type.getSuperclass())
+	            : super.serializedClass(type);
+	    }
+
+	public static boolean isCGLibEnhanced(Class type) {
+		return type.getName().indexOf(DEFAULT_NAMING_MARKER) > 0 && Enhancer.isEnhanced(type);
 	}
-	/**
-	 * Create a Source to use the given delegate.
-	 * @param delegate
-	 */
-	public Source(Operator delegate){
-		this.delegate = delegate;
-	}
+
 	@Override
-	public ExecBuffer execute(PipeContext context) {
-		return delegate.execute(context);
+	public boolean shouldSerializeMember(Class definedIn, String fieldName) {
+		if(isCGLibEnhanced(definedIn)){
+			if(fieldName.startsWith("CGLIB$")){
+				return false;
+			}
+		}
+		return super.shouldSerializeMember(definedIn, fieldName);
 	}
-
-	public Operator getDelegate() {
-		return delegate;
-	}
-
-	public void setDelegate(Operator delegate) {
-		this.delegate = delegate;
-	}
-	
 
 }

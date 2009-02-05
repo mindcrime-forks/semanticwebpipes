@@ -37,57 +37,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.core;
+package org.deri.pipes.core.internals;
 
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.Factory;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.Converter;
-import com.thoughtworks.xstream.converters.MarshallingContext;
-import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import com.thoughtworks.xstream.io.HierarchicalStreamReader;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import org.deri.pipes.core.ProcessingPipe;
+import org.deri.pipes.model.Memoizer;
+import org.deri.pipes.model.Operator;
+
+
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
 
 /**
  * @author robful
  *
  */
-public class BypassCGLibConverter implements Converter {
-	XStream xstream;
-	BypassCGLibConverter(XStream xstream){
-		this.xstream = xstream;
+public class OperatorMemoizerProvider extends PureJavaReflectionProvider implements
+		ReflectionProvider {
+	List<Class> noMemoize = new ArrayList<Class>();
+
+	public OperatorMemoizerProvider(){
+		super();
+		noMemoize.add(ProcessingPipe.class);
+		noMemoize.add(Source.class);
 	}
 	/* (non-Javadoc)
-	 * @see com.thoughtworks.xstream.converters.Converter#marshal(java.lang.Object, com.thoughtworks.xstream.io.HierarchicalStreamWriter, com.thoughtworks.xstream.converters.MarshallingContext)
+	 * @see com.thoughtworks.xstream.converters.reflection.ReflectionProvider#newInstance(java.lang.Class)
 	 */
 	@Override
-	public void marshal(Object arg0, HierarchicalStreamWriter arg1,
-			MarshallingContext arg2) {
-		Class<? extends Object> clazz = arg0.getClass();
-		Class<?> superclass = clazz.getSuperclass();
-		Converter converter = xstream.getConverterLookup().lookupConverterForType(superclass);
-		converter.marshal(arg0, arg1, arg2);
-
+	public Object newInstance(Class cls) {
+		if(Operator.class.isAssignableFrom(cls) && !noMemoize.contains(cls)){
+			return Memoizer.getMemoizedInstance(cls);
+		}
+		return super.newInstance(cls);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.thoughtworks.xstream.converters.Converter#unmarshal(com.thoughtworks.xstream.io.HierarchicalStreamReader, com.thoughtworks.xstream.converters.UnmarshallingContext)
-	 */
-	@Override
-	public Object unmarshal(HierarchicalStreamReader arg0,
-			UnmarshallingContext arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.thoughtworks.xstream.converters.ConverterMatcher#canConvert(java.lang.Class)
-	 */
-	@Override
-	public boolean canConvert(Class arg0) {
-		boolean assignableFrom = Factory.class.isAssignableFrom(arg0);
-		return assignableFrom;
-	}
 
 }

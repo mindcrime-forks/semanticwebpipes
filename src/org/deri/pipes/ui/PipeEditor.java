@@ -42,6 +42,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.apache.xerces.parsers.DOMParser;
+import org.deri.pipes.core.Environment;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.endpoints.Pipe;
 import org.deri.pipes.endpoints.PipeManager;
@@ -71,6 +72,8 @@ import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Textbox;
 public class PipeEditor extends Workspace {
+	//TODO: make environment a settable field
+	static Environment environment = Environment.defaultEnvironment();
 	final Logger logger = LoggerFactory.getLogger(PipeEditor.class);
 	private Textbox textDebugPanel,pipeid,pipename,password;
 	private Bandbox bdid;
@@ -304,33 +307,28 @@ public class PipeEditor extends Workspace {
 	public void debug(String syntax){
 		   syntax=populatePara(syntax);	
 		   //logger.debug(syntax);
-		   PipeParser parser= new PipeParser();	   
-		   Operator    stream= parser.parse(syntax);
+		   Operator    stream= environment.parse(syntax);
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
+		   try{
 		   if(stream instanceof RDFBox){
 			   ((RDFBox) stream).execute(null);
-			   org.deri.pipes.core.ExecBuffer buff=stream.execute(parser.getPipeContext());
+			   org.deri.pipes.core.ExecBuffer buff=stream.execute(environment.newContext());
 			   textResult=buff.toString();
 			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
-				   try{
 					   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
 			    		tuple=((((org.deri.pipes.model.SesameMemoryBuffer)buff).
 			    				     getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
-			    	}
-			        catch(MalformedQueryException e){ 
-			      	  
-			        }
-			        catch(QueryEvaluationException e){
-			      	  
-			        }
-			        catch(RepositoryException e){
-			      	  
-			        }
 			   }
 			   else if(buff instanceof org.deri.pipes.model.SesameTupleBuffer){
 				   tuple=((org.deri.pipes.model.SesameTupleBuffer)buff).getTupleQueryResult();
 			   }
+		   }
+		   }catch(Exception e){
+			   String msg = "A problem occurred executing the buffer";
+			logger.error(msg,e);
+			textResult = msg+": "+e;
+			   
 		   }
 		   reloadTextDebug(textResult);
 		   reloadTabularDebug(tuple);
@@ -339,15 +337,11 @@ public class PipeEditor extends Workspace {
 	public void hotDebug(String syntax){
 		syntax=populatePara(syntax);
 		 //logger.debug(syntax);
-		InputSource input=new InputSource(new java.io.StringReader(syntax));
 		try {
-           DOMParser parser = new DOMParser();
-           parser.parse(input);
-           PipeParser pipeParser= new PipeParser();
-		   Operator    op= pipeParser.parseOperator(parser.getDocument().getDocumentElement());
+		   Operator op= environment.parse(syntax);;
 		   TupleQueryResult tuple=null;
 		   String textResult=null;
-		   org.deri.pipes.core.ExecBuffer buff=op.execute(pipeParser.getPipeContext());
+		   org.deri.pipes.core.ExecBuffer buff=op.execute(environment.newContext());
 		   if(op instanceof RDFBox){
 			   textResult=buff.toString();
 			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){

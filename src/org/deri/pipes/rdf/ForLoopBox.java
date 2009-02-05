@@ -44,7 +44,7 @@ import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
-import org.deri.pipes.core.Source;
+import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
@@ -93,7 +93,7 @@ public class ForLoopBox extends RDFBox{
     private Source forloop;
         
     
-    public ExecBuffer execute(PipeContext context){
+    public ExecBuffer execute(PipeContext context) throws Exception{
     	if(sourcelist == null){
     		logger.warn("sourcelist is null, cannot execute for loop");
     		return new SesameMemoryBuffer();
@@ -112,7 +112,7 @@ public class ForLoopBox extends RDFBox{
  		return executeForLoop(context, tupleBuffer);
     }
 
-	private ExecBuffer executeForLoop(PipeContext context,SesameTupleBuffer tupleBuffer) {
+	private ExecBuffer executeForLoop(PipeContext context,SesameTupleBuffer tupleBuffer) throws Exception {
 		SesameMemoryBuffer buffer = new SesameMemoryBuffer();
 		try{
  			TupleQueryResult tupleQueryResult = tupleBuffer.getTupleQueryResult();
@@ -122,7 +122,7 @@ public class ForLoopBox extends RDFBox{
  				BindingSet bindingSet = tupleQueryResult.next();		   
  				operatorXml = bindVariables(operatorXml, bindingNames, bindingSet);
  				logger.debug("parsing:"+operatorXml);
- 				Operator op = context.parse(operatorXml);
+ 				Operator op = context.getEnvironment().parse(operatorXml);
  				ExecBuffer execBuffer = op.execute(context);
  				if(execBuffer instanceof SesameMemoryBuffer){
  					execBuffer.stream(buffer);					   

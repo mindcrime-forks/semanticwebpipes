@@ -89,7 +89,7 @@ Example (see http://pipes.deri.org:8080/pipes/Pipes/?id=simplemix )
 public class SimpleMixBox extends AbstractMerge{ 
 	private transient Logger logger = LoggerFactory.getLogger(SimpleMixBox.class);
 	
-	 public ExecBuffer execute(PipeContext context){
+	 public ExecBuffer execute(PipeContext context) throws Exception{
 		 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
     	 mergeInputs(buffer,context);
     	 return buffer;

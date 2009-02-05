@@ -159,11 +159,4 @@ public class SesameTupleBuffer extends ExecBuffer{
 		}
 	}
 
-	@Override
-	public RepositoryConnection getConnection() {
-		if(true){
-			throw new RuntimeException("getConnection not implemented for SesameTupleBuffer");
-		}
-		return null;
-	}
 }

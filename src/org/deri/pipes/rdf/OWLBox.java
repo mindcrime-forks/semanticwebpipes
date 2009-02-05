@@ -61,7 +61,7 @@ public class OWLBox extends AbstractMerge{
 	 String owlsource = null;
      
       
-     public ExecBuffer execute(PipeContext context){
+     public ExecBuffer execute(PipeContext context) throws Exception{
     	 //merge all input sourceOperators to Sesame buffer
     	 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
     	 mergeInputs(buffer,context);

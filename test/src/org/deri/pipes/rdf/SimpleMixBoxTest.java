@@ -5,12 +5,12 @@ import junit.framework.TestCase;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.core.PipeParser;
-import org.deri.pipes.core.Source;
+import org.deri.pipes.core.internals.Source;
 
 public class SimpleMixBoxTest extends TestCase {
 	private SimpleMixBox fixture;
 	private PipeContext mockContext;
-	public void test(){
+	public void test() throws Exception{
 		fixture = new SimpleMixBox();
 		String xml1 = "<?xml version='1.0'?>" +
 				"\n<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'" +
@@ -26,13 +26,13 @@ public class SimpleMixBoxTest extends TestCase {
 				"\n  <dc:abstract>RDF is good for everyone</dc:abstract> " +
 				"\n</rdf:Description> " +
 				"\n</rdf:RDF>";
-		fixture.addSource(new Source(new TextBox(xml1)));
-		fixture.addSource(new Source(new TextBox(xml2)));
+		fixture.addInput(new Source(new TextBox(xml1)));
+		fixture.addInput(new Source(new TextBox(xml2)));
 		ExecBuffer buffer = fixture.execute(mockContext);
 		String result = buffer.toString();
 		System.out.println(result);
 		assertTrue("Missing abstract in result :\n"+result,result.indexOf("abstract")>0);
 		assertTrue("Missing title in result :\n"+result,result.indexOf("title")>0);
-		System.out.println(new PipeParser().getXStreamSerializer().toXML(fixture));
+//		System.out.println(new PipeParser().serializeToXML(fixture));
 	}
 }

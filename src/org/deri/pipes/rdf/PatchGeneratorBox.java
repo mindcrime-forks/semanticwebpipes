@@ -56,7 +56,7 @@ public class PatchGeneratorBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(PatchGeneratorBox.class);
 	
      
-     public ExecBuffer execute(PipeContext context){
+     public ExecBuffer execute(PipeContext context) throws Exception{
     	 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
     	 mergeInputs(buffer,context);
     	 

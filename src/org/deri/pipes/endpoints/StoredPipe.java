@@ -40,6 +40,7 @@ package org.deri.pipes.endpoints;
 
 import java.util.List;
 
+import org.deri.pipes.core.Environment;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.utils.XMLUtil;
@@ -60,7 +61,7 @@ public class StoredPipe{
 			syntax = syntax.replace("${" + parameters.get(i).getTagName() + "}", XMLUtil.getTextData(parameters.get(i)));
 		}
 		if (syntax != null) {
-			return (new PipeParser()).parse(syntax);
+			return Environment.defaultEnvironment().parse(syntax);
 		}
 		return null;
 	}

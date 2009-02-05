@@ -43,30 +43,63 @@ import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.PipeContext;
-import org.deri.pipes.core.Source;
+import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.model.Operator;
+import org.deri.pipes.model.OperatorExecutor;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-
+/**
+ * Abstract class for merging multiple RDF results into
+ * a single result before further processing.
+ * @author robful
+ *
+ */
 public abstract class AbstractMerge extends RDFBox {
-	private transient Logger logger = LoggerFactory.getLogger(AbstractMerge.class);
+	private static Logger logger = LoggerFactory.getLogger(AbstractMerge.class);
 	@XStreamImplicit
 	protected List<Source> source = new ArrayList<Source>();
-   
-	void addSource(Source source){
-		this.source.add(source);
+	/**
+	 * Add a new input source.
+	 * @param source
+	 */
+	void addInput(Operator source){
+		if(!(source instanceof Source)){
+			source = new Source(source);
+		}
+		this.source.add((Source)source);
 	}
-	
-	protected void mergeInputs(ExecBuffer buffer, PipeContext context){
-		for(Source src : source){
-	       	 ExecBuffer inputBuffer = src.execute(context);
-			if (inputBuffer instanceof SesameMemoryBuffer){
-				inputBuffer.stream(buffer);
-	       	 }else{
-	       		logger.warn("Inappropriate input format, RDF is required!!!");
-	       	 }
+	/**
+	 * Execute a set of operators, merging the results together.
+	 * @param buffer
+	 * @param context
+	 * @throws Exception
+	 */
+	protected void mergeInputs(ExecBuffer buffer, PipeContext context) throws Exception{
+		List<Operator> operators = new ArrayList<Operator>();
+		operators.addAll(source);
+		mergeResults(context, operators, buffer);
+	}
+	/**
+	 * Merge the results of executing the inputs into the output buffer. Operators
+	 * are executed in parallel using the OperatorExecutor for the environment.
+	 * @param context the Execution context.
+	 * @param inputs The input operators.
+	 * @param output The output buffer for merging into.
+	 * @throws InterruptedException
+	 */
+	public static void mergeResults(PipeContext context, List<Operator> inputs,
+			ExecBuffer output) throws InterruptedException {
+		OperatorExecutor executor = context.getExecutor();
+		final List<ExecBuffer> results = executor.execute(inputs, context);
+		for(ExecBuffer input : results){
+			if(input == null){ // should throw an exception here, or have one thrown from the executor?
+				logger.warn("The returned exec buffer was null, some results may be missing, see log for details");
+				continue;
+			}
+			input.stream(output);
 	   	}
 	}
 	

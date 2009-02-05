@@ -36,8 +36,58 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.core;
 
-public class SourceList extends Source {
+package org.deri.pipes.core.internals;
+
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.Factory;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+
+/**
+ * @author robful
+ *
+ */
+public class BypassCGLibConverter implements Converter {
+	XStream xstream;
+	public BypassCGLibConverter(XStream xstream){
+		this.xstream = xstream;
+	}
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.Converter#marshal(java.lang.Object, com.thoughtworks.xstream.io.HierarchicalStreamWriter, com.thoughtworks.xstream.converters.MarshallingContext)
+	 */
+	@Override
+	public void marshal(Object arg0, HierarchicalStreamWriter arg1,
+			MarshallingContext arg2) {
+		Class<? extends Object> clazz = arg0.getClass();
+		Class<?> superclass = clazz.getSuperclass();
+		Converter converter = xstream.getConverterLookup().lookupConverterForType(superclass);
+		converter.marshal(arg0, arg1, arg2);
+
+	}
+
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.Converter#unmarshal(com.thoughtworks.xstream.io.HierarchicalStreamReader, com.thoughtworks.xstream.converters.UnmarshallingContext)
+	 */
+	@Override
+	public Object unmarshal(HierarchicalStreamReader arg0,
+			UnmarshallingContext arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.ConverterMatcher#canConvert(java.lang.Class)
+	 */
+	@Override
+	public boolean canConvert(Class arg0) {
+		boolean assignableFrom = Factory.class.isAssignableFrom(arg0);
+		return assignableFrom;
+	}
 
 }

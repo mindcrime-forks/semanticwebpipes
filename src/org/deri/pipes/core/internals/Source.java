@@ -36,49 +36,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package org.deri.pipes.core.internals;
 
-package org.deri.pipes.core;
-
-import org.deri.pipes.model.Memoizer;
+import org.deri.pipes.core.ExecBuffer;
+import org.deri.pipes.core.PipeContext;
 import org.deri.pipes.model.Operator;
-
-import net.sf.cglib.proxy.Enhancer;
-
-import com.thoughtworks.xstream.mapper.Mapper;
-import com.thoughtworks.xstream.mapper.MapperWrapper;
-
 /**
+ * Proxy implemenation of Operator. The class was introduced
+ * to support serialization using XStream with existing xml format.
  * @author robful
  *
  */
-public class BypassCGLibMapper extends MapperWrapper {
-	private static String DEFAULT_NAMING_MARKER = "$$EnhancerByCGLIB$$";
+public class Source implements Operator {
 
+	private Operator delegate;
+	
 	/**
-	 * @param wrapped
+	 * Default Constructor.
 	 */
-	public BypassCGLibMapper(Mapper wrapped) {
-		super(wrapped);
+	public Source(){
+	}
+	/**
+	 * Create a Source to use the given delegate.
+	 * @param delegate
+	 */
+	public Source(Operator delegate){
+		this.delegate = delegate;
+	}
+	@Override
+	public ExecBuffer execute(PipeContext context) throws Exception{
+		return delegate.execute(context);
+	}
+
+	public Operator getDelegate() {
+		return delegate;
+	}
+
+	public void setDelegate(Operator delegate) {
+		this.delegate = delegate;
 	}
 	
-	 public String serializedClass(Class type) {
-	        return isCGLibEnhanced(type) 
-	            ? super.serializedClass(type.getSuperclass())
-	            : super.serializedClass(type);
-	    }
-
-	public static boolean isCGLibEnhanced(Class type) {
-		return type.getName().indexOf(DEFAULT_NAMING_MARKER) > 0 && Enhancer.isEnhanced(type);
-	}
-
-	@Override
-	public boolean shouldSerializeMember(Class definedIn, String fieldName) {
-		if(isCGLibEnhanced(definedIn)){
-			if(fieldName.startsWith("CGLIB$")){
-				return false;
-			}
-		}
-		return super.shouldSerializeMember(definedIn, fieldName);
-	}
 
 }

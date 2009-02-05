@@ -43,6 +43,7 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.deri.pipes.model.Operator;
+import org.deri.pipes.model.OperatorExecutor;
 
 import com.thoughtworks.xstream.XStream;
 /**
@@ -53,9 +54,21 @@ import com.thoughtworks.xstream.XStream;
 public class PipeContext {
 	Map <String,Operator> operators = new HashMap<String,Operator>();
 	Map map = new HashMap();
-	XStream xstream;
-	PipeParser parser;
 	private transient HttpClient httpClient;
+	private Environment environment;
+	/**
+	 * Default constructor.
+	 */
+	public PipeContext(){
+		
+	}
+	/**
+	 * Create a PipeContext for this environment.
+	 * @param environment
+	 */
+	public PipeContext(Environment environment){
+		this.environment = environment;
+	}
 	/**
 	 * Get the operator having this id.
 	 * @param id
@@ -81,35 +94,17 @@ public class PipeContext {
 		return operators.containsKey(id);
 	}
 	/**
-	 * Set the PipeParser.
-	 * @param parser
-	 */
-	void setPipeParser(PipeParser parser){
-		this.parser = parser;
-	}
-	/**
 	 * Get the PipeParser.
 	 * @return
 	 */
 	public PipeParser getPipeParser(){
-		return parser;
+		return getEnvironment().getPipeParser();
 	}
 
 	public String serialize(Object o) {
-		return getXstream().toXML(o);
+		return getPipeParser().serializeToXML(o);
 	}
-	public Operator parse(String tmp) {
-		return (Operator)xstream.fromXML(tmp);
-	}
-	public XStream getXstream() {
-		if(xstream == null){
-			xstream = new PipeParser().getXStreamSerializer();
-		}
-		return xstream;
-	}
-	public void setXstream(XStream xstream) {
-		this.xstream = xstream;
-	}
+
 	public void setHttpClient(HttpClient httpClient) {
 		this.httpClient = httpClient;
 	}
@@ -129,5 +124,20 @@ public class PipeContext {
 	 */
 	public void put(Object key, Object value) {
 		map.put(key, value);
+	}
+	/**
+	 * @return
+	 */
+	public OperatorExecutor getExecutor() {
+		return getEnvironment().getExecutor();
+	}
+	/**
+	 * @return
+	 */
+	public Environment getEnvironment() {
+		if(environment == null){
+			environment = new Environment();
+		}
+		return environment;
 	}
 }

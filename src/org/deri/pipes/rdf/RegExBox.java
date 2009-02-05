@@ -67,7 +67,7 @@ public class RegExBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(RegExBox.class);
 	private List<Rule> rules = new ArrayList<Rule>();
      
-     public ExecBuffer execute(PipeContext context){
+     public ExecBuffer execute(PipeContext context) throws Exception{
     	 //merge all input sourceOperators to Sesame buffer
     	 SesameMemoryBuffer tmp= new SesameMemoryBuffer();
     	 mergeInputs(tmp,context);

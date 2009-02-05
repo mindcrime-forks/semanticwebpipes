@@ -53,7 +53,7 @@ public class SameAsBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(SameAsBox.class);
 	
      
-     public ExecBuffer execute(PipeContext context){
+     public ExecBuffer execute(PipeContext context) throws Exception{
     	 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
     	 mergeInputs(buffer,context);
     	 

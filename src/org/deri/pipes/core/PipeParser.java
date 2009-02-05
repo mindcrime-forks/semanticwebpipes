@@ -41,10 +41,15 @@
  */
 package org.deri.pipes.core;
 
+import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
 
 import org.apache.xerces.parsers.DOMParser;
+import org.deri.pipes.core.internals.BypassCGLibConverter;
+import org.deri.pipes.core.internals.BypassCGLibMapper;
+import org.deri.pipes.core.internals.OperatorMemoizerProvider;
+import org.deri.pipes.core.internals.SourceConverter;
 import org.deri.pipes.endpoints.PipeManager;
 import org.deri.pipes.endpoints.Pipes;
 import org.deri.pipes.model.Operator;
@@ -58,6 +63,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.zkoss.util.logging.Log;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.CGLIBEnhancedConverter;
@@ -76,55 +82,21 @@ public class PipeParser {
 	final static Logger logger = LoggerFactory.getLogger(PipeParser.class);
 	PipeContext pipeContext = new PipeContext();
 	private XStream xstream;
-	
+	PipeParser(){
+		
+	}
 	
 	/**
 	 * Parse the xml syntax contained in this String.
 	 * @param syntax xml pipe syntax.
 	 */
 	public Operator parse(String syntax) {
-		return parse(new InputSource(new java.io.StringReader(syntax)));
+    	return (Operator) getXStreamSerializer().fromXML(syntax);
 	}
 
-	/**
-	 * Parse the xml syntax contained in the first 'code' element
-	 * @param inputStream an xml stream.
-	 * @return an Operator, or null if the element could not be parsed.
-	 */
-    public Operator parse(InputSource inputStream){
-    	try {
-            DOMParser parser = new DOMParser();
-            parser.parse(inputStream);  
-            
-            // Search for the child node of the <code> element, parse and run pipe execution engine
-            NodeList pipeCodeXMLElements = parser.getDocument().getDocumentElement().getElementsByTagName("code").item(0).getChildNodes();
-            
-            for(int i=0;i<pipeCodeXMLElements.getLength();i++){
-    			switch (pipeCodeXMLElements.item(i).getNodeType()){
-    				case Node.ELEMENT_NODE:
-    					return parseOperator((Element)pipeCodeXMLElements.item(i));
-    			}
-    		} 
-
-        } catch (Exception e) {
-        	logger.warn("could not parse input stream",e);
-        }
-    	return null;
-    }
     
-    public Operator parseCode(String code){
-    	try {
-            DOMParser parser = new DOMParser();
-            parser.parse(new InputSource(new java.io.StringReader(code)));  
-            return parseOperator(parser.getDocument().getDocumentElement());
-        } catch (Exception e) {
-        	logger.debug("problem parsing code: ["+code+"]");
-        	logger.warn("could not parse code",e);
-        }
-    	return null;
-    }
     
-	public static Operator loadStoredOperator(Element element){
+/*	public static Operator loadStoredOperator(Element element){
 		String tagName = element.getTagName();
 		String syntax =PipeManager.getPipeSyntax(tagName);
 		if (syntax==null){
@@ -137,55 +109,7 @@ public class PipeParser {
 		}
 		return (new PipeParser()).parse(syntax);
 	}
-	
-	public Operator parseOperator(Element element){
-		String lowerCaseTagName = element.getTagName().toLowerCase();
-		String opClassName = Pipes.getOperatorProps().getProperty(lowerCaseTagName);
-		logger.debug("mapped element ["+element.getTagName()+"] to operator ["+opClassName+"]");
-		if(opClassName!=null){
-			try {
-				//find proper implemented class for an operator syntax 
-				Class operatorClass = Class.forName(opClassName);
-				
-				//initialize operator (PipeParser,Element)
-				Object obj= operatorClass.newInstance();
-				logger.debug("output "+obj.toString());
-				if(obj instanceof Operator){
-					Operator operator = (Operator)obj;
-				//	operator.initialize(pipeContext,element);
-					return operator;
-				}else{
-					logger.warn("Could not create operator for "+opClassName);
-				}
-			} catch (Exception e) {
-				logger.info("Could not parse element "+element,e);
-			}
-		}else{
-			logger.info("No mapped operator for element ["+lowerCaseTagName+"]");
-		}
-		
-		Operator operator=loadStoredOperator(element);
-		if(operator!=null){
-			return operator;
-		}
-    	logger.warn("Unreconigzed tag :"+element.getTagName()+" "+element.toString());
-		return null;
-	}
-	
-	public String addOperator(String id,Operator operator){
-		if((null!=id)&&(id.trim().length()>0)){
-			id=id.trim().toLowerCase();
-			if(pipeContext.contains(id)){
-				logger.warn("Not adding operator with duplicated ID [" +id+"]");
-				return null;
-			}else{
-				pipeContext.addOperator(id,operator);
-				return id;
-			}
-		}else{
-			return addOperator(operator);
-		}
-	}
+*/	
 	
 	public String addOperator(Operator operator){
 		if(operator==null){
@@ -203,35 +127,13 @@ public class PipeParser {
 	
 
 	
-	public String getSourceOperatorId(Element source){
-		String refid = source.getAttribute("refid");
-		if(refid!=null){
-		    return refid;	
-		}else{
-			Element sourceElement=XMLUtil.getFirstSubElement(source);
-			String id = null;
-			final Operator operator;
-			if(sourceElement==null){
-				TextBox textbox = new TextBox();
-				String format = source.getAttribute("format");
-				textbox.setFormat(format);
-				String textData = XMLUtil.getTextData(source);
-				textbox.setContent(textData);
-				operator = textbox;
-			}else{
-				id = sourceElement.getAttribute("id");
-				operator = parseOperator(sourceElement);
-			}
-			return addOperator(id,operator);
-	    }
-	}
 
 	public static String serialize(SimpleMixBox fixture) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public XStream getXStreamSerializer() {
+	private XStream getXStreamSerializer() {
 		if(xstream == null){
 		  xstream =  createXStreamSerializer();
 		}
@@ -262,13 +164,13 @@ public class PipeParser {
 			    }
 
 		};
-//		xstream.registerConverter(new CGLIBEnhancedConverter(xstream.getMapper(), xstream.getReflectionProvider()));
 		xstream.registerConverter(new BypassCGLibConverter(xstream));
 		xstream.alias("pipe",ProcessingPipe.class);
 		xstream.registerLocalConverter(ProcessingPipe.class, "parameters", new ParameterConverter());
 		xstream.registerConverter(new SourceConverter());
 		//xstream normally uses 'reference' for references, we want refid
-		xstream.aliasSystemAttribute("refid", "reference");
+		xstream.aliasSystemAttribute("REFID", "reference");
+		xstream.aliasSystemAttribute("ID", "id");
 		SourceConverter.registerAliases(xstream);
 		xstream.autodetectAnnotations(true);
 		return xstream;
@@ -279,5 +181,25 @@ public class PipeParser {
 	 */
 	public PipeContext getPipeContext() {
 		return pipeContext;
+	}
+
+	/**
+	 * @param o
+	 * @return
+	 */
+	public String serializeToXML(Object o) {
+		return getXStreamSerializer().toXML(o);
+	}
+
+	/**
+	 * @param in
+	 * @return
+	 */
+	public Object parse(InputStream in) {
+		long start = System.currentTimeMillis();
+		Object obj = getXStreamSerializer().fromXML(in);
+		long elapsed = System.currentTimeMillis()- start;
+		logger.info("parsed object from xml in "+elapsed+"ms");
+		return obj;
 	}
 }

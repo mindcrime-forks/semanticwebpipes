@@ -69,7 +69,7 @@ public class ConstructBox extends AbstractMerge {
     private String query;
 
    
-    public ExecBuffer execute(PipeContext context){
+    public ExecBuffer execute(PipeContext context) throws Exception{
     	SesameMemoryBuffer buffer= new SesameMemoryBuffer();
     	SesameMemoryBuffer tmp=new SesameMemoryBuffer();
     	mergeInputs(tmp,context);

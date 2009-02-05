@@ -49,7 +49,6 @@ import org.apache.commons.io.IOUtils;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.utils.UrlLoader;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
-import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,13 +128,5 @@ public class XMLStreamBuffer extends ExecBuffer {
 				logger.warn("problem streaming output",e);
 			}
 		}
-	}
-
-	@Override
-	public RepositoryConnection getConnection() {
-		if(true){
-			throw new RuntimeException("getConnection not implemented for XMLStreamBuffer");
-		}
-		return null;
 	}
 }
