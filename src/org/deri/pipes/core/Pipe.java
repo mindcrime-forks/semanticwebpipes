@@ -2,6 +2,8 @@ package org.deri.pipes.core;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -9,19 +11,45 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
+/**
+ * A Semantic Web Pipe!
+ * @author robful
+ *
+ */
 public class Pipe implements Operator{
 	private transient Logger logger = LoggerFactory.getLogger(Pipe.class);
 	private transient List<Operator> codeWithVariablesExpanded;
 	@XStreamAsAttribute
 	private String id;
-	List<Map<String,String>> parameters;
+	Parameters parameters;
 	List<Operator> code;
 	public void setId(String id){
 		this.id = id;
 	}
 	public String getId(){
 		return id;
+	}
+	/**
+	 * List the parameters to this pipe.
+	 * @return
+	 */
+	public Collection<String> listParameters(){
+		return parameters == null?new ArrayList<String>():parameters.list();
+	}
+	/**
+	 * Get the value of the given parameter.
+	 * @param key
+	 * @return
+	 */
+	public String getParameter(String key){
+		return parameters == null?null:parameters.get(key);
+	}
+	public void setParameter(String key, String value){
+		if(parameters == null){
+			parameters = new Parameters();
+		}
+		parameters.set(key, value);
+		this.codeWithVariablesExpanded = null;
 	}
 	/**
 	 * Execute this pipe and return the result.
@@ -48,7 +76,7 @@ public class Pipe implements Operator{
 		/*
 		 * Temporarily hide the parameters and serialize the code.
 		 */
-		List<Map<String,String>> tmpParameters = this.parameters;
+		Parameters tmpParameters = this.parameters;
 		this.parameters = null;
 		String xml = null;
 		try{
@@ -62,11 +90,10 @@ public class Pipe implements Operator{
 		this.codeWithVariablesExpanded = pipe.code;
 		
 	}
-	private String expandParameters(List<Map<String, String>> tmpParameters,
+	private String expandParameters(Parameters tmpParameters,
 			String xml) {
-		for(Map<String,String> parameterMap : tmpParameters){
-			String bindingName = parameterMap.get("id");
-			String bindingValue = parameterMap.get("default");
+		for(String bindingName : tmpParameters.list()){
+			String bindingValue = tmpParameters.get(bindingName);
 			xml=xml.replace("${"+bindingName+"}",bindingValue);
 		    	   try {
 					xml=xml.replace(URLEncoder.encode("${" + bindingName + "}","UTF-8"),

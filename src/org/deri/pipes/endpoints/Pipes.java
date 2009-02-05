@@ -55,6 +55,7 @@ import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
+import org.deri.pipes.core.Pipe;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.rdf.RDFBox;
@@ -70,6 +71,11 @@ import org.zkoss.zk.ui.Executions;
 import edu.mit.simile.babel.BabelWriter;
 import edu.mit.simile.babel.exhibit.ExhibitJsonWriter;
 import edu.mit.simile.babel.exhibit.ExhibitJsonpWriter;
+/**
+ * Pipes Servlet.
+ * @author robful
+ *
+ */
 public class Pipes extends HttpServlet {
 	//TODO: make engine a field.
 	static Engine engine = Engine.defaultEngine();
@@ -218,30 +224,18 @@ public class Pipes extends HttpServlet {
   		String pipeid = req.getParameter("id");
   		String syntax = PipeManager.getPipeSyntax(pipeid);
 		if (syntax == null) {
-			logger.info("Syntax was null for pipeid=["+pipeid+"]");
-			return new SesameMemoryBuffer();
+			logger.warn("Syntax was null for pipeid=["+pipeid+"]");
+			return null;
 		}
-		DOMParser parser = new DOMParser();
 		try{
-			parser.parse(new InputSource(new java.io.StringReader(syntax)));  
-			Element rootElm=parser.getDocument().getDocumentElement();
-			List<Element> paraElms=XMLUtil.getSubElementByName(XMLUtil.getFirstSubElementByName(rootElm,"parameters"), "parameter");
-			for(int i=0;i<paraElms.size();i++){		
-				String paraId = XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i),"id").trim();
-				String paraVal = (String) req.getParameter(paraId);
-				paraVal=(paraVal!=null)?paraVal:XMLUtil.getTextFromFirstSubEleByName(paraElms.get(i),"default");
-				syntax = syntax.replace("${" + paraId + "}", paraVal);
-				try{
-					syntax=syntax.replace(URLEncoder.encode("${" + paraId + "}","UTF-8"),
-							URLEncoder.encode(paraVal,"UTF-8"));
-				}
-				catch(java.io.UnsupportedEncodingException e){
-					logger.info("UTF-8 Encoding must be supported by JVM specification",e);
+			Pipe pipe = (Pipe)engine.parse(syntax);
+			for(String key : pipe.listParameters()){
+				String value = (String) req.getParameter(key);
+				if(value != null){
+					pipe.setParameter(key, value);
 				}
 			}
-			//logger.debug(syntax);
-			Operator stream = engine.parse(syntax);
-			ExecBuffer result = stream.execute(engine.newContext());
+			ExecBuffer result = pipe.execute(engine.newContext());
 			if (result instanceof SesameMemoryBuffer) {
 				return (SesameMemoryBuffer)result;
 			} else {
@@ -251,7 +245,7 @@ public class Pipes extends HttpServlet {
 			logger.debug("Problem executing pipe from syntax:"+syntax);
 			logger.error("Couldn't execute pipes from syntax (see debug for syntax)",e);
 		}
-  		return new SesameMemoryBuffer();
+		return new SesameMemoryBuffer();
   	}
   	
     private String getMimeHeader(String accept,String format){
