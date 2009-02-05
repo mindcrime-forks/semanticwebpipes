@@ -51,7 +51,7 @@ import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
- Similar to CONSTRUCT operator, the SELECT operator is used performs a SELECT query and outputs the result in the SPARQL-Result XML format. This  operator is  only used as an input for FOR operator.  Each RDF Source can be either a constant (directly input as RDF/XML) or another Pipe operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the sourcedata will be placed into an named graph with attribute's value as graph name.
+ Similar to CONSTRUCT operator, the SELECT operator is used performs a SELECT query and outputs the result in the SPARQL-Result XML format. This  operator is  only used as an input for FOR operator.  Each RDF Source can be either a constant (directly input as RDF/XML) or another PipeConfig operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the sourcedata will be placed into an named graph with attribute's value as graph name.
 <pre>
 Note: Constant RDF/XML text has to be wrapped into a CDATA section.
 

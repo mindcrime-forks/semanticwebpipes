@@ -46,7 +46,7 @@ import org.deri.pipes.core.internals.ThreadedExecutor;
 
 import com.thoughtworks.xstream.XStream;
 /**
- * Operators belonging to a Pipe.
+ * Operators belonging to a PipeConfig.
  * @author rfuller
  *
  */

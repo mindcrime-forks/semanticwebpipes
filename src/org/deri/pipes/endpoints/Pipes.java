@@ -295,6 +295,6 @@ public class Pipes extends HttpServlet {
     }
     
     public String getServletInfo() {
-        return "Semantic Pipe End Points";
+        return "Semantic PipeConfig End Points";
     }
 }

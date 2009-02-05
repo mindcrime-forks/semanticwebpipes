@@ -45,7 +45,7 @@ import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.PipeParser;
-import org.deri.pipes.endpoints.Pipe;
+import org.deri.pipes.endpoints.PipeConfig;
 import org.deri.pipes.endpoints.PipeManager;
 import org.deri.pipes.rdf.RDFBox;
 import org.deri.pipes.rdf.SelectBox;
@@ -403,10 +403,10 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void edit(String pid){
-		Pipe pipe=PipeManager.getPipe(pid);
-		reload(pipe.getConfig());
-		pipeid.setValue(pipe.getId());
-		bdid.setValue(pipe.getId());
-		pipename.setValue(pipe.getName());
+		PipeConfig pipeConfig=PipeManager.getPipe(pid);
+		reload(pipeConfig.getConfig());
+		pipeid.setValue(pipeConfig.getId());
+		bdid.setValue(pipeConfig.getId());
+		pipename.setValue(pipeConfig.getName());
 	}
 }

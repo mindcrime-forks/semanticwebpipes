@@ -40,8 +40,8 @@ package org.deri.pipes.endpoints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-public class Pipe {
-	final Logger logger = LoggerFactory.getLogger(Pipe.class);
+public class PipeConfig {
+	final Logger logger = LoggerFactory.getLogger(PipeConfig.class);
 	private String id = null;
 	private String name = null;
 	private String syntax = null;

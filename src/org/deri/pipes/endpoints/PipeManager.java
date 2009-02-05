@@ -82,7 +82,7 @@ public class PipeManager {
     	return conn;
     }
 	
-	public static  List<Pipe> getPipeList(){
+	public static  List<PipeConfig> getPipeList(){
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
@@ -90,12 +90,12 @@ public class PipeManager {
 		try {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);	
-			List<Pipe> pipeList = new ArrayList<Pipe>();
+			List<PipeConfig> pipeList = new ArrayList<PipeConfig>();
 			while(rs.next()){
-				Pipe pipe = new Pipe();
-				pipe.setId(rs.getString("pipeid"));
-				pipe.setName(rs.getString("pipename"));
-				pipeList.add(pipe);
+				PipeConfig pipeConfig = new PipeConfig();
+				pipeConfig.setId(rs.getString("pipeid"));
+				pipeConfig.setName(rs.getString("pipename"));
+				pipeList.add(pipeConfig);
 			}
 			return pipeList;
 		}
@@ -190,7 +190,7 @@ public class PipeManager {
 		return null;
 	}
 	
-	public static Pipe getPipe(String pipeid){
+	public static PipeConfig getPipe(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
@@ -199,12 +199,12 @@ public class PipeManager {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 			if(rs.next()){
-				Pipe pipe = new Pipe();
-				pipe.setId(pipeid);
-				pipe.setName(rs.getString("pipename"));
-				pipe.setSyntax(rs.getString("syntax"));
-				pipe.setConfig(rs.getString("config"));
-				return pipe;
+				PipeConfig pipeConfig = new PipeConfig();
+				pipeConfig.setId(pipeid);
+				pipeConfig.setName(rs.getString("pipename"));
+				pipeConfig.setSyntax(rs.getString("syntax"));
+				pipeConfig.setConfig(rs.getString("config"));
+				return pipeConfig;
 			}
 		}
 		catch(SQLException e){

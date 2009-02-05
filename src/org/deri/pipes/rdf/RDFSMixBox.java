@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 
-Similar to MIX operator,this RDFS operator will merge specified RDF sourceOperators and then infer implicit triples from the merged triples.The output of this operator is also RDFXML format.  Each RDF Source can be either a constant (directly input as RDF/XML) or another Pipe operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the sourcedata will be placed into an named graph with attribute's value as graph name.
+Similar to MIX operator,this RDFS operator will merge specified RDF sourceOperators and then infer implicit triples from the merged triples.The output of this operator is also RDFXML format.  Each RDF Source can be either a constant (directly input as RDF/XML) or another PipeConfig operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the sourcedata will be placed into an named graph with attribute's value as graph name.
 <pre>
 Note: Constant RDF/XML text has to be wrapped into a CDATA section.
 

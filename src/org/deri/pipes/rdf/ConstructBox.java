@@ -46,7 +46,7 @@ import org.openrdf.repository.util.RDFInserter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
- * The Construct query is used to create expected triples by using SPARQL-CONSTRUCT query on specified RDF sourceOperators. The output of this operator is the result of a SPARQL-CONSTRUCT query executed on the one or more sourceOperators. Each RDF Source can be either a constant (directly input as RDF/XML) or another Pipe operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the source data will be placed into an named graph with attribute's value as graph name.
+ * The Construct query is used to create expected triples by using SPARQL-CONSTRUCT query on specified RDF sourceOperators. The output of this operator is the result of a SPARQL-CONSTRUCT query executed on the one or more sourceOperators. Each RDF Source can be either a constant (directly input as RDF/XML) or another PipeConfig operator which can output RDF/XML data. There is an optional attribute &quot;uri&quot;. If it is speficfied, then the source data will be placed into an named graph with attribute's value as graph name.
 <pre>
 Note: Constant RDF/XML text has to be wrapped into a CDATA section.
 

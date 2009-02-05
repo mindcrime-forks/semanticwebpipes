@@ -103,9 +103,9 @@ public class PipeListRenderer implements RowRenderer {
 	
     public void render(Row row, Object data) {
       row.setValign("top");	
-      String pipeid=((Pipe)data).getId();
+      String pipeid=((PipeConfig)data).getId();
       Html pipeLink=new Html("<a href='./pipes/?id="+pipeid+"'>"+pipeid+"</a><br />" + 
-    		  justify(((Pipe)data).getName(),30));
+    		  justify(((PipeConfig)data).getName(),30));
       pipeLink.setParent(row);
 
       
@@ -165,7 +165,7 @@ public class PipeListRenderer implements RowRenderer {
     		    	}
     		    	else{
     		    		try{
-    		    			if (Messagebox.show("Are you sure want delete this Pipe?", "Delete?", Messagebox.YES | Messagebox.NO,
+    		    			if (Messagebox.show("Are you sure want delete this PipeConfig?", "Delete?", Messagebox.YES | Messagebox.NO,
         		    				Messagebox.QUESTION) == Messagebox.YES) {
         		    			  PipeManager.deletePipe(pipeid);
         		    		}
@@ -198,7 +198,7 @@ public class PipeListRenderer implements RowRenderer {
     		}
     		else{
     			try{
-    			    Messagebox.show("Password is incorrect, please re-enter the password for overwriting the Pipe!");
+    			    Messagebox.show("Password is incorrect, please re-enter the password for overwriting the PipeConfig!");
     			}
     			catch(java.lang.InterruptedException e){
     			}
