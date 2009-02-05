@@ -65,24 +65,9 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class SourceConverter implements Converter {
 	Logger logger = LoggerFactory.getLogger(SourceConverter.class);
-	public static Map<String,Class> ALIAS_MAPPINGS = new HashMap<String,Class>();
-	static{ //TODO: move these back to properties file
-		ALIAS_MAPPINGS.put("simplemix",SimpleMixBox.class);
-		ALIAS_MAPPINGS.put("source",Source.class);
-		ALIAS_MAPPINGS.put("code",Source.class);
-		ALIAS_MAPPINGS.put("sourcelist",Source.class);
-		ALIAS_MAPPINGS.put("rdffetch",RDFFetchBox.class);
-		ALIAS_MAPPINGS.put("for",ForLoopBox.class);
-		ALIAS_MAPPINGS.put("select",SelectBox.class);
-		ALIAS_MAPPINGS.put("smoosher",SameAsBox.class);
-		ALIAS_MAPPINGS.put("smoosher",SameAsBox.class);
-		ALIAS_MAPPINGS.put("patch-executor",PatchExecutorBox.class);
-		ALIAS_MAPPINGS.put("patch-generator",PatchGeneratorBox.class);
-		ALIAS_MAPPINGS.put("construct",ConstructBox.class);
-		ALIAS_MAPPINGS.put("htmlfetch", HTMLFetchBox.class);
-		ALIAS_MAPPINGS.put("regex", RegExBox.class);
-		ALIAS_MAPPINGS.put("rule",RegExBox.Rule.class);
-		ALIAS_MAPPINGS.put("text",TextBox.class);
+	final Map<String,Class> aliases;
+	public SourceConverter(Map<String,Class> aliases){
+		this.aliases = aliases;
 	}
 	
 	@Override
@@ -100,8 +85,8 @@ public class SourceConverter implements Converter {
 	}
 
 	private String getNodeForClass(Class clazz) {
-		for(String key : ALIAS_MAPPINGS.keySet()){
-			if(clazz.equals(ALIAS_MAPPINGS.get(key))){
+		for(String key : aliases.keySet()){
+			if(clazz.equals(aliases.get(key))){
 				return key;
 			}
 		}
@@ -115,7 +100,7 @@ public class SourceConverter implements Converter {
 		if(reader.hasMoreChildren()){
 			reader.moveDown();
 			String nodeName = reader.getNodeName();
-			Object delegate = context.convertAnother(source, ALIAS_MAPPINGS.get(nodeName));
+			Object delegate = context.convertAnother(source, aliases.get(nodeName));
 			if(delegate instanceof Operator){
 				Operator operator = (Operator)delegate;
 				source.setDelegate(operator);
@@ -132,9 +117,9 @@ public class SourceConverter implements Converter {
 		return Source.class.equals(clazz);
 	}
 
-	public static void registerAliases(XStream xstream) {
-		for(String key : ALIAS_MAPPINGS.keySet()){
-			xstream.alias(key, ALIAS_MAPPINGS.get(key));
+	public void registerAliases(XStream xstream) {
+		for(String key : aliases.keySet()){
+			xstream.alias(key, aliases.get(key));
 		}
 	}
 

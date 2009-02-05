@@ -41,17 +41,30 @@
  */
 package org.deri.pipes.core;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.internals.BypassCGLibConverter;
 import org.deri.pipes.core.internals.BypassCGLibMapper;
 import org.deri.pipes.core.internals.OperatorMemoizerProvider;
+import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.SourceConverter;
 import org.deri.pipes.endpoints.PipeManager;
 import org.deri.pipes.endpoints.Pipes;
+import org.deri.pipes.rdf.ConstructBox;
+import org.deri.pipes.rdf.ForLoopBox;
+import org.deri.pipes.rdf.HTMLFetchBox;
+import org.deri.pipes.rdf.PatchExecutorBox;
+import org.deri.pipes.rdf.PatchGeneratorBox;
+import org.deri.pipes.rdf.RDFFetchBox;
+import org.deri.pipes.rdf.RegExBox;
+import org.deri.pipes.rdf.SameAsBox;
+import org.deri.pipes.rdf.SelectBox;
 import org.deri.pipes.rdf.SimpleMixBox;
 import org.deri.pipes.rdf.TextBox;
 import org.deri.pipes.utils.IDTool;
@@ -78,11 +91,71 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  *
  */
 public class PipeParser {
+	/**
+	 * 
+	 */
+	private static final String OPERATORMAPPING_XML = "/operatormapping.xml";
 	final static Logger logger = LoggerFactory.getLogger(PipeParser.class);
 	Context context = new Context();
 	private XStream xstream;
+	public static Map<String,Class> DEFAULT_ALIAS_MAPPINGS = new HashMap<String,Class>();
+	static{ //TODO: move these back to properties file
+		DEFAULT_ALIAS_MAPPINGS.put("simplemix",SimpleMixBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("source",Source.class);
+		DEFAULT_ALIAS_MAPPINGS.put("code",Source.class);
+		DEFAULT_ALIAS_MAPPINGS.put("sourcelist",Source.class);
+		DEFAULT_ALIAS_MAPPINGS.put("rdffetch",RDFFetchBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("for",ForLoopBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("select",SelectBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("smoosher",SameAsBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("smoosher",SameAsBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("patch-executor",PatchExecutorBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("patch-generator",PatchGeneratorBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("construct",ConstructBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("htmlfetch", HTMLFetchBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("regex", RegExBox.class);
+		DEFAULT_ALIAS_MAPPINGS.put("rule",RegExBox.Rule.class);
+		DEFAULT_ALIAS_MAPPINGS.put("text",TextBox.class);
+		InputStream in = PipeParser.class.getResourceAsStream(OPERATORMAPPING_XML);
+		String cannotLoadMsg = "Could not load operator mappings "+ OPERATORMAPPING_XML+" from classpath, using defaults";
+		if(in == null){
+			logger.warn(cannotLoadMsg);
+		}else{
+			try{
+			XStream xstream = new XStream(new DomDriver());
+			Map<String,Class> defaultAliasMappings = (Map<String, Class>) xstream.fromXML(in);
+			if(defaultAliasMappings.size() == 0){
+				logger.warn(cannotLoadMsg+" (no mappings defined in "+OPERATORMAPPING_XML+")");
+			}else{
+				logger.info("Installed alias mappings loaded on classpath from "+OPERATORMAPPING_XML);
+				DEFAULT_ALIAS_MAPPINGS = defaultAliasMappings;
+			}
+			}catch(Throwable t){
+				logger.warn(cannotLoadMsg,t);
+			}finally{
+
+				try {
+					in.close();
+				} catch (IOException e) {
+					logger.debug("problem closing stream",e);
+				}
+			}
+		}
+	}
+	private Map <String,Class> aliasMappings = DEFAULT_ALIAS_MAPPINGS;
+
 	PipeParser(){
 		
+	}
+	/**
+	 * Set the alias class mappings. If xstream has already been
+	 * initialised, it will be replaced with a new instance
+	 * using the given mappings.
+	 * @param aliases
+	 */
+	public void setAliasMappings(Map<String,Class> aliases){
+		this.aliasMappings = aliases;
+		this.xstream = null;
 	}
 	
 	/**
@@ -90,7 +163,7 @@ public class PipeParser {
 	 * @param syntax xml pipe syntax.
 	 */
 	public Operator parse(String syntax) {
-    	return (Operator) getXStreamSerializer().fromXML(syntax);
+    	return (Operator) getXStream().fromXML(syntax);
 	}
 
     
@@ -132,14 +205,14 @@ public class PipeParser {
 		return null;
 	}
 
-	private XStream getXStreamSerializer() {
+	private XStream getXStream() {
 		if(xstream == null){
-		  xstream =  createXStreamSerializer();
+		  xstream =  createXStream();
 		}
 		return xstream;
 	}
 
-	private XStream createXStreamSerializer() {
+	private XStream createXStream() {
 		XStream xstream = new XStream(new OperatorMemoizerProvider(),
 			    new DomDriver() {
 			        public HierarchicalStreamWriter createWriter(Writer out) {
@@ -166,11 +239,12 @@ public class PipeParser {
 		xstream.registerConverter(new BypassCGLibConverter(xstream));
 		xstream.alias("pipe",Pipe.class);
 		xstream.registerLocalConverter(Pipe.class, "parameters", new ParameterConverter());
-		xstream.registerConverter(new SourceConverter());
+		SourceConverter sourceConverter = new SourceConverter(aliasMappings);
+		xstream.registerConverter(sourceConverter);
 		//xstream normally uses 'reference' for references, we want refid
 		xstream.aliasSystemAttribute("REFID", "reference");
 		xstream.aliasSystemAttribute("ID", "id");
-		SourceConverter.registerAliases(xstream);
+		sourceConverter.registerAliases(xstream);
 		xstream.autodetectAnnotations(true);
 		return xstream;
 	}
@@ -187,7 +261,7 @@ public class PipeParser {
 	 * @return
 	 */
 	public String serializeToXML(Object o) {
-		return getXStreamSerializer().toXML(o);
+		return getXStream().toXML(o);
 	}
 
 	/**
@@ -196,7 +270,7 @@ public class PipeParser {
 	 */
 	public Object parse(InputStream in) {
 		long start = System.currentTimeMillis();
-		Object obj = getXStreamSerializer().fromXML(in);
+		Object obj = getXStream().fromXML(in);
 		long elapsed = System.currentTimeMillis()- start;
 		logger.info("parsed object from xml in "+elapsed+"ms");
 		return obj;

@@ -44,7 +44,11 @@ import org.deri.pipes.core.Operator;
 import org.deri.pipes.model.XMLStreamBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/**
+ * Retrieves XML from the given location.
+ * @author robful
+ *
+ */
 public class XMLFetchBox extends FetchBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(XMLFetchBox.class);	
 	@Override

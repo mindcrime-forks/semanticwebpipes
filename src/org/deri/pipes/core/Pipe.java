@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Pipe implements Operator{
-	Logger logger = LoggerFactory.getLogger(Pipe.class);
+	private transient Logger logger = LoggerFactory.getLogger(Pipe.class);
 	List<Map<String,String>> parameters;
 	List<Operator> code;
 	public ExecBuffer execute(Context context) throws Exception {

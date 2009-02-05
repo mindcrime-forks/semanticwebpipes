@@ -50,20 +50,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class XSLTBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(XSLTBox.class);
-	String xmlStrID,xslStrID;
+	String xmlStrID;
+	String xslStrID;
 	
 	@Override
 	public ExecBuffer execute(Context context) throws Exception {
 		XMLStreamBuffer buffer = new XMLStreamBuffer();
-		//TODO: log warnings.
-		if((null!=xmlStrID)&&(null!=xslStrID)){			
-			StreamSource xmlSrc=executeXMLOp(xmlStrID,context);
-			StreamSource xslSrc=executeXMLOp(xslStrID,context);
-			if((xmlSrc!=null)&&(xslSrc!=null)){
-				buffer=new XMLStreamBuffer();	
-			    buffer.setStreamSource(XSLTUtil.transform(xmlSrc,xslSrc));				
-			}
-	    }
+		boolean cancel = false;
+		if(xmlStrID==null){
+			logger.warn("xmlStrID is not set, cancelling operation");
+			cancel = true;
+		}
+		if(xslStrID==null){
+			logger.warn("xslStrID is not set, cancelling operation");
+			cancel = true;
+		}
+		if(cancel){
+			return buffer;
+		}
+		StreamSource xmlSrc=executeXMLOp(xmlStrID,context);
+		StreamSource xslSrc=executeXMLOp(xslStrID,context);
+		if((xmlSrc!=null)&&(xslSrc!=null)){
+			buffer=new XMLStreamBuffer();	
+			buffer.setStreamSource(XSLTUtil.transform(xmlSrc,xslSrc));				
+		}
 		return buffer;
 	}
 	

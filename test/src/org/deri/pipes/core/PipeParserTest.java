@@ -21,8 +21,9 @@ import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 public class PipeParserTest extends TestCase {
 	public void testXStreamParser() throws Exception{
 		Engine env = Engine.defaultEngine();
-		System.out.println(env.getPipeParser().serializeToXML(SourceConverter.ALIAS_MAPPINGS));
-		if(true){
+//		System.out.println(env.getPipeParser().serializeToXML(PipeParser.DEFAULT_ALIAS_MAPPINGS));
+		testSource(env, "cityfacts.xml");
+		if(false){
 		testSource(env, "pipe1.xml");
 //		if(true){
 		testSource(env, "pipe2.xml");
@@ -42,7 +43,7 @@ public class PipeParserTest extends TestCase {
 		long time = timedExecute(pipe, context);
 		long repeat = timedExecute(pipe, context);
 		System.out.println("timing was original:"+time+", repeat:"+repeat);
-		
+		System.out.println(engine.serialize(pipe));
 	}
 
 

@@ -1,0 +1,42 @@
+<pipe>
+<parameters>
+<parameter>
+<id>cityname</id>
+<label>City name</label>
+<default>Rome</default>
+</parameter>
+</parameters>
+<code>
+<simplemix>
+<source>
+<rdffetch format="RDF/XML">
+<location><![CDATA[http://ws.geonames.org/search?q=%24%7Bcityname%7D&maxRows=10&type=rdf]]></location>
+</rdffetch>
+</source>
+<source>
+<for>
+<sourcelist>
+<select>
+<source>
+<rdffetch format="RDF/XML">
+<location><![CDATA[http://api.sindice.com/v2/search?q=%24%7Bcityname%7D&qt=term&page=1]]></location>
+</rdffetch>
+</source>
+<query>
+<![CDATA[
+PREFIX ss: <http://sindice.com/vocab/search#>
+PREFIX fields: <http://sindice.com/vocab/fields#>
+SELECT ?url WHERE {?p ss:link ?url.?p fields:format "RDF"}
+]]></query>
+</select>
+</sourcelist>
+<forloop>
+<rdffetch format="RDF/XML">
+<location><![CDATA[${{url}}]]></location>
+</rdffetch>
+</forloop>
+</for>
+</source>
+</simplemix>
+</code>
+</pipe>

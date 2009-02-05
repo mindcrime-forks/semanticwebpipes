@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!-- 
+This file contains operator mappings, consisting of a map
+of entries. Each entry contains a string (the
+name of the element to appear in the pipe xml file) and the
+class represented by that element.
+ -->
+<map>
+  <entry>
+    <!--  required for normal operation of pipes -->
+    <string>pipe</string>
+    <java-class>org.deri.pipes.core.Pipe</java-class>
+  </entry>
+  <entry>
+    <!--  required for normal operation of pipes -->
+    <string>code</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
+  <entry>
+    <!--  required for normal operation of pipes -->
+    <string>source</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
+  <entry>
+    <!--  required for normal operation of pipes -->
+    <string>sourcelist</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
+  
+  <entry>
+    <string>text</string>
+    <java-class>org.deri.pipes.rdf.TextBox</java-class>
+  </entry>
+  <entry>
+    <string>simplemix</string>
+    <java-class>org.deri.pipes.rdf.SimpleMixBox</java-class>
+  </entry>
+  <entry>
+    <string>for</string>
+    <java-class>org.deri.pipes.rdf.ForLoopBox</java-class>
+  </entry>
+  <entry>
+    <string>patch-generator</string>
+    <java-class>org.deri.pipes.rdf.PatchGeneratorBox</java-class>
+  </entry>
+  <entry>
+    <string>select</string>
+    <java-class>org.deri.pipes.rdf.SelectBox</java-class>
+  </entry>
+  <entry>
+    <string>regex</string>
+    <java-class>org.deri.pipes.rdf.RegExBox</java-class>
+  </entry>
+  <entry>
+    <string>rdffetch</string>
+    <java-class>org.deri.pipes.rdf.RDFFetchBox</java-class>
+  </entry>
+  <entry>
+    <string>patch-executor</string>
+    <java-class>org.deri.pipes.rdf.PatchExecutorBox</java-class>
+  </entry>
+  <entry>
+    <string>smoosher</string>
+    <java-class>org.deri.pipes.rdf.SameAsBox</java-class>
+  </entry>
+  <entry>
+    <string>htmlfetch</string>
+    <java-class>org.deri.pipes.rdf.HTMLFetchBox</java-class>
+  </entry>
+  <entry>
+    <string>rule</string>
+    <java-class>org.deri.pipes.rdf.RegExBox$Rule</java-class>
+  </entry>
+  <entry>
+    <string>construct</string>
+    <java-class>org.deri.pipes.rdf.ConstructBox</java-class>
+  </entry>
+</map>

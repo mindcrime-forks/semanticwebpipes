@@ -52,7 +52,7 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  *
  */
 public class BypassCGLibMapper extends MapperWrapper {
-	private static String DEFAULT_NAMING_MARKER = "$$EnhancerByCGLIB$$";
+	private static final String CGLIB_NAMING = "$$EnhancerByCGLIB$$";
 
 	/**
 	 * @param wrapped
@@ -68,7 +68,11 @@ public class BypassCGLibMapper extends MapperWrapper {
 	    }
 
 	public static boolean isCGLibEnhanced(Class type) {
-		return type.getName().indexOf(DEFAULT_NAMING_MARKER) > 0 && Enhancer.isEnhanced(type);
+		if(type == null){
+			return false;
+		}
+		String name = type.getName();
+		return name.indexOf(CGLIB_NAMING) > 0 && Enhancer.isEnhanced(type);
 	}
 
 	@Override
