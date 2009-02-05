@@ -42,8 +42,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.deri.pipes.core.internals.ThreadedExecutor;
 import org.deri.pipes.model.Operator;
-import org.deri.pipes.model.OperatorExecutor;
 
 import com.thoughtworks.xstream.XStream;
 /**

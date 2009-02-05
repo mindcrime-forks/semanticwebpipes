@@ -43,9 +43,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.core.internals.ThreadedExecutor;
 import org.deri.pipes.model.MultiExecBuffer;
 import org.deri.pipes.model.Operator;
-import org.deri.pipes.model.OperatorExecutor;
 
 /**
  * The SemanticWebPipes engine, for parsing and executing pipes.
@@ -55,7 +55,7 @@ import org.deri.pipes.model.OperatorExecutor;
 public class Engine {
 	private static Engine defaultEngine;
 	PipeParser parser;
-	OperatorExecutor executor;
+	ThreadedExecutor executor;
 
 	/**
 	 * @return
@@ -70,9 +70,9 @@ public class Engine {
 	/**
 	 * @return
 	 */
-	public OperatorExecutor getExecutor() {
+	public ThreadedExecutor getExecutor() {
 		if(executor == null){
-			executor = new OperatorExecutor();
+			executor = new ThreadedExecutor();
 		}
 		return executor;
 	}
