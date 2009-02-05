@@ -39,12 +39,12 @@
 package org.deri.pipes.model;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
 public interface Operator{	
-     public ExecBuffer execute(PipeContext context) throws Exception;
+     public ExecBuffer execute(Context context) throws Exception;
 }

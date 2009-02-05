@@ -38,7 +38,7 @@
  */
 package org.deri.pipes.rdf;
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +86,7 @@ WHERE
 public class RDFSMixBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(RDFSMixBox.class);
           
-     public ExecBuffer execute(PipeContext context) throws Exception{
+     public ExecBuffer execute(Context context) throws Exception{
     	 SesameMemoryBuffer buffer= new SesameMemoryBuffer(SesameMemoryBuffer.RDFS);
     	 mergeInputs(buffer,context);   
     	 return buffer;

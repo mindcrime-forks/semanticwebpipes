@@ -38,7 +38,7 @@
  */
 package org.deri.pipes.rdf;
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +52,11 @@ public class SplitBox implements Operator{
 
 
 	@Override
-	public ExecBuffer execute(PipeContext context) throws Exception {
+	public ExecBuffer execute(Context context) throws Exception {
 		return context.getOperator(inputOpID).execute(context);
 	}
 
-/*	public void initialize(PipeContext context,Element element){
+/*	public void initialize(Context context,Element element){
 		this.context = context;
         Element inputSrc =XMLUtil.getFirstSubElement(element);
       	inputOpID=context.getPipeParser().getSourceOperatorId(inputSrc);

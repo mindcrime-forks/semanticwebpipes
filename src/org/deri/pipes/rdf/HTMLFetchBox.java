@@ -45,7 +45,7 @@ import java.util.Hashtable;
 import javax.xml.transform.stream.StreamSource;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.utils.MappedStreamSource;
 import org.deri.pipes.utils.XSLTUtil;
@@ -108,7 +108,7 @@ public class HTMLFetchBox extends FetchBox {
 		return xsltFile.keySet();
 	}
 	@Override
-	public ExecBuffer execute(PipeContext context) {
+	public ExecBuffer execute(Context context) {
 		SesameMemoryBuffer buffer=new SesameMemoryBuffer();
 		Enumeration<String> k = xsltFile.keys();
 		StreamSource stream=new StreamSource(location);

@@ -51,7 +51,7 @@ import com.thoughtworks.xstream.XStream;
  * @author rfuller
  *
  */
-public class PipeContext {
+public class Context {
 	Map <String,Operator> operators = new HashMap<String,Operator>();
 	Map map = new HashMap();
 	private transient HttpClient httpClient;
@@ -59,14 +59,14 @@ public class PipeContext {
 	/**
 	 * Default constructor.
 	 */
-	public PipeContext(){
+	public Context(){
 		
 	}
 	/**
-	 * Create a PipeContext for this engine.
+	 * Create a Context for this engine.
 	 * @param engine
 	 */
-	public PipeContext(Engine engine){
+	public Context(Engine engine){
 		this.engine = engine;
 	}
 	/**

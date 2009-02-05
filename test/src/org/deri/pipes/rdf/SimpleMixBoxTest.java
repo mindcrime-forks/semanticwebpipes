@@ -3,13 +3,13 @@ package org.deri.pipes.rdf;
 import junit.framework.TestCase;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.core.internals.Source;
 
 public class SimpleMixBoxTest extends TestCase {
 	private SimpleMixBox fixture;
-	private PipeContext mockContext;
+	private Context mockContext;
 	public void test() throws Exception{
 		fixture = new SimpleMixBox();
 		String xml1 = "<?xml version='1.0'?>" +

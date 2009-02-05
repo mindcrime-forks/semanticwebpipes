@@ -41,7 +41,7 @@ package org.deri.pipes.rdf;
 import javax.xml.transform.stream.StreamSource;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.model.XMLStreamBuffer;
@@ -53,7 +53,7 @@ public class XSLTBox implements Operator {
 	String xmlStrID,xslStrID;
 	
 	@Override
-	public ExecBuffer execute(PipeContext context) throws Exception {
+	public ExecBuffer execute(Context context) throws Exception {
 		XMLStreamBuffer buffer = new XMLStreamBuffer();
 		//TODO: log warnings.
 		if((null!=xmlStrID)&&(null!=xslStrID)){			
@@ -67,7 +67,7 @@ public class XSLTBox implements Operator {
 		return buffer;
 	}
 	
-    private StreamSource executeXMLOp(String strID, PipeContext context) throws Exception{
+    private StreamSource executeXMLOp(String strID, Context context) throws Exception{
     	
     	Operator xmlOp=context.getOperator(strID);
 		ExecBuffer xmlBuff=xmlOp.execute(context);

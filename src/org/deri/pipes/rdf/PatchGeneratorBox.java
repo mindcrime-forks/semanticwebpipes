@@ -38,7 +38,7 @@
  */
 package org.deri.pipes.rdf;
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.revocations.Revoker;
 import org.openrdf.repository.Repository;
@@ -56,7 +56,7 @@ public class PatchGeneratorBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(PatchGeneratorBox.class);
 	
      
-     public ExecBuffer execute(PipeContext context) throws Exception{
+     public ExecBuffer execute(Context context) throws Exception{
     	 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
     	 mergeInputs(buffer,context);
     	 

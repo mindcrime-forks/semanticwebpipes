@@ -43,7 +43,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
@@ -93,7 +93,7 @@ public class ForLoopBox extends RDFBox{
     private Source forloop;
         
     
-    public ExecBuffer execute(PipeContext context) throws Exception{
+    public ExecBuffer execute(Context context) throws Exception{
     	if(sourcelist == null){
     		logger.warn("sourcelist is null, cannot execute for loop");
     		return new SesameMemoryBuffer();
@@ -112,7 +112,7 @@ public class ForLoopBox extends RDFBox{
  		return executeForLoop(context, tupleBuffer);
     }
 
-	private ExecBuffer executeForLoop(PipeContext context,SesameTupleBuffer tupleBuffer) throws Exception {
+	private ExecBuffer executeForLoop(Context context,SesameTupleBuffer tupleBuffer) throws Exception {
 		SesameMemoryBuffer buffer = new SesameMemoryBuffer();
 		try{
  			TupleQueryResult tupleQueryResult = tupleBuffer.getTupleQueryResult();

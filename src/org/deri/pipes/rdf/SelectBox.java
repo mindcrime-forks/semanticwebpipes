@@ -41,7 +41,7 @@ package org.deri.pipes.rdf;
 import java.util.ArrayList;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
 import org.openrdf.query.QueryLanguage;
@@ -85,7 +85,7 @@ public class SelectBox extends AbstractMerge {
 
     private String query;    	
 
-	public ExecBuffer execute(PipeContext context) throws Exception{              
+	public ExecBuffer execute(Context context) throws Exception{              
 		SesameTupleBuffer resultBuffer=new SesameTupleBuffer();       
 		SesameMemoryBuffer tmp= new SesameMemoryBuffer();
 		mergeInputs(tmp,context);

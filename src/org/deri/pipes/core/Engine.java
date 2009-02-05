@@ -120,8 +120,8 @@ public class Engine {
 	/**
 	 * @return
 	 */
-	public PipeContext newContext() {
-		return new PipeContext(this);
+	public Context newContext() {
+		return new Context(this);
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class Engine {
 	 * @return
 	 * @throws InterruptedException 
 	 */
-	public MultiExecBuffer execute(List<Operator> inputs, PipeContext context) throws InterruptedException {
+	public MultiExecBuffer execute(List<Operator> inputs, Context context) throws InterruptedException {
 		return getExecutor().execute(inputs,context);
 	}
 

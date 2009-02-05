@@ -37,7 +37,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.model;
+package org.deri.pipes.core.internals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
+import org.deri.pipes.model.MultiExecBuffer;
+import org.deri.pipes.model.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +60,8 @@ import org.slf4j.LoggerFactory;
  * @author robful
  *
  */
-public class OperatorExecutor {
-	Logger logger = LoggerFactory.getLogger(OperatorExecutor.class);
+public class ThreadedExecutor {
+	Logger logger = LoggerFactory.getLogger(ThreadedExecutor.class);
 	private TimeUnit defaultTimeoutUnits = TimeUnit.SECONDS;
 	private long defaultTimeout = 60;
 	/**
@@ -69,7 +71,7 @@ public class OperatorExecutor {
 	 * @return the ExecBuffers from executions.
 	 * @throws InterruptedException 
 	 */
-	public MultiExecBuffer execute(List<Operator> operators, PipeContext context) throws InterruptedException{
+	public MultiExecBuffer execute(List<Operator> operators, Context context) throws InterruptedException{
 		return execute(operators,context,defaultTimeout ,defaultTimeoutUnits);
 	}
 	/**
@@ -81,7 +83,7 @@ public class OperatorExecutor {
 	 * @return
 	 * @throws InterruptedException
 	 */
-	public MultiExecBuffer execute(List<Operator> operators, PipeContext context, long timeout, TimeUnit unit) throws InterruptedException{
+	public MultiExecBuffer execute(List<Operator> operators, Context context, long timeout, TimeUnit unit) throws InterruptedException{
 		//TODO: don't create the pool here
 		List<ExecBuffer> buffers = new ArrayList<ExecBuffer>();
 		ExecutorService pool = Executors.newCachedThreadPool();
@@ -107,7 +109,7 @@ public class OperatorExecutor {
 	 * @param operators
 	 * @return
 	 */
-	private List<Callable<ExecBuffer>> toCallable(List<Operator> operators, final PipeContext context) {
+	private List<Callable<ExecBuffer>> toCallable(List<Operator> operators, final Context context) {
 		List<Callable<ExecBuffer>> callables = new ArrayList<Callable<ExecBuffer>>();
 		for(final Operator operator : operators){
 			callables.add(new Callable<ExecBuffer>(){

@@ -80,7 +80,7 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  */
 public class PipeParser {
 	final static Logger logger = LoggerFactory.getLogger(PipeParser.class);
-	PipeContext pipeContext = new PipeContext();
+	Context context = new Context();
 	private XStream xstream;
 	PipeParser(){
 		
@@ -117,7 +117,7 @@ public class PipeParser {
 			return null;
 		}
 		String id=generateID();
-		pipeContext.addOperator(generateID(),operator);
+		context.addOperator(generateID(),operator);
 		return id;
 	}
 	
@@ -179,8 +179,8 @@ public class PipeParser {
 	/**
 	 * @return
 	 */
-	public PipeContext getPipeContext() {
-		return pipeContext;
+	public Context getPipeContext() {
+		return context;
 	}
 
 	/**

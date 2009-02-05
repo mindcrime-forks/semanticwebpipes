@@ -39,7 +39,7 @@
 package org.deri.pipes.rdf;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
@@ -75,7 +75,7 @@ public class TextBox implements Operator{
 	}
 	
 	
-	public ExecBuffer execute(PipeContext context){
+	public ExecBuffer execute(Context context){
 		ExecBuffer execBuffer = newExecBuffer(format);
 		// execBuffer.loadFromText(content); // would be nice?			
 		if(execBuffer instanceof SesameMemoryBuffer){

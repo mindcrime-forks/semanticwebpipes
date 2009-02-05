@@ -38,7 +38,7 @@
  */
 package org.deri.pipes.rdf;
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +89,7 @@ Example (see http://pipes.deri.org:8080/pipes/Pipes/?id=simplemix )
 public class SimpleMixBox extends AbstractMerge{ 
 	private transient Logger logger = LoggerFactory.getLogger(SimpleMixBox.class);
 	
-	 public ExecBuffer execute(PipeContext context) throws Exception{
+	 public ExecBuffer execute(Context context) throws Exception{
 		 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
     	 mergeInputs(buffer,context);
     	 return buffer;

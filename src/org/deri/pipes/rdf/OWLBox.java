@@ -41,7 +41,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class OWLBox extends AbstractMerge{
 	 String owlsource = null;
      
       
-     public ExecBuffer execute(PipeContext context) throws Exception{
+     public ExecBuffer execute(Context context) throws Exception{
     	 //merge all input sourceOperators to Sesame buffer
     	 SesameMemoryBuffer buffer= new SesameMemoryBuffer();
     	 mergeInputs(buffer,context);

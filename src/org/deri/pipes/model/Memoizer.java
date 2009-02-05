@@ -51,7 +51,7 @@ import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,11 +65,11 @@ public class Memoizer {
 	private static Method operatorExecuteMethod = null;
 	static{
 		try {
-			operatorExecuteMethod = Operator.class.getMethod("execute", new Class[]{PipeContext.class});
+			operatorExecuteMethod = Operator.class.getMethod("execute", new Class[]{Context.class});
 			// This is here to remind developers when changing operator interface.
 			new Operator(){
 				@Override
-				public ExecBuffer execute(PipeContext context) {
+				public ExecBuffer execute(Context context) {
 					return null;
 				}
 				
@@ -101,12 +101,12 @@ public class Memoizer {
 		@Override
 		public Object intercept(Object obj, Method method, Object[] args,
 				MethodProxy proxy) throws Throwable {
-			PipeContext pipeContext = (PipeContext)args[0];
-			Object memoizedResult = pipeContext.get(obj);
+			Context context = (Context)args[0];
+			Object memoizedResult = context.get(obj);
 			if(memoizedResult == null){
-				pipeContext.put(obj,proxy.invokeSuper(obj, args));
+				context.put(obj,proxy.invokeSuper(obj, args));
 			}
-			return pipeContext.get(obj);
+			return context.get(obj);
 		}
 
 		

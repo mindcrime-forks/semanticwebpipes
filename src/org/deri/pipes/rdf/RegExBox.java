@@ -42,7 +42,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -67,7 +67,7 @@ public class RegExBox extends AbstractMerge{
 	private transient Logger logger = LoggerFactory.getLogger(RegExBox.class);
 	private List<Rule> rules = new ArrayList<Rule>();
      
-     public ExecBuffer execute(PipeContext context) throws Exception{
+     public ExecBuffer execute(Context context) throws Exception{
     	 //merge all input sourceOperators to Sesame buffer
     	 SesameMemoryBuffer tmp= new SesameMemoryBuffer();
     	 mergeInputs(tmp,context);

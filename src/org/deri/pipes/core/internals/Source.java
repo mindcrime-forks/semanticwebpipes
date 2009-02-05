@@ -39,7 +39,7 @@
 package org.deri.pipes.core.internals;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.Operator;
 /**
  * Proxy implemenation of Operator. The class was introduced
@@ -64,7 +64,7 @@ public class Source implements Operator {
 		this.delegate = delegate;
 	}
 	@Override
-	public ExecBuffer execute(PipeContext context) throws Exception{
+	public ExecBuffer execute(Context context) throws Exception{
 		return delegate.execute(context);
 	}
 

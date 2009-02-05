@@ -39,7 +39,7 @@
 package org.deri.pipes.rdf;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class RDFFetchBox extends FetchBox {
 	@XStreamAsAttribute
 	protected String format="RDF/XML";		
 	
-	public ExecBuffer execute(PipeContext context){
+	public ExecBuffer execute(Context context){
 		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
 		rdfBuffer.loadFromURL(location,getRDFFormat());			
 		return rdfBuffer;

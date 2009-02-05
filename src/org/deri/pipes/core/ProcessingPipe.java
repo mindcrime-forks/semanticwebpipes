@@ -11,7 +11,7 @@ public class ProcessingPipe implements Operator{
 	Logger logger = LoggerFactory.getLogger(ProcessingPipe.class);
 	List<Map<String,String>> parameters;
 	List<Operator> code;
-	public ExecBuffer execute(PipeContext context) throws Exception {
+	public ExecBuffer execute(Context context) throws Exception {
 		long startTime = System.currentTimeMillis();
 		ExecBuffer result = code.size()>1?
 				code.get(1).execute(context)

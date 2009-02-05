@@ -42,11 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.core.internals.ThreadedExecutor;
 import org.deri.pipes.model.MultiExecBuffer;
 import org.deri.pipes.model.Operator;
-import org.deri.pipes.model.OperatorExecutor;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +78,7 @@ public abstract class AbstractMerge extends RDFBox {
 	 * @param context
 	 * @throws Exception
 	 */
-	protected void mergeInputs(ExecBuffer buffer, PipeContext context) throws Exception{
+	protected void mergeInputs(ExecBuffer buffer, Context context) throws Exception{
 		List<Operator> operators = new ArrayList<Operator>();
 		operators.addAll(source);
 		MultiExecBuffer result = context.getEngine().execute(operators, context);

@@ -41,7 +41,7 @@ package org.deri.pipes.model;
 
 import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.rdf.TextBox;
 
 import junit.framework.TestCase;
@@ -55,7 +55,7 @@ public class MemoizerTest extends TestCase {
 	public void test() throws Exception{
 		X x = (X)Memoizer.getMemoizedInstance(X.class);
 		x.expected = expected;
-		PipeContext context = new PipeContext();
+		Context context = new Context();
 		x.execute(context);
 		ExecBuffer result = x.execute(context);
 		assertEquals("Wrong number of invocations",1,x.nInvocations);
@@ -76,7 +76,7 @@ public class MemoizerTest extends TestCase {
 	static class X implements Operator{
 		volatile int nInvocations = 0;
 		ExecBuffer expected;
-		public ExecBuffer execute(PipeContext context) {
+		public ExecBuffer execute(Context context) {
 			nInvocations++;
 			return expected;
 		}

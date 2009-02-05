@@ -39,7 +39,7 @@
 package org.deri.pipes.rdf;
 
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.PipeContext;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.model.Operator;
 import org.deri.pipes.model.SesameTupleBuffer;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
@@ -50,7 +50,7 @@ public class TupleQueryResultFetchBox extends FetchBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchBox.class);
 	private TupleQueryResultFormat format=TupleQueryResultFormat.SPARQL;
 		
-	public ExecBuffer execute(PipeContext context){				
+	public ExecBuffer execute(Context context){				
 		SesameTupleBuffer buffer=new SesameTupleBuffer();
 		buffer.loadFromURL(location,format);		
 		return buffer;
