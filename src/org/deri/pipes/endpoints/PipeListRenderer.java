@@ -37,6 +37,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.endpoints;
+import org.deri.pipes.core.Engine;
 import org.deri.pipes.store.DatabasePipeManager;
 import org.deri.pipes.ui.PipeEditor;
 import org.slf4j.Logger;
@@ -58,6 +59,7 @@ import org.zkoss.zul.Window;
 
 public class PipeListRenderer implements RowRenderer {
 	final Logger logger = LoggerFactory.getLogger(PipeListRenderer.class);
+	Engine engine = Engine.defaultEngine();
 	Textbox checkPassText;
 	Window checkPassWin=null;
 	Button checkPassEnter,checkPassCancel;
@@ -155,7 +157,8 @@ public class PipeListRenderer implements RowRenderer {
     		    		wsp.clone(pipeid);
     		    	break;
     		    case DELETE:
-    		    	if(DatabasePipeManager.getPassword(pipeid)!=null){   
+    		    	PipeConfig config = engine.getPipeStore().getPipe(pipeid);
+    		    	if(config!= null && config.getPassword()!=null){   
     		    		try{
     		    			checkPassListener.setPipeId(pipeid);
     		    			checkPassWin.doModal();    		    			
@@ -168,7 +171,7 @@ public class PipeListRenderer implements RowRenderer {
     		    		try{
     		    			if (Messagebox.show("Are you sure want delete this PipeConfig?", "Delete?", Messagebox.YES | Messagebox.NO,
         		    				Messagebox.QUESTION) == Messagebox.YES) {
-        		    			  DatabasePipeManager.instance.deletePipe(pipeid);
+    		    				engine.getPipeStore().deletePipe(pipeid);
         		    		}
     	    			}
     	    			catch(java.lang.InterruptedException e){
@@ -179,7 +182,8 @@ public class PipeListRenderer implements RowRenderer {
     		    	wsp.edit(pipeid);
 		    		break;
     		    case DEBUG:  
-    		    	wsp.debug(DatabasePipeManager.getPipeSyntax(pipeid));
+    		    	PipeConfig pipeConfig = engine.getPipeStore().getPipe(pipeid);
+					wsp.debug(pipeConfig.getSyntax());
     	
 		    		break;	    		    	
     		}
@@ -193,8 +197,9 @@ public class PipeListRenderer implements RowRenderer {
     		this.pipeid=pipeid;
     	}
     	public void onEvent(org.zkoss.zk.ui.event.Event event) throws org.zkoss.zk.ui.UiException {
-    		if(DatabasePipeManager.getPassword(pipeid).matches(checkPassText.getValue())){
-    		   DatabasePipeManager.instance.deletePipe(pipeid);
+    		PipeConfig config = engine.getPipeStore().getPipe(pipeid);
+    		if(config != null && config.isPasswordCorrect(checkPassText.getValue())){
+    			engine.getPipeStore().deletePipe(pipeid);
     		   checkPassWin.setVisible(false);
     		}
     		else{

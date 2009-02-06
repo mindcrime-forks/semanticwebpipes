@@ -62,7 +62,7 @@ public class Engine {
 	ThreadedExecutor executor;
 	private PipeStore pipeStore;
 
-	PipeStore getPipeStore(){
+	public PipeStore getPipeStore(){
 		if(pipeStore == null){
 			logger.warn("Pipe store not set... use a FilePipeStore in temporary folder");
 			pipeStore = new FilePipeStore();

@@ -143,7 +143,7 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public boolean savePipe(){
-		return DatabasePipeManager.instance.save(getPipeConfig()); 
+		return engine.getPipeStore().save(getPipeConfig()); 
 	}
 	
 	public PipeConfig getPipeConfig() {
@@ -400,7 +400,8 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void clone(String pid){
-		reload(DatabasePipeManager.getPipeConfig(pid));
+		PipeConfig config = engine.getPipeStore().getPipe(pid);
+		reload(config == null?"":config.getConfig());
 		pipeid.setValue("");
 		bdid.setValue("");
 		pipename.setValue("");
@@ -414,7 +415,10 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void edit(String pid){
-		PipeConfig pipeConfig=DatabasePipeManager.instance.getPipe(pid);
+		PipeConfig pipeConfig=engine.getPipeStore().getPipe(pid);
+		if(pipeConfig == null){
+			pipeConfig = new PipeConfig();
+		}
 		reload(pipeConfig.getConfig());
 		pipeid.setValue(pipeConfig.getId());
 		bdid.setValue(pipeConfig.getId());

@@ -55,7 +55,8 @@ import org.w3c.dom.Element;
 public class StoredPipe{
 	private transient Logger logger = LoggerFactory.getLogger(StoredPipe.class);
 	public static Operator loadOperator(Element element){
-		String syntax =DatabasePipeManager.getPipeSyntax(element.getTagName());
+		PipeConfig config = Engine.defaultEngine().getPipeStore().getPipe(element.getTagName());
+		String syntax = config == null?"":config.getSyntax();
 		if (syntax==null) return null;
 		List<Element> parameters =XMLUtil.getSubElement(element);
 		for (int i=0;i<parameters.size();i++) {			

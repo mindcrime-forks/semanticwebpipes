@@ -177,8 +177,8 @@
 	     workspace.createFigure(x,y,figureType);
     }
     
-    ListModel model = new SimpleListModel(org.deri.pipes.store.DatabasePipeManager.instance.getPipeList().toArray());
-    Object[] items=org.deri.pipes.store.DatabasePipeManager.instance.getPipeList().toArray();
+    Object[] items=org.deri.pipes.core.Engine.defaultEngine().getPipeStore().getPipeList().toArray();
+    ListModel model = new SimpleListModel(items);
     RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(workspace,deleteWin);
     </zscript>
      	      	
@@ -320,13 +320,15 @@
     </zscript> 	
 <zscript>
 <![CDATA[
-    import org.deri.pipes.store.DatabasePipeManager;	
+    import org.deri.pipes.store.PipeStore;
+    import org.deri.pipes.core.Engine;	
+    PipeStore pipeStore = Engine.defaultEngine().getPipeStore();
     String tmpPass;
     void checkB4Save(){
-       if(PipeManager.contains(pipeid.value))
+       if(pipeStore.contains(pipeid.value))
          {
              if(tmpPass==null)
-                 tmpPass=PipeManager.getPassword(pipeid.value);
+                 tmpPass=pipeStore.getPipe(pipeid.value).getPassword();
              if(tmpPass!=null){
                  passwordchecking.doModal();
              }
@@ -349,8 +351,8 @@
          alert("Password is incorrect, please re-enter the password for overwriting the Pipe");
     }
     void hidePassword(){
-         tmpPass=PipeManager.getPassword(pipeid.value);
-         if(tmpPass!=null){
+               tmpPass=pipeStore.getPipe(pipeid.value).getPassword();
+              if(tmpPass!=null){
              //password.value=tmpPass;
              password.value="";
              passwordrow.visible=false;
@@ -374,7 +376,7 @@
 	
 	void savePipe(){
 	    updateCode();	    
-	    if(!PipeManager.save(workspace.getPipeConfig()))
+	    if(!pipeStore.save(workspace.getPipeConfig()))
 	       alert("There are some errors in your pipe, please check it again and make sure that all required fields are filled out");
 	    else{
 	     alert("Your pipe was successfully saved");

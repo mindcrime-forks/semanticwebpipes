@@ -157,9 +157,10 @@ public class Pipes extends HttpServlet {
 	        	}
 	        }
 	        
-		    String pipeid = req.getParameter("id");			
-			String syntax = DatabasePipeManager.getPipeSyntax(pipeid);
-			String pipeName = DatabasePipeManager.instance.getPipe(pipeid).getName();
+		    String pipeid = req.getParameter("id");
+		    PipeConfig config = engine.getPipeStore().getPipe(pipeid);
+			String syntax = config ==  null?"":config.getSyntax();
+			String pipeName = config == null?"":config.getName();
 			
             // replace $pipe_name$ placeholder in the HTML template with the pipe name.
 			outputString = outputString.replace("$pipe_name$", pipeName);
@@ -223,11 +224,12 @@ public class Pipes extends HttpServlet {
   
   	public SesameMemoryBuffer getRDFBuffer(HttpServletRequest req, HttpServletResponse res){
   		String pipeid = req.getParameter("id");
-  		String syntax = DatabasePipeManager.getPipeSyntax(pipeid);
-		if (syntax == null) {
+  		PipeConfig config = engine.getPipeStore().getPipe(pipeid);
+		if (config == null) {
 			logger.warn("Syntax was null for pipeid=["+pipeid+"]");
 			return null;
 		}
+  		String syntax = config.getSyntax();
 		try{
 			Pipe pipe = (Pipe)engine.parse(syntax);
 			for(String key : pipe.listParameters()){
