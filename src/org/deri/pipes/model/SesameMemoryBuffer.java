@@ -192,8 +192,13 @@ public class SesameMemoryBuffer implements ExecBuffer {
 	public StringBuffer toXMLStringBuffer(){
 		StringWriter stBuff=new StringWriter();
 		try{
-			getConnection().export(new RDFXMLPrettyWriter(stBuff));
+			RepositoryConnection connection = getConnection();
+			try{
+			connection.export(new RDFXMLPrettyWriter(stBuff));
 			return stBuff.getBuffer();
+			}finally{
+				connection.close();
+			}
 		}
 		catch(Exception e){
 			logger.warn("could not export to StringBuffer",e);
@@ -207,7 +212,12 @@ public class SesameMemoryBuffer implements ExecBuffer {
 
 	public void stream(OutputStream output,RDFFormat format){
 		try{
-			getConnection().export(Rio.createWriter(format, output));
+			RepositoryConnection connection = getConnection();
+			try{
+				connection.export(Rio.createWriter(format, output));
+			}finally{
+				connection.close();
+			}
 		}
 		catch(Exception e){
 			logger.warn("problem exportin",e);

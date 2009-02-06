@@ -1,0 +1,67 @@
+<project name="pipes" default="war">
+
+    <!-- project-specific variables -->
+	<property name="version" value="0.6.0" />
+    <property name="dest.dir" value="target" />
+    <property name="jsp.dir.name" value="pipes" />
+	<property name="jar.name" value="${jsp.dir.name}-${version}.jar" />
+	<property name="jar.file" value="${dest.dir}/${jar.name}" />
+    <property name="package.name" value="${jsp.dir.name}.war" />
+
+    <property environment="env" />
+    <property name="build.dir" value="build" />
+
+    <property name="lib.dir" value="lib" />
+    <property name="pages.dir" value="pages" />
+    <property name="src.dir" value="src" />
+    <property name="src.tests.dir" value="test/src" />
+    <property name="webcontent.dir" value="WebContent" />
+
+    <!-- put everything in a temp folder with the right structure during the build -->
+    <property name="temp.dir" value="temp" />
+    <property name="temp.dir.classes" value="${temp.dir}/classes" />
+	
+    <property name="package.file" value="${dest.dir}/${package.name}" />
+
+    <path id="build.class.path">
+        <fileset dir="${webcontent.dir}/WEB-INF/lib">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <mkdir dir="${dest.dir}" />
+        <delete>
+            <fileset dir="${dest.dir}" includes="**/*"/>
+        </delete>
+        <delete dir="${temp.dir}" />
+    </target>
+
+    <target name="prepare" depends="clean">
+        <mkdir dir="${dest.dir}" />
+        <mkdir dir="${temp.dir}" />
+        <mkdir dir="${temp.dir.classes}" />
+    </target>
+
+    <!-- COMPILE -->
+    <target name="compile" depends="prepare">
+        <echo>=== COMPILE ===</echo>
+        <echo>Compiling ${src.dir} files ...</echo>
+        <javac debug="on" srcdir="${src.dir}" destdir="${temp.dir.classes}" includes="**/*">
+            <classpath refid="build.class.path" />
+        </javac>
+    </target>
+	
+	<target name="jar" depends="compile">
+		<jar destfile="${jar.file}" basedir="${temp.dir.classes}" />
+    </target>
+
+    <target name="war" depends="jar">
+      <war destfile="${package.file}" webxml="${webcontent.dir}/WEB-INF/web.xml" basedir="${temp.dir}">
+        <fileset dir="${webcontent.dir}"/>
+        <lib dir="${lib.dir}" />
+      	<lib file="${jar.file}" />
+      </war>
+    </target>
+
+</project>

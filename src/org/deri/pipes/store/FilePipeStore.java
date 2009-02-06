@@ -88,7 +88,7 @@ public class FilePipeStore implements PipeStore {
 		return xstream;
 	}
 	/**
-	 * 
+	 * Create a new FilePipeStore beneath the temporary folder.
 	 */
 	public FilePipeStore(){
 		String folderName = "semanticWebPipeStore";	
@@ -100,6 +100,13 @@ public class FilePipeStore implements PipeStore {
 		}
 		this.xstream = configureXstream();
 		logger.info("Storing pipes in folder "+rootFolder);
+	}
+	/**
+	 * Create a FilePipeStore at the given path
+	 * @param string
+	 */
+	public FilePipeStore(String filepath) {
+		this(new File(filepath));
 	}
 	/* (non-Javadoc)
 	 * @see org.deri.pipes.store.PipeStore#contains(java.lang.String)
