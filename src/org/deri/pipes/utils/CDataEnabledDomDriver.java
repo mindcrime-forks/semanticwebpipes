@@ -36,29 +36,36 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui.events;
-import org.deri.pipes.ui.ConnectingInputNode;
-import org.deri.pipes.ui.ConnectingOutputNode;
-import org.integratedmodelling.zk.diagram.components.Node;
-import org.integratedmodelling.zk.diagram.events.ConnectionCreatedEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
-public class ConnectionDeletedListener implements EventListener {	
-	final Logger logger = LoggerFactory.getLogger(ConnectionDeletedListener.class);
-	   
-	   public void onEvent(Event event) throws org.zkoss.zk.ui.UiException {    
-		     logger.debug("deleted");
-	         ConnectionCreatedEvent e=(ConnectionCreatedEvent)event;
-	         Node src=(Node)e.getSource().getParent();
-	         Node tag=(Node)e.getDestination().getParent();
-	         if((tag instanceof ConnectingInputNode)&&(src instanceof ConnectingOutputNode))
-	        		 ((ConnectingInputNode)tag).onDisconnected(e.getDestination());
-	   		 if((tag instanceof ConnectingOutputNode)&&(src instanceof ConnectingInputNode))
-	   			((ConnectingInputNode)src).onDisconnected(e.getSource());
-	   		 Executions.sendRedirect(".");
-	   }    
- 
+
+package org.deri.pipes.utils;
+
+import java.io.Writer;
+
+import com.thoughtworks.xstream.core.util.QuickWriter;
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
+
+/**
+ * @author robful
+ *
+ */
+public class CDataEnabledDomDriver extends DomDriver implements
+		HierarchicalStreamDriver {
+	@Override
+        public HierarchicalStreamWriter createWriter(Writer out) {
+            return new PrettyPrintWriter(out) {
+                protected void writeText(QuickWriter writer, String text) {
+                	if(text==null || (text.indexOf('&')<0 && text.indexOf('<')<0)){
+                		writer.write(text==null?"":text);
+                	}else{
+                    writer.write("<![CDATA[");
+                    writer.write(text.replaceAll("]]>", "]]]]><![CDATA[>"));//encode CDATA end
+                    writer.write("]]>");
+                	}
+                }
+            };
+        }
+
 }

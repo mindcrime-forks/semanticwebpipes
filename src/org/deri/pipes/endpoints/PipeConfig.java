@@ -38,8 +38,20 @@
  */
 package org.deri.pipes.endpoints;
 
+import java.io.StringReader;
+import java.io.StringWriter;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.deri.pipes.utils.XSLTUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("pipeConfig")
@@ -72,7 +84,7 @@ public class PipeConfig {
 	}
 
 	public void setSyntax(String syntax) {
-		this.syntax = syntax;
+		this.syntax = XSLTUtil.toPrettyXml(syntax);
 	}
 
 	public String getConfig() {
@@ -80,8 +92,10 @@ public class PipeConfig {
 	}
 
 	public void setConfig(String config) {
-		this.config = config;
+		this.config = XSLTUtil.toPrettyXml(config);
 	}
+
+
 	/**
 	 * @param password
 	 */

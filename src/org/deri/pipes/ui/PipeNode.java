@@ -43,6 +43,7 @@ import java.util.List;
 import org.apache.xerces.dom.DocumentImpl;
 import org.deri.pipes.utils.IDTool;
 import org.deri.pipes.utils.XMLUtil;
+import org.deri.pipes.utils.XSLTUtil;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.PortType;
@@ -229,7 +230,6 @@ public class PipeNode extends ZKNode{
 	   reset(true);
 	   DocumentImpl doc =new DocumentImpl();
 	   getSrcCode(doc,config);
-	   
 	   java.io.StringWriter  strWriter =new java.io.StringWriter(); 
 	   try{
 			java.util.Properties props = 
@@ -240,7 +240,7 @@ public class PipeNode extends ZKNode{
 			return strWriter.getBuffer().toString();
 	   }	 
 	   catch(java.io.IOException e){
-			
+			logger.info("problem rendering source",e);
 	   }
 	   return null;
    }

@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deri.pipes.endpoints.PipeConfig;
+import org.deri.pipes.utils.CDataEnabledDomDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,9 +78,14 @@ public class FilePipeStore implements PipeStore {
 	 */
 	public FilePipeStore(File rootFolder){
 		this.rootFolder = rootFolder;
-		xstream = new XStream();
-		xstream.autodetectAnnotations(true);
+		this.xstream = configureXstream();
 		logger.info("Storing pipes in folder "+rootFolder);
+	}
+	private XStream configureXstream() {
+		XStream xstream = new XStream( new CDataEnabledDomDriver());
+		xstream.autodetectAnnotations(true);
+		xstream.alias("pipeConfig", PipeConfig.class);
+		return xstream;
 	}
 	/**
 	 * 
@@ -92,8 +98,7 @@ public class FilePipeStore implements PipeStore {
 		} catch (IOException e) {
 			rootFolder = new File(System.getProperty("java.io.tmpdir"),folderName);
 		}
-		xstream = new XStream();
-		xstream.autodetectAnnotations(true);
+		this.xstream = configureXstream();
 		logger.info("Storing pipes in folder "+rootFolder);
 	}
 	/* (non-Javadoc)

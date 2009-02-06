@@ -37,9 +37,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.utils;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -56,7 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 public class XSLTUtil {
-	final Logger logger = LoggerFactory.getLogger(XSLTUtil.class);
+	final static Logger logger = LoggerFactory.getLogger(XSLTUtil.class);
 	
 	public static String transform(String xmlURL,String xsltURL){
 		StringWriter sw=new StringWriter();
@@ -99,6 +101,28 @@ public class XSLTUtil {
 			return "http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 		}
 		return "";	
+	}
+	
+	/**
+	 * @param xml
+	 * @return
+	 */
+	public static String toPrettyXml(String xml) {
+		if(xml == null || xml.trim().length()==0 || xml.indexOf("\n")>=0){
+			return xml;
+		}
+		try{
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			//initialize StreamResult with File object to save to file
+			StreamResult result = new StreamResult(new StringWriter());
+			StreamSource source = new StreamSource(new StringReader(xml));
+			transformer.transform(source, result);
+			return result.getWriter().toString().replaceFirst("\\?><", "?>\n<");
+		}catch(Throwable t){
+			logger.info("problem indenting xml",t);
+		}
+		return xml;
 	}
 }
 

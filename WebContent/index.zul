@@ -321,6 +321,7 @@
 <zscript>
 <![CDATA[
     import org.deri.pipes.store.PipeStore;
+    import org.deri.pipes.endpoints.PipeConfig;    
     import org.deri.pipes.core.Engine;	
     PipeStore pipeStore = Engine.defaultEngine().getPipeStore();
     String tmpPass;
@@ -375,13 +376,18 @@
 	}
 	
 	void savePipe(){
-	    updateCode();	    
+	    updateCode();
+	    PipeConfig x = workspace.getPipeConfig(); 
+	    if(x.getId()==null||x.getId().trim().length()==0){
+	       alert("Please assign an id to the pipe before saving");
+	    }else{
 	    if(!pipeStore.save(workspace.getPipeConfig()))
 	       alert("There are some errors in your pipe, please check it again and make sure that all required fields are filled out");
 	    else{
 	     alert("Your pipe was successfully saved");
 	     Executions.sendRedirect(".");
-	    }  	
+	    }
+	    }
 	}
 	
 	void debugPipe(){
@@ -391,7 +397,7 @@
 	}
 	
 	void updateCode(){
-	    pipesyntax.setValue(workspace.getSrcCode(false));
+	    pipesyntax.setValue(workspace.getPipeConfig().getSyntax());
 	    pipesyntax.invalidate();
 	}
 	

@@ -67,6 +67,7 @@ import org.deri.pipes.rdf.SelectBox;
 import org.deri.pipes.rdf.SimpleMixBox;
 import org.deri.pipes.rdf.TextBox;
 import org.deri.pipes.store.DatabasePipeManager;
+import org.deri.pipes.utils.CDataEnabledDomDriver;
 import org.deri.pipes.utils.IDTool;
 import org.deri.pipes.utils.XMLUtil;
 import org.slf4j.Logger;
@@ -214,22 +215,7 @@ public class PipeParser {
 
 	private XStream createXStream() {
 		XStream xstream = new XStream(new OperatorMemoizerProvider(),
-			    new DomDriver() {
-			        public HierarchicalStreamWriter createWriter(Writer out) {
-			            return new PrettyPrintWriter(out) {
-			                protected void writeText(QuickWriter writer, String text) {
-			                	if(text==null || (text.indexOf('&')<0 && text.indexOf('<')<0)){
-			                		writer.write(text);
-			                	}else{
-			                    writer.write("<![CDATA[");
-			                    writer.write(text);
-			                    writer.write("]]>");
-			                	}
-			                }
-			            };
-			        }
-			    }
-			){
+			    new CDataEnabledDomDriver()			){
 			@Override
 			 protected MapperWrapper wrapMapper(MapperWrapper next) {
 			        return new BypassCGLibMapper(next);

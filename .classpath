@@ -98,7 +98,6 @@
 	<classpathentry kind="lib" path="lib/xmlunit-1.2.jar"/>
 	<classpathentry kind="lib" path="test/lib/easymockclassextension.jar"/>
 	<classpathentry kind="lib" path="test/lib/easymock.jar"/>
-	<classpathentry kind="lib" path="test/lib/cglib-nodep-2.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre6"/>
 	<classpathentry kind="output" path="build/classes"/>
