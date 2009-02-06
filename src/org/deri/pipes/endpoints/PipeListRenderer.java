@@ -37,6 +37,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.endpoints;
+import org.deri.pipes.store.DatabasePipeManager;
 import org.deri.pipes.ui.PipeEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

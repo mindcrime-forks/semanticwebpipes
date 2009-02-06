@@ -43,6 +43,7 @@ import java.util.List;
 import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.PipeParser;
+import org.deri.pipes.store.DatabasePipeManager;
 import org.deri.pipes.utils.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

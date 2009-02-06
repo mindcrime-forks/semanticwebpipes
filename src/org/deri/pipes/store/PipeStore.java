@@ -37,9 +37,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.endpoints;
+package org.deri.pipes.store;
 
 import java.util.List;
+
+import org.deri.pipes.endpoints.PipeConfig;
 
 /**
  * @author robful

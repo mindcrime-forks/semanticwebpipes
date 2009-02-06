@@ -59,6 +59,7 @@ import org.deri.pipes.core.Pipe;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.rdf.RDFBox;
+import org.deri.pipes.store.DatabasePipeManager;
 import org.deri.pipes.utils.XMLUtil;
 import org.deri.pipes.utils.XSLTUtil;
 import org.openrdf.rio.RDFFormat;

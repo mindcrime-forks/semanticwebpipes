@@ -36,7 +36,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.endpoints;
+package org.deri.pipes.store;
 import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.deri.pipes.endpoints.PipeConfig;
 import org.deri.pipes.ui.PipeEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

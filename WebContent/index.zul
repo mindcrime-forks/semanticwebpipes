@@ -177,8 +177,8 @@
 	     workspace.createFigure(x,y,figureType);
     }
     
-    ListModel model = new SimpleListModel(org.deri.pipes.endpoints.DatabasePipeManager.instance.getPipeList().toArray());
-    Object[] items=org.deri.pipes.endpoints.DatabasePipeManager.instance.getPipeList().toArray();
+    ListModel model = new SimpleListModel(org.deri.pipes.store.DatabasePipeManager.instance.getPipeList().toArray());
+    Object[] items=org.deri.pipes.store.DatabasePipeManager.instance.getPipeList().toArray();
     RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(workspace,deleteWin);
     </zscript>
      	      	
@@ -320,7 +320,7 @@
     </zscript> 	
 <zscript>
 <![CDATA[
-    import org.deri.pipes.endpoints.DatabasePipeManager;	
+    import org.deri.pipes.store.DatabasePipeManager;	
     String tmpPass;
     void checkB4Save(){
        if(PipeManager.contains(pipeid.value))
