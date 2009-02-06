@@ -40,23 +40,23 @@ package org.deri.pipes.endpoints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+@XStreamAlias("pipeConfig")
 public class PipeConfig {
-	final Logger logger = LoggerFactory.getLogger(PipeConfig.class);
+	final transient Logger logger = LoggerFactory.getLogger(PipeConfig.class);
 	private String id = null;
 	private String name = null;
 	private String syntax = null;
 	private String config=null;
-	private String password;
+	private String password = null;
 
-	public PipeConfig(){
-		
-	}
 	public String getId() {
 		return id;
 	}
 
 	public void setId(String id) {
-		this.id = id;
+		this.id = id==null?null:id.trim();
 	}
 
 	public String getName() {
