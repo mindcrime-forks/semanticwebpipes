@@ -46,7 +46,7 @@ import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.endpoints.PipeConfig;
-import org.deri.pipes.endpoints.PipeManager;
+import org.deri.pipes.endpoints.DatabasePipeManager;
 import org.deri.pipes.rdf.RDFBox;
 import org.deri.pipes.rdf.SelectBox;
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
@@ -143,8 +143,19 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public boolean savePipe(){
-		return PipeManager.savePipe(this); 
+		return DatabasePipeManager.save(getPipeConfig()); 
 	}
+	
+	public PipeConfig getPipeConfig() {
+		PipeConfig pipeConfig = new PipeConfig();
+		pipeConfig.setId(getPipeId());
+		pipeConfig.setName(getPipeName());
+		pipeConfig.setPassword(getPassword());
+		pipeConfig.setSyntax(getSrcCode(false));
+		pipeConfig.setConfig(getSrcCode(true));
+		return pipeConfig;
+	}
+
 	
 	public String getSrcCode(boolean config){
 		if(outputNode==null) return "";
@@ -389,7 +400,7 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void clone(String pid){
-		reload(PipeManager.getPipeConfig(pid));
+		reload(DatabasePipeManager.getPipeConfig(pid));
 		pipeid.setValue("");
 		bdid.setValue("");
 		pipename.setValue("");
@@ -403,7 +414,7 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void edit(String pid){
-		PipeConfig pipeConfig=PipeManager.getPipe(pid);
+		PipeConfig pipeConfig=DatabasePipeManager.getPipe(pid);
 		reload(pipeConfig.getConfig());
 		pipeid.setValue(pipeConfig.getId());
 		bdid.setValue(pipeConfig.getId());

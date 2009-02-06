@@ -177,11 +177,11 @@
 	     workspace.createFigure(x,y,figureType);
     }
     
-    ListModel model = new SimpleListModel(org.deri.pipes.endpoints.PipeManager.getPipeList().toArray());
-    Object[] items=org.deri.pipes.endpoints.PipeManager.getPipeList().toArray();
+    ListModel model = new SimpleListModel(org.deri.pipes.endpoints.DatabasePipeManager.getPipeList().toArray());
+    Object[] items=org.deri.pipes.endpoints.DatabasePipeManager.getPipeList().toArray();
     RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(workspace,deleteWin);
-     /* ListModel model = new SimpleListModel(org.deri.pipes.endpoints.PipeManager.getPipeList().toArray());
-    Object[] items=org.deri.pipes.endpoints.PipeManager.getPipeList().toArray();
+     /* ListModel model = new SimpleListModel(org.deri.pipes.endpoints.DatabasePipeManager.getPipeList().toArray());
+    Object[] items=org.deri.pipes.endpoints.DatabasePipeManager.getPipeList().toArray();
     RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(pipeid,pipename,pipesyntax,debugView,debugViewArea,deleteWin);*/
     </zscript>
      	      	
@@ -323,10 +323,10 @@
     </zscript> 	
 <zscript>
 <![CDATA[
-    import org.deri.pipes.endpoints.PipeManager;	
+    import org.deri.pipes.endpoints.DatabasePipeManager;	
     String tmpPass;
     void checkB4Save(){
-       if(PipeManager.isExist(pipeid.value))
+       if(PipeManager.contains(pipeid.value))
          {
              if(tmpPass==null)
                  tmpPass=PipeManager.getPassword(pipeid.value);
@@ -377,7 +377,7 @@
 	
 	void savePipe(){
 	    updateCode();	    
-	    if(!PipeManager.savePipe(workspace))
+	    if(!PipeManager.save(workspace.getPipeConfig()))
 	       alert("There are some errors in your pipe, please check it again and make sure that all required fields are filled out");
 	    else{
 	     alert("Your pipe was successfully saved");

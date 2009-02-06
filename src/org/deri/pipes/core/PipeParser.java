@@ -54,7 +54,7 @@ import org.deri.pipes.core.internals.BypassCGLibMapper;
 import org.deri.pipes.core.internals.OperatorMemoizerProvider;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.SourceConverter;
-import org.deri.pipes.endpoints.PipeManager;
+import org.deri.pipes.endpoints.DatabasePipeManager;
 import org.deri.pipes.endpoints.Pipes;
 import org.deri.pipes.rdf.ConstructBox;
 import org.deri.pipes.rdf.ForLoopBox;
@@ -170,7 +170,7 @@ public class PipeParser {
     
 /*	public static Operator loadStoredOperator(Element element){
 		String tagName = element.getTagName();
-		String syntax =PipeManager.getPipeSyntax(tagName);
+		String syntax =DatabasePipeManager.getPipeSyntax(tagName);
 		if (syntax==null){
 			logger.warn("no syntax found for element "+element);
 			return null;

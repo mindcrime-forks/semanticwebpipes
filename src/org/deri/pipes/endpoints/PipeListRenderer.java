@@ -154,7 +154,7 @@ public class PipeListRenderer implements RowRenderer {
     		    		wsp.clone(pipeid);
     		    	break;
     		    case DELETE:
-    		    	if(PipeManager.getPassword(pipeid)!=null){   
+    		    	if(DatabasePipeManager.getPassword(pipeid)!=null){   
     		    		try{
     		    			checkPassListener.setPipeId(pipeid);
     		    			checkPassWin.doModal();    		    			
@@ -167,7 +167,7 @@ public class PipeListRenderer implements RowRenderer {
     		    		try{
     		    			if (Messagebox.show("Are you sure want delete this PipeConfig?", "Delete?", Messagebox.YES | Messagebox.NO,
         		    				Messagebox.QUESTION) == Messagebox.YES) {
-        		    			  PipeManager.deletePipe(pipeid);
+        		    			  DatabasePipeManager.deletePipe(pipeid);
         		    		}
     	    			}
     	    			catch(java.lang.InterruptedException e){
@@ -178,7 +178,7 @@ public class PipeListRenderer implements RowRenderer {
     		    	wsp.edit(pipeid);
 		    		break;
     		    case DEBUG:  
-    		    	wsp.debug(PipeManager.getPipeSyntax(pipeid));
+    		    	wsp.debug(DatabasePipeManager.getPipeSyntax(pipeid));
     	
 		    		break;	    		    	
     		}
@@ -192,8 +192,8 @@ public class PipeListRenderer implements RowRenderer {
     		this.pipeid=pipeid;
     	}
     	public void onEvent(org.zkoss.zk.ui.event.Event event) throws org.zkoss.zk.ui.UiException {
-    		if(PipeManager.getPassword(pipeid).matches(checkPassText.getValue())){
-    		   PipeManager.deletePipe(pipeid);
+    		if(DatabasePipeManager.getPassword(pipeid).matches(checkPassText.getValue())){
+    		   DatabasePipeManager.deletePipe(pipeid);
     		   checkPassWin.setVisible(false);
     		}
     		else{

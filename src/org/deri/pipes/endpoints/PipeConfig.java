@@ -46,6 +46,7 @@ public class PipeConfig {
 	private String name = null;
 	private String syntax = null;
 	private String config=null;
+	private String password;
 
 	public PipeConfig(){
 		
@@ -80,5 +81,32 @@ public class PipeConfig {
 
 	public void setConfig(String config) {
 		this.config = config;
+	}
+	/**
+	 * @param password
+	 */
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	/**
+	 * This method could be removed and use instead
+	 * isPasswordCorrect(String password)
+	 * @return
+	 */
+	public String getPassword(){
+		return this.password;
+	}
+	/**
+	 * Whether another password is the same as the 
+	 * one for this PipeConfig.
+	 */
+	public boolean isPasswordCorrect(String password){
+		if(this.password==null && password==null){
+			return true;
+		}
+		if(this.password == null){
+			return false;
+		}
+		return this.password.equals(password);
 	}
 }

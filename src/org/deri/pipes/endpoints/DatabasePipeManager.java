@@ -53,35 +53,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Executions;
 
-public class PipeManager {
-	static Logger logger = LoggerFactory.getLogger(PipeManager.class);
+public class DatabasePipeManager {
+	static Logger logger = LoggerFactory.getLogger(DatabasePipeManager.class);
 	private static String DB_PROP ="db.properties";
 	public static Connection getConnection(){
-    	Connection conn = null;
-    	Properties prop = new Properties();
+		Connection conn = null;
+		Properties prop = new Properties();
 		try
 		{
 			prop.load(new FileInputStream(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+DB_PROP)));
-			
-            StringBuffer connStr= new StringBuffer("jdbc:mysql://");
-            connStr.append(prop.getProperty("host"));
-            if (prop.getProperty("port")!=null) 
-            	connStr.append(":").append(prop.getProperty("port"));
-            connStr.append("/").append(prop.getProperty("database"));
-            
-/*    		DataSource ds = (DataSource)new InitialContext().lookup("java:comp/env/jdbc/pipes");
+
+			StringBuffer connStr= new StringBuffer("jdbc:mysql://");
+			connStr.append(prop.getProperty("host"));
+			if (prop.getProperty("port")!=null) 
+				connStr.append(":").append(prop.getProperty("port"));
+			connStr.append("/").append(prop.getProperty("database"));
+
+			/*    		DataSource ds = (DataSource)new InitialContext().lookup("java:comp/env/jdbc/pipes");
     	    conn = ds.getConnection();*/
-    	
- 	    	Class.forName("com.mysql.jdbc.Driver");
-	    	conn = DriverManager.getConnection(connStr.toString(), prop.getProperty("username"), prop.getProperty("password"));
-	    	//logger.debug("connStr "+ connStr.toString());
-    	}
-    	catch(Exception e){
+
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(connStr.toString(), prop.getProperty("username"), prop.getProperty("password"));
+			//logger.debug("connStr "+ connStr.toString());
+		}
+		catch(Exception e){
 			logger.info("could not get connection",e);
 		}
-    	return conn;
-    }
-	
+		return conn;
+	}
+
 	public static  List<PipeConfig> getPipeList(){
 		Connection conn = getConnection();
 		Statement stmt = null;
@@ -112,14 +112,14 @@ public class PipeManager {
 			}
 			if (conn != null) {
 				try {
-				conn.close();
+					conn.close();
 				} catch (SQLException ex) {
 				}
 			}
 		}
 		return null;
 	}
-	
+
 	public static String getPipeSyntax(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
@@ -147,14 +147,14 @@ public class PipeManager {
 			}
 			if (conn != null) {
 				try {
-				conn.close();
+					conn.close();
 				} catch (SQLException ex) {
 				}
 			}
 		}
 		return null;
 	}
-	
+
 	public static String getPipeConfig(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
@@ -182,14 +182,14 @@ public class PipeManager {
 			}
 			if (conn != null) {
 				try {
-				conn.close();
+					conn.close();
 				} catch (SQLException ex) {
 				}
 			}
 		}
 		return null;
 	}
-	
+
 	public static PipeConfig getPipe(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
@@ -220,14 +220,14 @@ public class PipeManager {
 			}
 			if (conn != null) {
 				try {
-				conn.close();
+					conn.close();
 				} catch (SQLException ex) {
 				}
 			}
 		}
 		return null;
 	}
-	
+
 	public static void deletePipe(String pipeid){
 		Connection conn = getConnection();
 		String query = "DELETE FROM pipes where pipeid=?";
@@ -243,14 +243,14 @@ public class PipeManager {
 		finally { 
 			if (conn != null) {
 				try {
-				conn.close();
+					conn.close();
 				} catch (SQLException ex) {
 				}
 			}
 		}
 	}
-	
-	public static boolean isExist(String pipeid){
+
+	public static boolean contains(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
@@ -273,7 +273,7 @@ public class PipeManager {
 			}
 			if (conn != null) {
 				try {
-				conn.close();
+					conn.close();
 				} catch (SQLException ex) {
 				}
 			}
@@ -306,62 +306,63 @@ public class PipeManager {
 			}
 			if (conn != null) {
 				try {
-				conn.close();
+					conn.close();
 				} catch (SQLException ex) {
 				}
 			}
 		}
 		return null;
 	}
-	
-	public static boolean savePipe(PipeEditor wsp){
-		String pipeid=wsp.getPipeId(),pipename=wsp.getPipeName(),
-		password=wsp.getPassword(),syntax=wsp.getSrcCode(false),config=wsp.getSrcCode(true);
-		
-		if((null!=pipeid)&&(pipeid.trim().length()>0)){
-			Connection conn = getConnection();
-			Statement stmt = null;
-			ResultSet rs=null;
-			String query = "SELECT pipeid FROM pipes where pipeid='"+pipeid+"'";
-			try {
-				stmt = conn.createStatement();
-				rs = stmt.executeQuery(query);	
-				PreparedStatement pstmt;
 
-				if(rs.next()){
-					query =  "UPDATE  pipes set pipeid=?,pipename=?,syntax=?,config=?,password=? where pipeid='"+pipeid+"'";
-				   pstmt = conn.prepareStatement(query);
-				}else{
-					query = "INSERT INTO pipes(pipeid,pipename,syntax,config,password) values(?, ?,?,?,?)";
-				    pstmt = conn.prepareStatement(query);
-				}
-				pstmt.setString(1, pipeid);
-				pstmt.setString(2, pipename);
-				pstmt.setString(3, syntax);
-				pstmt.setString(4, config);
-				pstmt.setString(5, password);
-				pstmt.executeUpdate();					
-				return true;
+	public static boolean save(PipeConfig pipeConfig){
+		if(pipeConfig.getId() == null){
+			logger.warn("cannot save pipe having null id");
+			return false;
+		}
+		Connection conn = getConnection();
+		Statement stmt = null;
+		ResultSet rs=null;
+		String query = "SELECT pipeid FROM pipes where pipeid='"+pipeConfig.getId()+"'";
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(query);	
+			PreparedStatement pstmt;
+
+			if(rs.next()){
+				query =  "UPDATE  pipes set pipeid=?,pipename=?,syntax=?,config=?,password=? where pipeid=?";
+				pstmt = conn.prepareStatement(query);
+				pstmt.setString(6, pipeConfig.getId());
+			}else{
+				query = "INSERT INTO pipes(pipeid,pipename,syntax,config,password) values(?,?,?,?,?)";
+				pstmt = conn.prepareStatement(query);
 			}
-			catch(SQLException e){
-				logger.info("problem executing query ["+query+"]",e);
-			}
-			finally { 
-				if (stmt != null) {
-					try {
-						stmt.close();
-					} 
-					catch (SQLException ex) {
-					}
+			pstmt.setString(1, pipeConfig.getId());
+			pstmt.setString(2, pipeConfig.getName());
+			pstmt.setString(3, pipeConfig.getSyntax());
+			pstmt.setString(4, pipeConfig.getConfig());
+			pstmt.setString(5, pipeConfig.getPassword());
+			pstmt.executeUpdate();					
+			return true;
+		}
+		catch(SQLException e){
+			logger.info("problem executing query ["+query+"]",e);
+		}
+		finally { 
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} 
+				catch (SQLException ex) {
 				}
-				if (conn != null) {
-					try {
+			}
+			if (conn != null) {
+				try {
 					conn.close();
-					} catch (SQLException ex) {
-					}
+				} catch (SQLException ex) {
 				}
 			}
-		}		
+		}
 		return false;
 	}
+
 }
