@@ -45,6 +45,8 @@ import java.util.List;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.ThreadedExecutor;
 import org.deri.pipes.model.MultiExecBuffer;
+import org.deri.pipes.store.FilePipeStore;
+import org.deri.pipes.store.PipeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +60,19 @@ public class Engine {
 	private static Engine defaultEngine;
 	PipeParser parser;
 	ThreadedExecutor executor;
+	private PipeStore pipeStore;
 
+	PipeStore getPipeStore(){
+		if(pipeStore == null){
+			logger.warn("Pipe store not set... use a FilePipeStore in temporary folder");
+			pipeStore = new FilePipeStore();
+		}
+		return pipeStore;
+	}
+	void setPipeStore(PipeStore pipeStore){
+		this.pipeStore = pipeStore;
+		logger.info("Set pipe store to "+pipeStore);
+	}
 	/**
 	 * @return
 	 */

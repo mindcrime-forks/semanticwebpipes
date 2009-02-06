@@ -67,7 +67,7 @@ public class FilePipeStore implements PipeStore {
 	 */
 	private static final String PIPE_FILE_EXTENSION = ".pipe";
 	Logger logger = LoggerFactory.getLogger(FilePipeStore.class);
-	private  final File rootFolder;
+	private File rootFolder;
 	private final XStream xstream;
 	/**
 	 * Create a FilePipeStore in this folder.
@@ -79,6 +79,22 @@ public class FilePipeStore implements PipeStore {
 		this.rootFolder = rootFolder;
 		xstream = new XStream();
 		xstream.autodetectAnnotations(true);
+		logger.info("Storing pipes in folder "+rootFolder);
+	}
+	/**
+	 * 
+	 */
+	public FilePipeStore(){
+		String folderName = "semanticWebPipeStore";	
+		try {
+			File tmp = File.createTempFile("pipestore", "xxx");
+			rootFolder = new File(tmp.getParentFile(),folderName);
+		} catch (IOException e) {
+			rootFolder = new File(System.getProperty("java.io.tmpdir"),folderName);
+		}
+		xstream = new XStream();
+		xstream.autodetectAnnotations(true);
+		logger.info("Storing pipes in folder "+rootFolder);
 	}
 	/* (non-Javadoc)
 	 * @see org.deri.pipes.store.PipeStore#contains(java.lang.String)

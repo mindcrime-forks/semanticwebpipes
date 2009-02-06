@@ -122,7 +122,7 @@ public class PipeParser {
 			logger.warn(cannotLoadMsg);
 		}else{
 			try{
-			XStream xstream = new XStream(new DomDriver());
+			XStream xstream = new XStream();
 			Map<String,Class> defaultAliasMappings = (Map<String, Class>) xstream.fromXML(in);
 			if(defaultAliasMappings.size() == 0){
 				logger.warn(cannotLoadMsg+" (no mappings defined in "+OPERATORMAPPING_XML+")");
