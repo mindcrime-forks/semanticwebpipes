@@ -45,7 +45,7 @@ import java.util.List;
  * @author robful
  *
  */
-public interface PipeManager {
+public interface PipeStore {
 	/**
 	 * Get the list of all pipes in the manager.
 	 * @return
