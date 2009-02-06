@@ -143,7 +143,7 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public boolean savePipe(){
-		return DatabasePipeManager.save(getPipeConfig()); 
+		return DatabasePipeManager.instance.save(getPipeConfig()); 
 	}
 	
 	public PipeConfig getPipeConfig() {
@@ -414,7 +414,7 @@ public class PipeEditor extends Workspace {
 	}
 	
 	public void edit(String pid){
-		PipeConfig pipeConfig=DatabasePipeManager.getPipe(pid);
+		PipeConfig pipeConfig=DatabasePipeManager.instance.getPipe(pid);
 		reload(pipeConfig.getConfig());
 		pipeid.setValue(pipeConfig.getId());
 		bdid.setValue(pipeConfig.getId());

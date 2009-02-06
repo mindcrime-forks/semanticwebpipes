@@ -177,12 +177,9 @@
 	     workspace.createFigure(x,y,figureType);
     }
     
-    ListModel model = new SimpleListModel(org.deri.pipes.endpoints.DatabasePipeManager.getPipeList().toArray());
-    Object[] items=org.deri.pipes.endpoints.DatabasePipeManager.getPipeList().toArray();
+    ListModel model = new SimpleListModel(org.deri.pipes.endpoints.DatabasePipeManager.instance.getPipeList().toArray());
+    Object[] items=org.deri.pipes.endpoints.DatabasePipeManager.instance.getPipeList().toArray();
     RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(workspace,deleteWin);
-     /* ListModel model = new SimpleListModel(org.deri.pipes.endpoints.DatabasePipeManager.getPipeList().toArray());
-    Object[] items=org.deri.pipes.endpoints.DatabasePipeManager.getPipeList().toArray();
-    RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(pipeid,pipename,pipesyntax,debugView,debugViewArea,deleteWin);*/
     </zscript>
      	      	
 	      	<separator bar="false"/>

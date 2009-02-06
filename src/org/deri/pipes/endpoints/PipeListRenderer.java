@@ -167,7 +167,7 @@ public class PipeListRenderer implements RowRenderer {
     		    		try{
     		    			if (Messagebox.show("Are you sure want delete this PipeConfig?", "Delete?", Messagebox.YES | Messagebox.NO,
         		    				Messagebox.QUESTION) == Messagebox.YES) {
-        		    			  DatabasePipeManager.deletePipe(pipeid);
+        		    			  DatabasePipeManager.instance.deletePipe(pipeid);
         		    		}
     	    			}
     	    			catch(java.lang.InterruptedException e){
@@ -193,7 +193,7 @@ public class PipeListRenderer implements RowRenderer {
     	}
     	public void onEvent(org.zkoss.zk.ui.event.Event event) throws org.zkoss.zk.ui.UiException {
     		if(DatabasePipeManager.getPassword(pipeid).matches(checkPassText.getValue())){
-    		   DatabasePipeManager.deletePipe(pipeid);
+    		   DatabasePipeManager.instance.deletePipe(pipeid);
     		   checkPassWin.setVisible(false);
     		}
     		else{

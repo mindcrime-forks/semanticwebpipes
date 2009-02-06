@@ -53,9 +53,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Executions;
 
-public class DatabasePipeManager {
+public class DatabasePipeManager implements PipeManager {
 	static Logger logger = LoggerFactory.getLogger(DatabasePipeManager.class);
 	private static String DB_PROP ="db.properties";
+	public static PipeManager instance = new DatabasePipeManager(); //TODO remove this.
 	public static Connection getConnection(){
 		Connection conn = null;
 		Properties prop = new Properties();
@@ -82,7 +83,10 @@ public class DatabasePipeManager {
 		return conn;
 	}
 
-	public static  List<PipeConfig> getPipeList(){
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.endpoints.PipeManager#getPipeList()
+	 */
+	public List<PipeConfig> getPipeList(){
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
@@ -190,7 +194,10 @@ public class DatabasePipeManager {
 		return null;
 	}
 
-	public static PipeConfig getPipe(String pipeid){
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.endpoints.PipeManager#getPipe(java.lang.String)
+	 */
+	public PipeConfig getPipe(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
@@ -228,7 +235,10 @@ public class DatabasePipeManager {
 		return null;
 	}
 
-	public static void deletePipe(String pipeid){
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.endpoints.PipeManager#deletePipe(java.lang.String)
+	 */
+	public void deletePipe(String pipeid){
 		Connection conn = getConnection();
 		String query = "DELETE FROM pipes where pipeid=?";
 		try {
@@ -250,7 +260,10 @@ public class DatabasePipeManager {
 		}
 	}
 
-	public static boolean contains(String pipeid){
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.endpoints.PipeManager#contains(java.lang.String)
+	 */
+	public boolean contains(String pipeid){
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs=null;
@@ -314,7 +327,10 @@ public class DatabasePipeManager {
 		return null;
 	}
 
-	public static boolean save(PipeConfig pipeConfig){
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.endpoints.PipeManager#save(org.deri.pipes.endpoints.PipeConfig)
+	 */
+	public boolean save(PipeConfig pipeConfig){
 		if(pipeConfig.getId() == null){
 			logger.warn("cannot save pipe having null id");
 			return false;

@@ -158,7 +158,7 @@ public class Pipes extends HttpServlet {
 	        
 		    String pipeid = req.getParameter("id");			
 			String syntax = DatabasePipeManager.getPipeSyntax(pipeid);
-			String pipeName = DatabasePipeManager.getPipe(pipeid).getName();
+			String pipeName = DatabasePipeManager.instance.getPipe(pipeid).getName();
 			
             // replace $pipe_name$ placeholder in the HTML template with the pipe name.
 			outputString = outputString.replace("$pipe_name$", pipeName);
