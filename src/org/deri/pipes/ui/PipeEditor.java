@@ -43,6 +43,7 @@ import java.util.ArrayList;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.Engine;
+import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.endpoints.PipeConfig;
@@ -74,7 +75,7 @@ import org.zkoss.zul.Textbox;
 public class PipeEditor extends Workspace {
 	//TODO: make engine a settable field
 	static Engine engine = Engine.defaultEngine();
-	final Logger logger = LoggerFactory.getLogger(PipeEditor.class);
+	final static Logger logger = LoggerFactory.getLogger(PipeEditor.class);
 	private Textbox textDebugPanel,pipeid,pipename,password;
 	private Bandbox bdid;
 	private Tabpanel tabularDebugPanel=null;
@@ -186,6 +187,7 @@ public class PipeEditor extends Workspace {
 			   return paraList.get(i);
 			}
 		}
+		logger.debug("No parameter set for ["+nodeId+"]");
 		return null;
 	}
 	
@@ -257,6 +259,8 @@ public class PipeEditor extends Workspace {
 		 }
 	     else if(figureType.equalsIgnoreCase("sparqlendpoint")){
 		     	addFigure(new SPARQLEndpointNode(x,y));
+		 }else{
+			 logger.warn("Not configured to add node of type ["+figureType+"]");
 		 }
 	}
 	
@@ -282,7 +286,7 @@ public class PipeEditor extends Workspace {
 		       } 
 		   }
 		   catch(QueryEvaluationException e){
-		      	  
+		      	  logger.warn("Problem encountered appending to listbox",e);
 	       }
 		   return listbox;
 	}
@@ -317,24 +321,30 @@ public class PipeEditor extends Workspace {
 	}
 	public void debug(String syntax){
 		   syntax=populatePara(syntax);	
-		   //logger.debug(syntax);
-		   Operator    stream= engine.parse(syntax);
-		   TupleQueryResult tuple=null;
 		   String textResult=null;
-		   try{
-		   if(stream instanceof RDFBox){
-			   ((RDFBox) stream).execute(null);
-			   org.deri.pipes.core.ExecBuffer buff=stream.execute(engine.newContext());
-			   textResult=buff.toString();
-			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
-					   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
-			    		tuple=((((org.deri.pipes.model.SesameMemoryBuffer)buff).
-			    				     getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
-			   }
-			   else if(buff instanceof org.deri.pipes.model.SesameTupleBuffer){
-				   tuple=((org.deri.pipes.model.SesameTupleBuffer)buff).getTupleQueryResult();
-			   }
+		   //logger.debug(syntax);
+		   Operator stream= engine.parse(syntax);
+		   if(stream == null){
+			   textResult = "An error occurred executing the pipe";
 		   }
+		   TupleQueryResult tuple=null;
+		   try{
+			   ExecBuffer buff = stream.execute(engine.newContext());
+			   if(buff == null){
+				   textResult = "A null result buffer was returned by the pipe";
+			   }else{
+				   textResult=buff.toString();
+				   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
+					   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
+					   tuple=((((org.deri.pipes.model.SesameMemoryBuffer)buff).
+							   getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
+				   }
+				   else if(buff instanceof org.deri.pipes.model.SesameTupleBuffer){
+					   tuple=((org.deri.pipes.model.SesameTupleBuffer)buff).getTupleQueryResult();
+				   }else{
+					   logger.warn("could not show debug result of type "+buff.getClass());
+				   }
+			   }
 		   }catch(Exception e){
 			   String msg = "A problem occurred executing the buffer";
 			logger.error(msg,e);

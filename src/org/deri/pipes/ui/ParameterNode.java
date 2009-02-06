@@ -123,9 +123,5 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 		node.setDefaultValue(XMLUtil.getTextFromFirstSubEleByName(elm, "default"));
 		return node;
 	}
-	
-	public void debug(){
-		
-	}
 }
 

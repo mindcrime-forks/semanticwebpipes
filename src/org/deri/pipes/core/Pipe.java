@@ -59,8 +59,11 @@ public class Pipe implements Operator{
 		if(codeWithVariablesExpanded == null){
 			expandVariables(context);
 		}
-		ExecBuffer result = codeWithVariablesExpanded.size()>1?
-				codeWithVariablesExpanded.get(1).execute(context)
+		if(codeWithVariablesExpanded.size()>1){
+		logger.info("the pipe has ["+codeWithVariablesExpanded.size()+"] results at root level");
+		}
+		ExecBuffer result = codeWithVariablesExpanded.size()==1?
+				codeWithVariablesExpanded.get(0).execute(context)
 				:context.getEngine().execute(codeWithVariablesExpanded,context);
 		long elapsed = System.currentTimeMillis() - startTime;
 		logger.info("pipe execution time was "+elapsed+"ms");
@@ -86,6 +89,7 @@ public class Pipe implements Operator{
 			this.parameters = tmpParameters;
 		}
 		xml = expandParameters(tmpParameters, xml);
+		logger.info("expanded pipe with variables to:"+xml);
 		Pipe pipe = (Pipe) context.getEngine().parse(xml);
 		this.codeWithVariablesExpanded = pipe.code;
 		
