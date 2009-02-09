@@ -51,7 +51,9 @@ import org.zkoss.zul.Vbox;
 
 public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	final Logger logger = LoggerFactory.getLogger(ParameterNode.class);
-	Textbox nameBox,labelBox,defaultBox;
+	Textbox nameBox;
+	Textbox labelBox;
+	Textbox defaultBox;
 	public ParameterNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,200,100);
 		wnd.setTitle("Text input");
@@ -96,8 +98,7 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			if(srcCode!=null) return srcCode;
-			srcCode =doc.createElement(tagName);
+			Element srcCode =doc.createElement(tagName);
 			if(config) setPosition((Element)srcCode);
 			srcCode.appendChild(XMLUtil.createElmWithText(doc, "id", nameBox.getValue()));
 			srcCode.appendChild(XMLUtil.createElmWithText(doc, "label", labelBox.getValue()));
@@ -123,5 +124,6 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 		node.setDefaultValue(XMLUtil.getTextFromFirstSubEleByName(elm, "default"));
 		return node;
 	}
+
 }
 

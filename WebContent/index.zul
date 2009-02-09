@@ -172,7 +172,7 @@
     workspace.addEventListener("onDrop",new DropListener());
     workspace.addEventListener("onConnectionCreated",new ConnectionCreatedListener());
     workspace.addEventListener("onConnectionDeleted",new ConnectionDeletedListener());
-    
+     
     void createFigure(int x,int y,figureType){         
 	     workspace.createFigure(x,y,figureType);
     }

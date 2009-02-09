@@ -40,6 +40,7 @@ package org.deri.pipes.ui;
 
 import java.util.ArrayList;
 
+import org.deri.pipes.core.Pipe;
 import org.deri.pipes.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-public class OutPipeNode extends PipeNode {
+public class OutPipeNode extends PipeNode{
 	final Logger logger = LoggerFactory.getLogger(OutPipeNode.class);
 		
 	    protected Port input =null;
@@ -66,23 +67,23 @@ public class OutPipeNode extends PipeNode {
 		
 		public Node getSrcCode(Document doc,boolean config){
 			((PipeEditor)getWorkspace()).removeParameters();
-			if (srcCode!=null) return srcCode;
-			srcCode=doc.createElement("pipe");
+			Element srcCode=doc.createElement("pipe");
 			Element codeElm=doc.createElement("code");
-			if (config) setPosition(codeElm);
+			if (config){
+				setPosition(codeElm);
+			}
 			
 			for(Port p:getWorkspace().getIncomingConnections(input.getUuid())){
 				if(p.getParent() instanceof PipeNode){
 					codeElm.appendChild(((PipeNode)p.getParent()).getSrcCode(doc,config));					
-					break;
 				}
 			}
 			
 			Element paraElm =doc.createElement("parameters");
 			ArrayList<ParameterNode> paraList=((PipeEditor)getWorkspace()).getParameters();
-			for(int i=0;i<paraList.size();i++)
+			for(int i=0;i<paraList.size();i++){
 				paraElm.appendChild(paraList.get(i).getSrcCode(doc,config));
-			
+			}
 			srcCode.appendChild(paraElm);
 			srcCode.appendChild(codeElm);
 			return srcCode;
@@ -97,14 +98,6 @@ public class OutPipeNode extends PipeNode {
 			return node;
 		}
 		
-		@Override
-		public void reset(boolean recursive){
-			super.reset(recursive);
-			if (!recursive) return;
-			for(Port p:getWorkspace().getIncomingConnections(input.getUuid()))
-				if(p.getParent() instanceof PipeNode)
-					((PipeNode)p.getParent()).reset(recursive);				
-		}
 			
 		public void debug(){	   
 			   ((PipeEditor)getWorkspace()).debug(getSrcCode(false));

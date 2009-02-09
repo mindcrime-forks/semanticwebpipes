@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Image;
@@ -62,7 +63,7 @@ import org.zkoss.zul.Vbox;
 
 public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,ConnectingOutputNode{
 	final Logger logger = LoggerFactory.getLogger(URLBuilderNode.class);
-	Hashtable<String,Port> pathPorts= new Hashtable<String,Port>();
+	//Hashtable<String,Port> pathPorts= new Hashtable<String,Port>();
 	Hashtable<String,Port> paraPorts= new Hashtable<String,Port>();
 	
 	Textbox baseURL=null;
@@ -75,25 +76,26 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	
 	class AddRemoveListener implements org.zkoss.zk.ui.event.EventListener {
 		   public void onEvent(Event event) throws  org.zkoss.zk.ui.UiException {	
+				Component component = event.getTarget().getParent();
 				if(((Image)event.getTarget()).getSrc().equals(ADD_ICON)){
-					if (event.getTarget().getParent().getParent()==pathVbox) addPath();
+					if (component.getParent()==pathVbox) addPath();
 					else 
-						if (event.getTarget().getParent().getParent()==paraVbox) addParameter();
+						if (component.getParent()==paraVbox) addParameter();
 				}
 				if(((Image)event.getTarget()).getSrc().equals(REMOVE_ICON)){
-					if(event.getTarget().getParent().getParent()==pathVbox){
-						if(pathPorts.get(event.getTarget().getParent().getUuid())!=null)
-							pathPorts.get(event.getTarget().getParent().getUuid()).detach();
-						pathPorts.remove(event.getTarget().getParent().getUuid());
-						event.getTarget().getParent().detach();
+					if(component.getParent()==pathVbox){
+						Port port = getFirstPort(component);
+						if(port!=null)
+							port.detach();
+						component.detach();
 						relayoutPathPorts(1);
 						relayoutParaPorts(1);
 					}
 					else
-						if(event.getTarget().getParent().getParent()==paraVbox){
-							paraPorts.get(event.getTarget().getParent().getUuid()).detach();
-							paraPorts.remove(event.getTarget().getParent().getUuid());
-							event.getTarget().getParent().detach();
+						if(component.getParent()==paraVbox){
+							paraPorts.get(component.getUuid()).detach();
+							paraPorts.remove(component.getUuid());
+							component.detach();
 							relayoutParaPorts(1);
 						}
 				}
@@ -163,16 +165,22 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 			return;
 		}
 		for(int i=1;i<pathVbox.getChildren().size();i++){
-			if(pathPorts.get(((Hbox)pathVbox.getChildren().get(i)).getUuid())==port){
-				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setValue("text [wired]");
-				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setReadonly(true);
+			Hbox hbox = (Hbox)pathVbox.getChildren().get(i);
+			String puuid = hbox.getUuid();
+			Port hbport = getFirstPort(hbox);
+			if(hbport==port){
+				Textbox textbox = (Textbox)hbox.getLastChild();
+				textbox.setValue("text [wired]");
+				textbox.setReadonly(true);
 				return;
 			}
 		}
 		for(int i=1;i<paraVbox.getChildren().size();i++){
-			if(paraPorts.get(((Hbox)paraVbox.getChildren().get(i)).getUuid())==port){
-				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setValue("text [wired]");
-				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setReadonly(true);
+			Hbox hbox = (Hbox)paraVbox.getChildren().get(i);
+			if(paraPorts.get(hbox.getUuid())==port){
+				Textbox textbox = (Textbox)hbox.getLastChild();
+				textbox.setValue("text [wired]");
+				textbox.setReadonly(true);
 				return;
 			}
 		}
@@ -185,16 +193,21 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 			return;
 		}
 		for(int i=1;i<pathVbox.getChildren().size();i++){
-			if(pathPorts.get(((Vbox)pathVbox.getChildren().get(i)).getUuid())==port){
-				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setValue("");
-				((Textbox)((Hbox)pathVbox.getChildren().get(i)).getLastChild()).setReadonly(false);
+			Hbox hbox = (Hbox)pathVbox.getChildren().get(i);
+			Port hbport = getFirstPort(hbox);
+			if(hbport==port){
+				Textbox textbox = (Textbox)hbox.getLastChild();
+				textbox.setValue("");
+				textbox.setReadonly(false);
 				return;
 			}
 		}
 		for(int i=1;i<paraVbox.getChildren().size();i++){
-			if(paraPorts.get(((Vbox)paraVbox.getChildren().get(i)).getUuid())==port){
-				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setValue("false");
-				((Textbox)((Hbox)paraVbox.getChildren().get(i)).getLastChild()).setReadonly(false);
+			Hbox hbox = (Hbox)paraVbox.getChildren().get(i);
+			if(paraPorts.get(hbox.getUuid())==port){
+				Textbox textbox = (Textbox)hbox.getLastChild();
+				textbox.setValue("false");
+				textbox.setReadonly(false);
 				return;
 			}
 		}
@@ -235,7 +248,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
 		hbox.appendChild(createParaBox(150,16));		
 		Port nPort=createPort(PipePortType.TEXTIN,175,57+(pathVbox.getChildren().size())*_rs);
-		pathPorts.put(hbox.getUuid(), nPort);
+		hbox.appendChild(nPort);
 		pathVbox.appendChild(hbox);
 		relayoutParaPorts(1);
 	}
@@ -243,44 +256,42 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	public void addPath(Element pathElm){
 		Hbox hbox= new Hbox();
 		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
-		Port nPort=createPort(PipePortType.TEXTIN,175,57+(pathVbox.getChildren().size())*_rs);
-		pathPorts.put(hbox.getUuid(), nPort);		
-		
 		Textbox txtBox=createParaBox(150,16);
 		hbox.appendChild(txtBox);		
+		Port nPort=createPort(PipePortType.TEXTIN,175,57+(pathVbox.getChildren().size())*_rs);
+		hbox.appendChild(nPort);
 		pathVbox.appendChild(hbox);
 		loadConnectedConfig(pathElm, nPort, txtBox);
 	}
 	
 	public void addParameter(){
 		Hbox hbox= new Hbox();
-		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
-		
+		hbox.appendChild(addImage("img/edit_remove-48x48.png"));		
 		hbox.appendChild(createParaBox(80,16));
 		hbox.appendChild(new Label(" = "));
 		hbox.appendChild(createParaBox(80,16));
 		Port nPort=createPort(PipePortType.TEXTIN,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
+		hbox.appendChild(nPort);
 		paraPorts.put(hbox.getUuid(), nPort);		
 		paraVbox.appendChild(hbox);		
 	}
 	
 	public void addParameter(Element paraElm){
 		Hbox hbox= new Hbox();
-		hbox.appendChild(addImage("img/edit_remove-48x48.png"));		
-		
+		hbox.appendChild(addImage("img/edit_remove-48x48.png"));			
 		hbox.appendChild(createParaBox(80,16,paraElm.getAttribute("name")));
 		hbox.appendChild(new Label(" = "));
 		Textbox txtBox=createParaBox(80,16);
-		hbox.appendChild(txtBox);
-		
+		hbox.appendChild(txtBox);	
 		Port nPort=createPort(PipePortType.TEXTIN,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
+		hbox.appendChild(nPort);
 		paraPorts.put(hbox.getUuid(), nPort);
 		paraVbox.appendChild(hbox);
 		loadConnectedConfig(paraElm, nPort, txtBox);	
 	}
 	
 	public void relayout(){
-		setDimension(220, 94+(pathVbox.getChildren().size()+paraVbox.getChildren().size()-2)*_rs);
+		setDimension(220, 594+(pathVbox.getChildren().size()+paraVbox.getChildren().size()-2)*_rs);
 	}
 	
 	public void relayoutParaPorts(int from){
@@ -292,11 +303,25 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	
 	public void relayoutPathPorts(int from){
 		for(int i=from;i<pathVbox.getChildren().size();i++){
-			pathPorts.get(((Hbox)pathVbox.getChildren().get(i)).getUuid())
-			           .setPosition(175,57+i*_rs);
+			Hbox hbox = (Hbox)pathVbox.getChildren().get(i);
+			Port port = getFirstPort(hbox);
+			port.setPosition(175,57+i*_rs);
 		}
 	}
 	
+	/**
+	 * @param component
+	 * @return
+	 */
+	private Port getFirstPort(Component component) {
+		for(Object child : component.getChildren()){
+			if(child instanceof Port){
+				return (Port)child;
+			}
+		}
+		return null;
+	}
+
 	public Textbox createParaBox(int w,int h,String value){
 		Textbox box=new Textbox(value);
 		box.setHeight(h+"px");
@@ -310,78 +335,87 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		box.setWidth(w+"px");
 		return box;
 	}
-		
-	public String getCode(){
-		if(getWorkspace()!=null){
-			String code="";
-			code+=getConnectedCode(baseURL, basePort);
-						
-			String tmp=null;
-			for(int i=1;i<pathVbox.getChildren().size();i++){
-				
-				Hbox hbox=(Hbox)pathVbox.getChildren().get(i);
-				tmp=getConnectedCode(((Textbox)hbox.getLastChild()), pathPorts.get(hbox.getUuid()));
-				code+=tmp.trim();
-				/*if(null!=tmp&&tmp.trim()!=""){
-					if((code.charAt(code.length()-1)=='/')||(tmp.charAt(0)=='/'))
-						code+=tmp;
-					else
-						code+="/"+tmp;
-				}*/
-				
-			}
-			String and="";
-		
-			for(int i=1;i<paraVbox.getChildren().size();i++){
-				try{
-					Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
-					if(((Textbox)hbox.getFirstChild().getNextSibling()).getValue().trim()!=""){
-						tmp=getConnectedCode(((Textbox)hbox.getLastChild()), paraPorts.get(hbox.getUuid()));											
-						//TODO : encoding location fragments here?
-						
-						if(tmp.indexOf('}')>=0)
-							tmp=URLEncoder.encode(tmp,"UTF-8");
-						code+=and+URLEncoder.encode(((Textbox)hbox.getFirstChild().getNextSibling()).getValue(),"UTF-8")+"="+tmp;
-						and="&";
-					}
-				}
-				catch(java.io.UnsupportedEncodingException e){
-					logger.info("UTF-8 support is required by the JVM specification",e);
-				}
-			}
-			
-			return code;
+	@Override	
+	public String getSrcCode(boolean config){
+		if(config){
+			return super.getSrcCode(config);
 		}
-		return null;
+		StringBuilder code=new StringBuilder();
+		code.append(getConnectedCode(baseURL, basePort));
+
+		String tmp=null;
+		for(int i=1;i<pathVbox.getChildren().size();i++){
+
+			Hbox hbox=(Hbox)pathVbox.getChildren().get(i);
+			tmp=getConnectedCode((Textbox)hbox.getChildren().get(1), (Port)hbox.getLastChild()).trim();
+			if(tmp.length() == 0){
+				continue;
+			}
+			if(tmp.charAt(0)!='/' && code.charAt(code.length()-1)!='/'){
+				code.append('/');
+			}
+			code.append(tmp);
+
+		}
+		String and="?";
+
+		for(int i=1;i<paraVbox.getChildren().size();i++){
+			try{
+				Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
+				if(((Textbox)hbox.getFirstChild().getNextSibling()).getValue().trim()!=""){
+					tmp=getConnectedCode((Textbox)hbox.getChildren().get(3), (Port)hbox.getLastChild());											
+					//TODO : encoding location fragments here?
+
+					if(tmp.indexOf('}')>=0){
+						tmp=URLEncoder.encode(tmp,"UTF-8");
+					}
+					code.append(and)
+					.append(URLEncoder.encode(((Textbox)hbox.getFirstChild().getNextSibling()).getValue(),"UTF-8"))
+					.append("=").append(tmp);
+					and="&";
+				}
+			}
+			catch(java.io.UnsupportedEncodingException e){
+				logger.info("UTF-8 support is required by the JVM specification",e);
+			}
+		}
+
+		return code.toString();
 	}
 	
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			if(srcCode!=null) return srcCode;
-			srcCode =doc.createElement(tagName);
-			if(config) setPosition((Element)srcCode);
-			
-			Element baseElm = doc.createElement("base");
-			baseElm.appendChild(getConnectedCode(doc, baseURL, basePort, config));
-			srcCode.appendChild(baseElm);
-			
-			for(int i=1;i<pathVbox.getChildren().size();i++){
-				Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
-				Element pathElm=doc.createElement("path");
-				pathElm.appendChild(getConnectedCode(doc, (Textbox)hbox.getLastChild(), pathPorts.get(hbox.getUuid()), config));	
-				srcCode.appendChild(pathElm);
-			}
-			String tmp=null;
-			for(int i=1;i<paraVbox.getChildren().size();i++){
-				Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
-				Element paraElm =doc.createElement("para");
-				paraElm.appendChild(getConnectedCode(doc,(Textbox)hbox.getLastChild(), paraPorts.get(hbox.getUuid()),config));
-				srcCode.appendChild(paraElm);	
-			}
-			return srcCode;
+		if(getWorkspace()==null){
+			return null;
 		}
-		return null;
+		Element srcCode =doc.createElement(tagName);
+		if(config) setPosition((Element)srcCode);
+
+		Element baseElm = doc.createElement("base");
+		baseElm.appendChild(getConnectedCode(doc, baseURL, basePort, config));
+		srcCode.appendChild(baseElm);
+
+		List children = pathVbox.getChildren();
+		for(int i=1;i<children.size();i++){
+			Hbox hbox=(Hbox)pathVbox.getChildren().get(i);
+			Port port = getFirstPort(hbox);
+			if(port == null){
+				logger.info("No port found for "+hbox.getUuid()+" at i="+i);
+				continue;
+			}
+			Element pathElm=doc.createElement("path");
+			pathElm.appendChild(getConnectedCode(doc, (Textbox)hbox.getChildren().get(1), (Port)hbox.getLastChild(), config));	
+			srcCode.appendChild(pathElm);
+		}
+		children = paraVbox.getChildren();
+		for(int i=1;i<children.size();i++){
+			Hbox hbox=(Hbox)children.get(i);
+			Element paraElm =doc.createElement("para");
+			paraElm.setAttribute("name", ((Textbox)hbox.getChildren().get(1)).getValue());
+			paraElm.appendChild(getConnectedCode(doc,(Textbox)hbox.getChildren().get(3), (Port)hbox.getLastChild(),config));
+			srcCode.appendChild(paraElm);	
+		}
+		return srcCode;
 	}
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
@@ -391,7 +425,9 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	}
 	
 	public void debug(){
-		((PipeEditor)getWorkspace()).reloadTextDebug(getCode()) ;
+		((PipeEditor)getWorkspace()).reloadTextDebug(getSrcCode(false)) ;
 		((PipeEditor)getWorkspace()).reloadTabularDebug(null);
 	}
+
+
 }

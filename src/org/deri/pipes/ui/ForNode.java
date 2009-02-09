@@ -72,9 +72,7 @@ public class ForNode extends InOutNode{
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-	    	if(srcCode!=null) return srcCode;
-	    	
-	    	srcCode=doc.createElement("for");
+	    	Element srcCode=doc.createElement("for");
 	    	if(config) setPosition((Element)srcCode);
 	    	
 	    	srcCode.appendChild(getConnectedCode(doc, "sourcelist", input, config));
@@ -85,12 +83,6 @@ public class ForNode extends InOutNode{
 		return null;
     }
 	
-	@Override
-	public void reset(boolean recursive){
-		super.reset(recursive);
-		if (!recursive) return;
-		reset(loopPort,recursive);
-	}
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		ForNode node= new ForNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));

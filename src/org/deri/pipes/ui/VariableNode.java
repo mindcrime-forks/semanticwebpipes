@@ -41,7 +41,9 @@ package org.deri.pipes.ui;
 import org.deri.pipes.utils.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
@@ -90,5 +92,16 @@ public class VariableNode extends InPipeNode implements ConnectingOutputNode{
 	public void debug(){
 		
 	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getSrcCode(org.w3c.dom.Document, boolean)
+	 */
+	@Override
+	public Node getSrcCode(Document doc, boolean config) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }
 

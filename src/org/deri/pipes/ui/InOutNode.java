@@ -51,14 +51,16 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-public class InOutNode extends PipeNode{
+public abstract class InOutNode extends PipeNode{
 	final Logger logger = LoggerFactory.getLogger(InOutNode.class);
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2684001403256691428L;
-	protected Port input =null,output=null;
-	PortType inPType,outPType;
+	protected Port input;
+	protected Port output;
+	PortType inPType;
+	PortType outPType;
 	public InOutNode(PortType inPType,PortType outPType,int x,int y,int width,int height){
 		super(x,y,width,height);
 		this.inPType=inPType;
@@ -85,7 +87,6 @@ public class InOutNode extends PipeNode{
 	
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
 			Element codeElm =doc.createElement(tagName);
 			if(config) setPosition(codeElm);
 			insertInSrcCode(codeElm, input, "source", config);
@@ -93,13 +94,7 @@ public class InOutNode extends PipeNode{
 		}
 		return null;
     }
-	
-	public void reset(boolean recursive){
-		super.reset(recursive);
-		if (!recursive) return;
-		reset(input,recursive);
-	}
-	
+		
 	public void connectSource(Element elm){
 		List<Element> childNodes=XMLUtil.getSubElementByName(elm, "source");
  		for(int i=0;i<childNodes.size();i++){		

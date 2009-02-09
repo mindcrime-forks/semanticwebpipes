@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.ui;
 
+import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
@@ -47,6 +48,8 @@ import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.endpoints.PipeConfig;
+import org.deri.pipes.model.SesameMemoryBuffer;
+import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.rdf.RDFBox;
 import org.deri.pipes.rdf.SelectBox;
 import org.deri.pipes.store.DatabasePipeManager;
@@ -81,7 +84,7 @@ public class PipeEditor extends Workspace {
 	private Tabpanel tabularDebugPanel=null;
 	private OutPipeNode outputNode;
 	private PortTypeManager pTypeMag;
-	private ArrayList<ParameterNode> paraList =new ArrayList();
+	private ArrayList<ParameterNode> paraList =new ArrayList<ParameterNode>();
 	public PipeEditor(String w,String h){
 		super();
 		setWidth(w);
@@ -89,41 +92,42 @@ public class PipeEditor extends Workspace {
 		pTypeMag=new PortTypeManager(this);
 		PipePortType.generateAllPortTypes(this);
 	}
-	
+
 	public void setTextDebugPanel(Textbox txtBox){
 		textDebugPanel=txtBox;
 	}
-	
+
 	public void addFigure(Shape shape){
 		super.addFigure(shape);
 		if(shape instanceof PipeNode)
 			((PipeNode)shape).initialize();
 	}
-	
+
 	public PortTypeManager getPTManager(){
 		return pTypeMag;
 	}
-	
+
 	public OutPipeNode getOutput(){
 		return outputNode;
 	}
-	
+
 	public void setOutput(OutPipeNode outputNode){
 		this.outputNode=outputNode;
 	}
-	
+
 	public void setTabularDebugPanel(Tabpanel tabpanel){
 		tabularDebugPanel=tabpanel;
 	}
-	
+
 	public Textbox getTextDebugPanel(){
 		return textDebugPanel;
 	}
-	
+
 	public Tabpanel getTabularDebugPanel(){
 		return tabularDebugPanel;
 	}
-	
+
+
 	public void setConfigComps(Textbox pipeid,Bandbox bdid,Textbox pipename,Textbox password){
 		this.pipeid=pipeid;
 		this.pipename=pipename;
@@ -134,19 +138,19 @@ public class PipeEditor extends Workspace {
 	public Textbox getPipeIdTxtBox(){
 		return pipeid;
 	}
-	
+
 	public Textbox getPipeNameTxtBox(){
 		return pipeid;
 	}
-	
+
 	public Textbox getPasswordTxtBox(){
 		return password;
 	}
-	
+
 	public boolean savePipe(){
 		return engine.getPipeStore().save(getPipeConfig()); 
 	}
-	
+
 	public PipeConfig getPipeConfig() {
 		PipeConfig pipeConfig = new PipeConfig();
 		pipeConfig.setId(getPipeId());
@@ -157,13 +161,12 @@ public class PipeEditor extends Workspace {
 		return pipeConfig;
 	}
 
-	
+
 	public String getSrcCode(boolean config){
 		if(outputNode==null) return "";
-		outputNode.reset(true);
 		return outputNode.getSrcCode(config);
 	}
-	
+
 	public String getPipeId(){
 		return pipeid.getValue();
 	}
@@ -171,226 +174,196 @@ public class PipeEditor extends Workspace {
 	public String getPipeName(){
 		return pipename.getValue();
 	}
-	
+
 	public String getPassword(){
 		return password.getValue();
 	}
-	
+
 	public void addParameter(ParameterNode paraNode){
 		if (paraList.indexOf(paraNode)<0)
 			paraList.add(paraNode);
 	}
-	
+
 	public ParameterNode getParameter(String nodeId){
 		for(int i=0;i<paraList.size();i++){
 			if((nodeId.equals("${"+paraList.get(i).getParaId()+"}"))&&(paraList.get(i).getWorkspace()!=null)){
-			   return paraList.get(i);
+				return paraList.get(i);
 			}
 		}
 		logger.debug("No parameter set for ["+nodeId+"]");
 		return null;
 	}
-	
+
 	public ArrayList<ParameterNode> getParameters(){
 		return paraList;
 	}
-	
+
 	public void removeParameters(){
 		paraList.removeAll(paraList);
 	}
-	
+
 	public void createFigure(int x,int y,String figureType){
-		 if(outputNode==null){
-			 outputNode=new  OutPipeNode(400,400);
-			 addFigure(outputNode);
-		 }
-	     x-=350;
-	     y-=70;             
-	     if(figureType.equalsIgnoreCase("rdffetchop")){
-	     	 addFigure(new RDFFetchNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("htmlfetchop")){
-	     	 addFigure(new HTMLFetchNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("sparqlresultfetchop")){
-	     	 addFigure(new SPARQLResultFetchNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("simplemixop")){
-	     	 addFigure(new SimpleMixNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("constructop")){
-	     	 addFigure(new ConstructNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("selectop")){
-	     	 addFigure(new SelectNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("patch-gen")){
-	     	 addFigure(new PatchGeneratorNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("patch-exec")){
-	     	 addFigure(new PatchExecutorNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("rdfsmixop")){
-	     	 addFigure(new RDFSMixNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("smoosherop")){
-	     	 addFigure(new SmoosherNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("forop")){
-	     	addFigure(new ForNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("xsltop")){
-		     	addFigure(new XSLTNode(x,y));
-		 }
-	     else if(figureType.equalsIgnoreCase("xmlfetchop")){
-		     	addFigure(new XMLFetchNode(x,y));
-		 }
-	     else if(figureType.equalsIgnoreCase("xslfetchop")){
-		     	addFigure(new XSLFetchNode(x,y));
-		 }
-	     else if(figureType.equalsIgnoreCase("urlbuilder")){
-	     	addFigure(new URLBuilderNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("parameter")){
-	     	addFigure(new ParameterNode(x,y));
-	     }
-	     else if(figureType.equalsIgnoreCase("variable")){
-		     	addFigure(new VariableNode(x,y));
-		 }
-	     else if(figureType.equalsIgnoreCase("sparqlendpoint")){
-		     	addFigure(new SPARQLEndpointNode(x,y));
-		 }else{
-			 logger.warn("Not configured to add node of type ["+figureType+"]");
-		 }
+		if(outputNode==null){
+			outputNode=new  OutPipeNode(400,400);
+			addFigure(outputNode);
+		}
+		x-=350;
+		y-=70;             
+		if(figureType.equalsIgnoreCase("rdffetchop")){
+			addFigure(new RDFFetchNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("htmlfetchop")){
+			addFigure(new HTMLFetchNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("sparqlresultfetchop")){
+			addFigure(new SPARQLResultFetchNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("simplemixop")){
+			addFigure(new SimpleMixNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("constructop")){
+			addFigure(new ConstructNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("selectop")){
+			addFigure(new SelectNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("patch-gen")){
+			addFigure(new PatchGeneratorNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("patch-exec")){
+			addFigure(new PatchExecutorNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("rdfsmixop")){
+			addFigure(new RDFSMixNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("smoosherop")){
+			addFigure(new SmoosherNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("forop")){
+			addFigure(new ForNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("xsltop")){
+			addFigure(new XSLTNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("xmlfetchop")){
+			addFigure(new XMLFetchNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("xslfetchop")){
+			addFigure(new XSLFetchNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("urlbuilder")){
+			addFigure(new URLBuilderNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("parameter")){
+			addFigure(new ParameterNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("variable")){
+			addFigure(new VariableNode(x,y));
+		}
+		else if(figureType.equalsIgnoreCase("sparqlendpoint")){
+			addFigure(new SPARQLEndpointNode(x,y));
+		}else{
+			logger.warn("Not configured to add node of type ["+figureType+"]");
+		}
 	}
-	
+
 	public static Listbox createListbox(TupleQueryResult tuple){
-		   Listbox listbox =new Listbox();
-		   listbox.setWidth("98%");
-		   listbox.setRows(20);
-		   java.util.List<String> bindingNames = tuple.getBindingNames();
-		   Listhead listhead=new Listhead();
-		   for(int i=0;i<bindingNames.size();i++)
-			    listhead.appendChild(new Listheader(bindingNames.get(i)));
-		   listbox.appendChild(listhead);
-		   try{
-			   while (tuple.hasNext()) {
-		    	   Listitem item=new Listitem();			    	   
-				   BindingSet bindingSet = tuple.next();		   
-				   for(int i=0;i<bindingNames.size();i++){
-					       Listcell cell=new Listcell(bindingSet.getValue(bindingNames.get(i)).toString());
-					       cell.setStyle("font-size: 8px;");
-					       item.appendChild(cell);
-				   }
-				   listbox.appendChild(item);	   
-		       } 
-		   }
-		   catch(QueryEvaluationException e){
-		      	  logger.warn("Problem encountered appending to listbox",e);
-	       }
-		   return listbox;
+		Listbox listbox =new Listbox();
+		listbox.setWidth("98%");
+		listbox.setRows(20);
+		java.util.List<String> bindingNames = tuple.getBindingNames();
+		Listhead listhead=new Listhead();
+		for(int i=0;i<bindingNames.size();i++)
+			listhead.appendChild(new Listheader(bindingNames.get(i)));
+		listbox.appendChild(listhead);
+		try{
+			while (tuple.hasNext()) {
+				Listitem item=new Listitem();			    	   
+				BindingSet bindingSet = tuple.next();		   
+				for(int i=0;i<bindingNames.size();i++){
+					Listcell cell=new Listcell(bindingSet.getValue(bindingNames.get(i)).toString());
+					cell.setStyle("font-size: 8px;");
+					item.appendChild(cell);
+				}
+				listbox.appendChild(item);	   
+			} 
+		}
+		catch(QueryEvaluationException e){
+			logger.warn("Problem encountered appending to listbox",e);
+		}
+		return listbox;
 	}
-	
+
 	public  void reloadTextDebug(String text){
-		   textDebugPanel.setValue(text);
+		textDebugPanel.setValue(text);
 	}
-	   
+
 	public void reloadTabularDebug(TupleQueryResult tuple){
-		   if(tabularDebugPanel.getFirstChild()!=null)
-			   tabularDebugPanel.getFirstChild().detach();
-		   if(tuple!=null)
-			   tabularDebugPanel.appendChild(createListbox(tuple));
+		if(tabularDebugPanel.getFirstChild()!=null)
+			tabularDebugPanel.getFirstChild().detach();
+		if(tuple!=null)
+			tabularDebugPanel.appendChild(createListbox(tuple));
 	}
-	
+
 	public void debug(){
 		debug(getSrcCode(false));
 	}
+	
 	public String populatePara(String syntax){
 		for(int i=0;i<paraList.size();i++){
 			syntax = syntax.replace("${" + paraList.get(i).getParaId() + "}", paraList.get(i).getDefaultVal());
 			try{
 				syntax=syntax.replace(URLEncoder.encode("${" + paraList.get(i).getParaId()  + "}","UTF-8"),
-										URLEncoder.encode(paraList.get(i).getDefaultVal(),"UTF-8"));
+						URLEncoder.encode(paraList.get(i).getDefaultVal(),"UTF-8"));
 			}
 			catch(java.io.UnsupportedEncodingException e){
 				logger.warn("UTF-8 support is required by the JVM specification",e);
 			}
 		}
-		
+
 		return syntax;
 	}
 	public void debug(String syntax){
-		   syntax=populatePara(syntax);	
-		   String textResult=null;
-		   //logger.debug(syntax);
-		   Operator stream= engine.parse(syntax);
-		   if(stream == null){
-			   textResult = "An error occurred executing the pipe";
-		   }
-		   TupleQueryResult tuple=null;
-		   try{
-			   ExecBuffer buff = stream.execute(engine.newContext());
-			   if(buff == null){
-				   textResult = "A null result buffer was returned by the pipe";
-			   }else{
-				   textResult=buff.toString();
-				   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
-					   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
-					   tuple=((((org.deri.pipes.model.SesameMemoryBuffer)buff).
-							   getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
-				   }
-				   else if(buff instanceof org.deri.pipes.model.SesameTupleBuffer){
-					   tuple=((org.deri.pipes.model.SesameTupleBuffer)buff).getTupleQueryResult();
-				   }else{
-					   logger.warn("could not show debug result of type "+buff.getClass());
-				   }
-			   }
-		   }catch(Exception e){
-			   String msg = "A problem occurred executing the buffer";
-			logger.error(msg,e);
-			textResult = msg+": "+e;
-			   
-		   }
-		   reloadTextDebug(textResult);
-		   reloadTabularDebug(tuple);
+		hotDebug(syntax);
 	}
-	
+
 	public void hotDebug(String syntax){
 		syntax=populatePara(syntax);
-		 //logger.debug(syntax);
+		//	logger.debug(syntax);
+		TupleQueryResult tuple=null;
+		String textResult=null;
 		try {
-		   Operator op= engine.parse(syntax);;
-		   TupleQueryResult tuple=null;
-		   String textResult=null;
-		   org.deri.pipes.core.ExecBuffer buff=op.execute(engine.newContext());
-		   if(op instanceof RDFBox){
-			   textResult=buff.toString();
-			   if(buff instanceof org.deri.pipes.model.SesameMemoryBuffer){
-				   String query ="SELECT * WHERE {?predicate ?subject ?object.}";
-				   try{
-			    		tuple=((((org.deri.pipes.model.SesameMemoryBuffer)buff).
-			    				     getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query)).evaluate());
-			    	}
-			        catch(Exception e){ 
-			        	logger.warn("Problem executing sparql query ["+query+"]",e);
-			        }
-			   }   
-		   }else if(op instanceof SelectBox){
-			   //textResult=buff.toString();
-			   
-			   if(buff instanceof org.deri.pipes.model.SesameTupleBuffer){
-				   tuple=((org.deri.pipes.model.SesameTupleBuffer)buff).getTupleQueryResult();
-				   textResult=((org.deri.pipes.model.SesameTupleBuffer)buff).toString();
-			   }
-			   
-		   }
-		   reloadTextDebug(textResult);
-		   reloadTabularDebug(tuple);		
+			Operator op= engine.parse(syntax);;
+			if(op == null){
+				textResult = "An error occurred parsing the pipe";
+				return;
+			}
+			ExecBuffer buff=op.execute(engine.newContext());
+			if(buff == null){
+				textResult = "An error occurred executing the pipe";
+				return;
+			}
+			try{
+				textResult= buff.toString();
+				if(buff instanceof SesameMemoryBuffer){
+					buff = ((SesameMemoryBuffer)buff).toTupleBuffer();
+				}
+				if(buff instanceof SesameTupleBuffer){
+					tuple=((SesameTupleBuffer)buff).getTupleQueryResult();
+				}else{
+					logger.warn("Unable to hotDebug buffer of type "+buff.getClass());
+				}
+			}catch(Exception e){
+				logger.warn("Problem encountered getting tuples from pipe result");
+			}
 		} catch (Exception e) {
 			logger.warn("could not hotDebug",e);
-	    }
+		}finally{
+			reloadTextDebug(textResult);
+			reloadTabularDebug(tuple);
+		}
 	}
-	
+
 	public void reload(String config){
 		Object[] children=getChildren().toArray();
 		for(int i=0;i<children.length;i++){
@@ -399,16 +372,16 @@ public class PipeEditor extends Workspace {
 		}
 		outputNode=null;
 		if((null==config)||(config.trim()=="")) return;
-		InputSource input=new InputSource(new java.io.StringReader(config));
+		InputSource input=new InputSource(new StringReader(config));
 		try {
-            DOMParser parser = new DOMParser();
-            parser.parse(input);  
-            PipeNode.loadConfig(parser.getDocument().getDocumentElement(),this);
-        } catch (Exception e) {
-        	System.out.print(e.toString()+"\n");
-        }
+			DOMParser parser = new DOMParser();
+			parser.parse(input);  
+			PipeNode.loadConfig(parser.getDocument().getDocumentElement(),this);
+		} catch (Exception e) {
+			logger.warn("problem parsing config",e);
+		}
 	}
-	
+
 	public void clone(String pid){
 		PipeConfig config = engine.getPipeStore().getPipe(pid);
 		reload(config == null?"":config.getConfig());
@@ -416,14 +389,14 @@ public class PipeEditor extends Workspace {
 		bdid.setValue("");
 		pipename.setValue("");
 	}
-	
+
 	public void newPipe(){
 		reload(null);
 		pipeid.setValue("");
 		bdid.setValue("");
 		pipename.setValue("");
 	}
-	
+
 	public void edit(String pid){
 		PipeConfig pipeConfig=engine.getPipeStore().getPipe(pid);
 		if(pipeConfig == null){

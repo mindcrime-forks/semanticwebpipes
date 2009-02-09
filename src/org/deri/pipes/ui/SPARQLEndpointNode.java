@@ -167,8 +167,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			if(srcCode!=null) return srcCode;
-			srcCode =doc.createElement(tagName);
+			Element srcCode =doc.createElement(tagName);
 			if(config) setPosition((Element)srcCode);
 			
 			Element endpointElm=doc.createElement("endpoint");
@@ -203,5 +202,6 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 		((PipeEditor)getWorkspace()).reloadTabularDebug(null);
 		
 	}
+
 }
 

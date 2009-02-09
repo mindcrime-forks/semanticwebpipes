@@ -51,6 +51,10 @@ import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.utils.UrlLoader;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -85,23 +89,7 @@ public class SesameMemoryBuffer implements ExecBuffer {
 	public  RepositoryConnection getConnection(){
 		try{
 			if(buffRepository==null){
-				if(sail == null){
-					sail=new MemoryStore();
-				}
-				switch (reasoningType){
-				case RDFS:
-					logger.debug("using ForwardChainingRDFSInferencer" );
-					buffRepository =new SailRepository(
-							new ForwardChainingRDFSInferencer(sail));
-					break;
-				case NONE:
-				default:
-					logger.debug("using no inference" );
-					buffRepository = new SailRepository(sail);
-				break;
-				}
-				buffRepository.initialize();
-
+				initialiseRepository();
 			}
 			return buffRepository.getConnection();
 		}
@@ -109,6 +97,25 @@ public class SesameMemoryBuffer implements ExecBuffer {
 			logger.warn("could not initialise repository",e);
 		}
 		return null;
+	}
+
+	private void initialiseRepository() throws RepositoryException {
+		if(sail == null){
+			sail=new MemoryStore();
+		}
+		switch (reasoningType){
+		case RDFS:
+			logger.debug("using ForwardChainingRDFSInferencer" );
+			buffRepository =new SailRepository(
+					new ForwardChainingRDFSInferencer(sail));
+			break;
+		case NONE:
+		default:
+			logger.debug("using no inference" );
+			buffRepository = new SailRepository(sail);
+		break;
+		}
+		buffRepository.initialize();
 	}
 
 	public Sail getSail(){
@@ -155,6 +162,12 @@ public class SesameMemoryBuffer implements ExecBuffer {
 
 	public void stream(ExecBuffer outputBuffer){
 		stream(outputBuffer,null);
+	}
+	
+	public SesameTupleBuffer toTupleBuffer() throws QueryEvaluationException, RepositoryException, MalformedQueryException{
+		String query ="SELECT * WHERE {?subject ?predicate ?object.}";
+		TupleQueryResult result = getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query).evaluate();
+		return new SesameTupleBuffer(result);
 	}
 
 	public void stream(ExecBuffer outputBuffer,String uri){

@@ -248,8 +248,7 @@ public class RegExNode extends InOutNode implements ConnectingInputNode{
 		
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
-			srcCode =super.getSrcCode(doc, config);
+			Node srcCode =super.getSrcCode(doc, config);
 			
 			Element rulesElm=doc.createElement("rules");
 			for(int i=1;i<vbox.getChildren().size();i++){	

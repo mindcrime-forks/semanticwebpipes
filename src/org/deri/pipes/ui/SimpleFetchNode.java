@@ -91,9 +91,8 @@ public class SimpleFetchNode extends InPipeNode implements ConnectingInputNode{
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
 			//return if srcCode was created
-			if (srcCode!=null) return srcCode;
 			
-			srcCode = doc.createElement(tagName);
+			Element srcCode = doc.createElement(tagName);
 			if (config) setPosition((Element)srcCode);
 			
 			Element locElm=doc.createElement("location");
@@ -104,12 +103,7 @@ public class SimpleFetchNode extends InPipeNode implements ConnectingInputNode{
 		return null;
 	}
 	
-	@Override
-	public void reset(boolean recursive){
-		srcCode=null;
-		if(recursive)
-			reset(urlPort,recursive);
-	}
+
 	
 	public void _loadConfig(Element elm){		
 		Element locElm=XMLUtil.getFirstSubElementByName(elm, "location");

@@ -72,19 +72,13 @@ public class OWLNode extends InOutNode{
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
-			srcCode =super.getSrcCode(doc, config);
+			Node srcCode =super.getSrcCode(doc, config);
 	    	srcCode.appendChild(getConnectedCode(doc,"owlsource",owlPort,config));
 	    	return srcCode;
 		}
 		return null;
     }
 	
-	@Override
-	public void reset(boolean recursive){
-		super.reset(recursive);
-		if(recursive) reset(owlPort,recursive);
-	}
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		OWLNode node= new OWLNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));

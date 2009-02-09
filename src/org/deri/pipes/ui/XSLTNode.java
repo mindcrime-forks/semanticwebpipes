@@ -69,7 +69,7 @@ public class XSLTNode extends InOutNode{
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
+			Element srcCode = doc.createElement(tagName);
 			if(config) setPosition((Element)srcCode);
 	    	srcCode.appendChild(getConnectedCode(doc,"xmlsource",input,config));
 	    	srcCode.appendChild(getConnectedCode(doc,"xslsource",xslPort,config));

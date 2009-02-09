@@ -62,6 +62,14 @@ public class SesameTupleBuffer implements ExecBuffer{
 	public SesameTupleBuffer(){
 		reset();
 	}
+	/**
+	 * Create a new SesameTupleBuffer using these query results.
+	 * @param result
+	 * @throws QueryEvaluationException
+	 */
+	public SesameTupleBuffer(TupleQueryResult result) throws QueryEvaluationException{
+		this.buffer=new MutableTupleQueryResult(result);
+	}
 
 	/**
 	 * Clear the result buffer.

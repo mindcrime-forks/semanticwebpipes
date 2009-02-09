@@ -69,8 +69,7 @@ public class QueryNode extends InOutNode{
 	
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			if (srcCode!=null) return srcCode;
-			srcCode =super.getSrcCode(doc, config);
+			Node srcCode =super.getSrcCode(doc, config);
 			Element queryElm=doc.createElement("query");
 			queryElm.appendChild(doc.createCDATASection(queryBox.getQuery()));
 	    	srcCode.appendChild(queryElm);

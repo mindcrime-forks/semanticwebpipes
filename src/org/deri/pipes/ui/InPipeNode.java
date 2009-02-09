@@ -43,7 +43,7 @@ import org.integratedmodelling.zk.diagram.components.PortType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InPipeNode extends PipeNode{
+public abstract class InPipeNode extends PipeNode{
 	final Logger logger = LoggerFactory.getLogger(InPipeNode.class);
 	
     protected Port output =null;
