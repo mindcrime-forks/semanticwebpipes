@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Session Timeout" ?>
+<window width="80%" title="Session Timeout" border="normal">
+	<vbox>
+Sorry, the page or component you request is no longer available.
+	<div style="margin-top: 10px">Return to <toolbarbutton href="./index.zul" label="Semantic Web Pipes"/>
+	</div>
+	</vbox>
+</window>

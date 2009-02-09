@@ -42,6 +42,7 @@ package org.deri.pipes.core;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.commons.httpclient.HttpClient;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.ThreadedExecutor;
 import org.deri.pipes.model.MultiExecBuffer;
@@ -61,6 +62,7 @@ public class Engine {
 	PipeParser parser;
 	ThreadedExecutor executor;
 	private PipeStore pipeStore;
+	private HttpClient httpClient;
 
 	public PipeStore getPipeStore(){
 		if(pipeStore == null){
@@ -99,6 +101,25 @@ public class Engine {
 	void setPipeParser(PipeParser parser){
 		this.parser = parser;
 	}
+	
+	/**
+	 * Get the HttpClient.
+	 * @return
+	 */
+	public HttpClient getHttpClient(){
+		if(httpClient == null){
+			httpClient = new HttpClient();
+		}
+		return httpClient;
+	}
+	/**
+	 * Set the http client;
+	 * @param httpClient
+	 */
+	public void setHttpClient(HttpClient httpClient){
+		this.httpClient = httpClient;
+	}
+	
 	/**
 	 * Parse the XML returning the defined operator.
 	 * @param xml
