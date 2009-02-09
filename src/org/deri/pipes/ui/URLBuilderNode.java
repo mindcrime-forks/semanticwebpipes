@@ -270,7 +270,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		hbox.appendChild(createParaBox(80,16));
 		hbox.appendChild(new Label(" = "));
 		hbox.appendChild(createParaBox(80,16));
-		Port nPort=createPort(PipePortType.TEXTIN,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
+		Port nPort=createPort(PipePortType.TEXTIN,"right");//,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
 		hbox.appendChild(nPort);
 		paraPorts.put(hbox.getUuid(), nPort);		
 		paraVbox.appendChild(hbox);		
@@ -283,7 +283,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		hbox.appendChild(new Label(" = "));
 		Textbox txtBox=createParaBox(80,16);
 		hbox.appendChild(txtBox);	
-		Port nPort=createPort(PipePortType.TEXTIN,203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
+		Port nPort=createPort(PipePortType.TEXTIN,"right");//203,57+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*_rs);
 		hbox.appendChild(nPort);
 		paraPorts.put(hbox.getUuid(), nPort);
 		paraVbox.appendChild(hbox);

@@ -85,7 +85,7 @@ public class SelectBox extends AbstractMerge {
 
     private String query;    	
 
-	public ExecBuffer execute(Context context) throws Exception{              
+	public ExecBuffer execute(Context context) throws Exception{            
 		SesameTupleBuffer resultBuffer=new SesameTupleBuffer();       
 		SesameMemoryBuffer tmp= new SesameMemoryBuffer();
 		mergeInputs(tmp,context);

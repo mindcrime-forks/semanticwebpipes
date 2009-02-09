@@ -12,7 +12,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/arq.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/babel-exhibit-converter-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/babel-interfaces-1.0-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/bsh.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/catalina-ant.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/catalina-ha.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/catalina-tribes.jar"/>

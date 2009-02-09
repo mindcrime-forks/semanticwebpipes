@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.rdf;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -140,7 +141,7 @@ public class ForLoopBox extends RDFBox{
 
 	private void executeJobsConcurrentlyAndClearList(Context context,
 			SesameMemoryBuffer buffer, List<Operator> execJobs)
-			throws InterruptedException {
+			throws InterruptedException,IOException {
 		if(execJobs.size()==0){
 			return;
 		}

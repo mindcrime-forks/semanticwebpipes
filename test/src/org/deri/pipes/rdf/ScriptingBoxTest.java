@@ -37,81 +37,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.model;
+package org.deri.pipes.rdf;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
+import org.deri.pipes.core.Context;
 import org.deri.pipes.core.ExecBuffer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.deri.pipes.core.internals.Source;
+
+import junit.framework.TestCase;
 
 /**
- * A collection of ExecBuffers.
  * @author robful
  *
  */
-public class MultiExecBuffer implements ExecBuffer{
-	Logger logger = LoggerFactory.getLogger(ExecBuffer.class);
-	List<ExecBuffer> buffers = new ArrayList<ExecBuffer>();
-	public MultiExecBuffer(List<ExecBuffer> buffers){
-		this.buffers.addAll(buffers);
-	}
-	
-	/**
-	 * Streams each buffer in sequence to the output buffer.
-	 * Logs a warning if any buffer is null.
-	 * @throws IOException 
-	 */
-	@Override
-	public void stream(ExecBuffer outputBuffer) throws IOException {
-		for(ExecBuffer buffer : buffers){
-			if(buffer == null){
-				logger.warn("A null buffer was included in the results");
-			}else{
-				buffer.stream(outputBuffer);
-			}
-		}
-	}
+public class ScriptingBoxTest extends TestCase {
+	public void test() throws Exception{
+		ScriptingBox x = new ScriptingBox();
+		String xml1 = "<?xml version='1.0'?>" +
+		"\n<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'" +
+		"\n         xmlns:dc='http://purl.org/dc/elements/1.1/' >" +
+		"\n<rdf:Description rdf:about='http://www.w3.org/TR/rdf-syntax-grammar'> " +
+		"\n  <dc:title>RDF/XML Syntax Specification (Revised)</dc:title> " +
+		"\n</rdf:Description> " +
+		"\n</rdf:RDF>";
+		x.setSource(new Source(new TextBox(xml1)));
+		x.setLanguage("groovy");
+		x.setScript("'Hello, this is the answer, thanks to groovy scripting!'");
+		ExecBuffer output = x.execute(new Context());
+		System.out.println(output);
 
-	/**
-	 * Streams each buffer in sequence to the output buffer.
-	 * Logs a warning if any buffer is null.
-	 * @throws IOException 
-	 */
-	@Override
-	public void stream(ExecBuffer outputBuffer, String context) throws IOException {
-		for(ExecBuffer buffer : buffers){
-			if(buffer == null){
-				logger.warn("A null buffer was included in the results");
-			}else{
-				buffer.stream(outputBuffer,context);
-			}
-		}
-	}
-
-	/**
-	 * Streams each buffer in sequence to the output stream.
-	 * Logs a warning if any buffer is null.
-	 * @throws IOException 
-	 */
-	@Override
-	public void stream(OutputStream output) throws IOException {
-		for(ExecBuffer buffer : buffers){
-			if(buffer == null){
-				logger.warn("A null buffer was included in the results");
-			}else{
-				buffer.stream(output);
-			}
-		}
-	}
-	/**
-	 * Get a reference to the list of ExecBuffers.
-	 * @return The underlying ExecBuffers
-	 */
-	public List<ExecBuffer> getExecBuffers(){
-		return buffers;
 	}
 }

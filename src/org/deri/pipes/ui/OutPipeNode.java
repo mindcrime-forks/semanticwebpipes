@@ -102,4 +102,12 @@ public class OutPipeNode extends PipeNode{
 		public void debug(){	   
 			   ((PipeEditor)getWorkspace()).debug(getSrcCode(false));
 		}
+
+		/* (non-Javadoc)
+		 * @see org.deri.pipes.ui.PipeNode#connectTo(org.integratedmodelling.zk.diagram.components.Port)
+		 */
+		@Override
+		public void connectTo(Port port) {
+			logger.warn("The output pipe node should not be invoked to connect()");
+		}
 	}

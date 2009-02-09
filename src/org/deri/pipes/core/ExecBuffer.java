@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.core;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 
@@ -47,7 +48,7 @@ import java.io.OutputStream;
  */
 
 public interface ExecBuffer {
-     public abstract void stream(ExecBuffer outputBuffer);
-     public abstract void stream(ExecBuffer outputBuffer,String context);
-     public abstract void stream(OutputStream output);
+     public abstract void stream(ExecBuffer outputBuffer) throws IOException;
+     public abstract void stream(ExecBuffer outputBuffer,String context)throws IOException;
+     public abstract void stream(OutputStream output) throws IOException;
 }

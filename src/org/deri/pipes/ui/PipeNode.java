@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.ui;
 
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -50,6 +51,7 @@ import org.deri.pipes.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.PortType;
+import org.integratedmodelling.zk.diagram.components.Shape;
 import org.integratedmodelling.zk.diagram.components.ZKNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +66,7 @@ import org.zkoss.zul.Window;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
-public abstract class PipeNode extends ZKNode implements PipeNodeFactory{  
+public abstract class PipeNode extends ZKNode{  
 	final Logger logger = LoggerFactory.getLogger(PipeNode.class);
 
 	private static final long serialVersionUID = -1520720934219234911L;
@@ -78,9 +80,9 @@ public abstract class PipeNode extends ZKNode implements PipeNodeFactory{
 		appendChild(wnd); 	   
 	}
 
-	protected void initialize(){
-
-	}
+	abstract void initialize();
+	public abstract Node getSrcCode(Document doc,boolean config);
+	public abstract void connectTo(Port port);
 
 	public CustomPort createPort(PortType pType,String position){
 		CustomPort port=new CustomPort(((PipeEditor)getWorkspace()).getPTManager(),pType);
@@ -129,7 +131,7 @@ public abstract class PipeNode extends ZKNode implements PipeNodeFactory{
 	}
 
 	private Node asTextOrCDataNode(Document doc, String srcCode) {
-		if(srcCode.indexOf('<')>=0){
+		if(srcCode.indexOf('<')>=0|| srcCode.indexOf('\n')>=0){
 			return doc.createCDATASection(srcCode);
 		}else{
 			return doc.createTextNode(srcCode);
@@ -183,8 +185,12 @@ public abstract class PipeNode extends ZKNode implements PipeNodeFactory{
 		Element linkedElm=XMLUtil.getFirstSubElement(elm);
 		String txt;
 		if(linkedElm!=null){
-			PipeNode linkedNode=PipeNode.loadConfig(linkedElm,(PipeEditor)getWorkspace());
-			linkedNode.connectTo(port);
+			Shape shape = PipeNode.loadConfig(linkedElm,(PipeEditor)getWorkspace());
+			if(shape !=null && shape instanceof PipeNode){
+				((PipeNode)shape).connectTo(port);
+			}else{
+				logger.warn("cannot connect shape ["+shape+"] to port "+port);
+			}
 		}else if((txt=XMLUtil.getTextData(elm))!=null){
 			if(txt.indexOf("${")>=0){				
 				ParameterNode paraNode=((PipeEditor)getWorkspace()).getParameter(txt);
@@ -209,7 +215,6 @@ public abstract class PipeNode extends ZKNode implements PipeNodeFactory{
 		caption.appendChild(delButton);
 	}
 
-	public abstract Node getSrcCode(Document doc,boolean config);
 
 	public String getSrcCode(boolean config){
 		DocumentImpl doc =new DocumentImpl();
@@ -233,7 +238,8 @@ public abstract class PipeNode extends ZKNode implements PipeNodeFactory{
 
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		//logger.debug(elm.getTagName());
-		if(elm.getTagName().equalsIgnoreCase("pipe")){    
+		String elementName = elm.getTagName();
+		if(elementName.equalsIgnoreCase("pipe")){    
 			List<Element>  paraElms=XMLUtil.getSubElementByName(
 					XMLUtil.getFirstSubElementByName(elm, "parameters"),"parameter");
 			for(int i=0;i<paraElms.size();i++){
@@ -242,69 +248,10 @@ public abstract class PipeNode extends ZKNode implements PipeNodeFactory{
 			return PipeNode.loadConfig(XMLUtil.getFirstSubElementByName(elm, "code"),wsp);
 		}
 
-		if(elm.getTagName().equalsIgnoreCase("code"))
-			return OutPipeNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("rdffetch"))    
-			return RDFFetchNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("simplemix"))    
-			return SimpleMixNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("construct"))    
-			return ConstructNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("for"))    
-			return ForNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("xslt"))    
-			return XSLTNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("htmlfetch"))    
-			return HTMLFetchNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("xmlfetch"))    
-			return XMLFetchNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("xslfetch"))    
-			return XSLFetchNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("parameter"))    
-			return ParameterNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("patch-executor"))    
-			return PatchExecutorNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("patch-generator"))    
-			return PatchGeneratorNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("smoosher"))    
-			return SmoosherNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("rdfs"))    
-			return RDFSMixNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("select"))    
-			return SelectNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("tuplefetch"))    
-			return TupleQueryResultFetchNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("urlbuilder"))    
-			return URLBuilderNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("variable"))    
-			return VariableNode.loadConfig(elm,wsp);
-
-		if(elm.getTagName().equalsIgnoreCase("sparqlendpoint"))    
-			return SPARQLEndpointNode.loadConfig(elm,wsp);
-
-		return null;
+		return wsp.createNodeForElement(elm);
 	}
 
-	public void connectTo(Port port){
 
-	}
 	public byte getTypeIdx(){
 		return PipePortType.NONE;
 	}
@@ -313,11 +260,5 @@ public abstract class PipeNode extends ZKNode implements PipeNodeFactory{
 		((PipeEditor)getWorkspace()).hotDebug(getSrcCode(false));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.deri.pipes.ui.PipeNodeFactory#createPipeNode(org.w3c.dom.Element, org.deri.pipes.ui.PipeEditor)
-	 */
-	@Override
-	public PipeNode createPipeNode(Element elm, PipeEditor wsp) {
-		return loadConfig(elm,wsp);
-	}
+
 }

@@ -38,6 +38,9 @@
  */
 package org.deri.pipes.ui;
 
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyObject;
+
 import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -65,6 +68,7 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Bandbox;
@@ -78,6 +82,7 @@ import org.zkoss.zul.Textbox;
 public class PipeEditor extends Workspace {
 	//TODO: make engine a settable field
 	static Engine engine = Engine.defaultEngine();
+	private transient IPipeNodeFactory groovyPipeNodeFactory;
 	final static Logger logger = LoggerFactory.getLogger(PipeEditor.class);
 	private Textbox textDebugPanel,pipeid,pipename,password;
 	private Bandbox bdid;
@@ -208,64 +213,23 @@ public class PipeEditor extends Workspace {
 			addFigure(outputNode);
 		}
 		x-=350;
-		y-=70;             
-		if(figureType.equalsIgnoreCase("rdffetchop")){
-			addFigure(new RDFFetchNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("htmlfetchop")){
-			addFigure(new HTMLFetchNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("sparqlresultfetchop")){
-			addFigure(new SPARQLResultFetchNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("simplemixop")){
-			addFigure(new SimpleMixNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("constructop")){
-			addFigure(new ConstructNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("selectop")){
-			addFigure(new SelectNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("patch-gen")){
-			addFigure(new PatchGeneratorNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("patch-exec")){
-			addFigure(new PatchExecutorNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("rdfsmixop")){
-			addFigure(new RDFSMixNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("smoosherop")){
-			addFigure(new SmoosherNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("forop")){
-			addFigure(new ForNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("xsltop")){
-			addFigure(new XSLTNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("xmlfetchop")){
-			addFigure(new XMLFetchNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("xslfetchop")){
-			addFigure(new XSLFetchNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("urlbuilder")){
-			addFigure(new URLBuilderNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("parameter")){
-			addFigure(new ParameterNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("variable")){
-			addFigure(new VariableNode(x,y));
-		}
-		else if(figureType.equalsIgnoreCase("sparqlendpoint")){
-			addFigure(new SPARQLEndpointNode(x,y));
-		}else{
-			logger.warn("Not configured to add node of type ["+figureType+"]");
+		y-=70;
+		try{
+			if(groovyPipeNodeFactory == null){
+				initialiseGrovePipeNodeFactory();
+			}
+			Shape shape =  groovyPipeNodeFactory.createShape(figureType,x,y);
+			if(shape != null){
+				addFigure(shape);
+			}else{
+				logger.warn("Not configured to add shape having tag name=["+figureType+"]");
+
+			}
+		}catch(Throwable t){
+			logger.error("Cannot parse pipe xml",t);
 		}
 	}
+
 
 	public static Listbox createListbox(TupleQueryResult tuple){
 		Listbox listbox =new Listbox();
@@ -406,5 +370,29 @@ public class PipeEditor extends Workspace {
 		pipeid.setValue(pipeConfig.getId());
 		bdid.setValue(pipeConfig.getId());
 		pipename.setValue(pipeConfig.getName());
+	}
+
+	/**
+	 * @param elm
+	 * @return
+	 */
+	public PipeNode createNodeForElement(Element element) {
+		try{
+			if(groovyPipeNodeFactory == null){
+				initialiseGrovePipeNodeFactory();
+			}
+			return groovyPipeNodeFactory.createPipeNode(element, this);
+		}catch(Throwable t){
+			logger.error("Cannot parse pipe xml",t);
+		}
+		return null;
+	}
+
+	private void initialiseGrovePipeNodeFactory()
+			throws ClassNotFoundException, InstantiationException,
+			IllegalAccessException {
+		GroovyClassLoader loader = new GroovyClassLoader(PipeNode.class.getClassLoader());
+		Class groovyClass = loader.loadClass("PipeNodeFactory",true,true);
+		groovyPipeNodeFactory = (IPipeNodeFactory) groovyClass.newInstance();
 	}
 }

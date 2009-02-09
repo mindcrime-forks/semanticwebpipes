@@ -37,81 +37,77 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.model;
+package org.deri.pipes.rdf;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 
+import org.apache.bsf.BSFDeclaredBean;
+import org.apache.bsf.BSFEngine;
+import org.apache.bsf.BSFManager;
+import org.apache.bsf.util.CodeBuffer;
+import org.deri.pipes.core.Context;
 import org.deri.pipes.core.ExecBuffer;
+import org.deri.pipes.core.Operator;
+import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.model.BinaryContentBuffer;
+import org.deri.pipes.model.SesameMemoryBuffer;
+import org.deri.pipes.model.SesameTupleBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A collection of ExecBuffers.
  * @author robful
  *
  */
-public class MultiExecBuffer implements ExecBuffer{
-	Logger logger = LoggerFactory.getLogger(ExecBuffer.class);
-	List<ExecBuffer> buffers = new ArrayList<ExecBuffer>();
-	public MultiExecBuffer(List<ExecBuffer> buffers){
-		this.buffers.addAll(buffers);
-	}
+public class ScriptingBox implements Operator {
+	final transient Logger logger = LoggerFactory.getLogger(ScriptingBox.class);
 	
-	/**
-	 * Streams each buffer in sequence to the output buffer.
-	 * Logs a warning if any buffer is null.
-	 * @throws IOException 
+	private String language;
+	private String script;
+	private Source source;
+	
+	public String getLanguage() {
+		return language;
+	}
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+	public String getScript() {
+		return script;
+	}
+	public void setScript(String script) {
+		this.script = script;
+	}
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.Operator#execute(org.deri.pipes.core.Context)
 	 */
 	@Override
-	public void stream(ExecBuffer outputBuffer) throws IOException {
-		for(ExecBuffer buffer : buffers){
-			if(buffer == null){
-				logger.warn("A null buffer was included in the results");
-			}else{
-				buffer.stream(outputBuffer);
-			}
+	public ExecBuffer execute(Context context) throws Exception {
+		BSFManager manager = new BSFManager();
+		manager.declareBean("source", source, Source.class);
+		manager.declareBean("context", context, Context.class);
+		BSFEngine engine = manager.loadScriptingEngine(language);
+		Vector args = new Vector();
+		args.add(source);
+		args.add(context);
+		Vector argNames = new Vector();
+		argNames.add("source");
+		argNames.add("context");
+		Object result = engine.apply(language,0, 0,script, argNames, args);
+		if(result instanceof ExecBuffer){
+			return(ExecBuffer)result;
 		}
+		logger.warn("converting results to String for "+this.getClass());
+		BinaryContentBuffer content = new BinaryContentBuffer();
+		content.setContentType("text/plain");
+		content.setContent(result.toString());
+		return content;
+	}
+	/**
+	 * @param source2
+	 */
+	public void setSource(Source source) {
+		this.source = source;
 	}
 
-	/**
-	 * Streams each buffer in sequence to the output buffer.
-	 * Logs a warning if any buffer is null.
-	 * @throws IOException 
-	 */
-	@Override
-	public void stream(ExecBuffer outputBuffer, String context) throws IOException {
-		for(ExecBuffer buffer : buffers){
-			if(buffer == null){
-				logger.warn("A null buffer was included in the results");
-			}else{
-				buffer.stream(outputBuffer,context);
-			}
-		}
-	}
-
-	/**
-	 * Streams each buffer in sequence to the output stream.
-	 * Logs a warning if any buffer is null.
-	 * @throws IOException 
-	 */
-	@Override
-	public void stream(OutputStream output) throws IOException {
-		for(ExecBuffer buffer : buffers){
-			if(buffer == null){
-				logger.warn("A null buffer was included in the results");
-			}else{
-				buffer.stream(output);
-			}
-		}
-	}
-	/**
-	 * Get a reference to the list of ExecBuffers.
-	 * @return The underlying ExecBuffers
-	 */
-	public List<ExecBuffer> getExecBuffers(){
-		return buffers;
-	}
 }

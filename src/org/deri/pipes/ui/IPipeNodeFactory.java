@@ -39,12 +39,19 @@
 
 package org.deri.pipes.ui;
 
+import org.integratedmodelling.zk.diagram.components.Shape;
 import org.w3c.dom.Element;
 
 /**
  * @author robful
  *
  */
-public interface PipeNodeFactory {
+public interface IPipeNodeFactory {
 	public PipeNode createPipeNode(Element elm,PipeEditor wsp);
+
+	/**
+	 * @param string
+	 * @return
+	 */
+	public Shape createShape(String tagName,int x, int y);
 }

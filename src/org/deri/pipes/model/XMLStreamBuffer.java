@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,6 +57,7 @@ public class XMLStreamBuffer implements ExecBuffer {
 	private transient Logger logger = LoggerFactory.getLogger(XMLStreamBuffer.class);
 	String url=null;
 	StringBuffer strBuff=null;
+	private byte[] byteData = null;
 	
 	public XMLStreamBuffer(){
 	}
@@ -69,6 +71,9 @@ public class XMLStreamBuffer implements ExecBuffer {
 	}
 	
 	public StreamSource getStreamSource(){
+		if(byteData != null){
+			return new StreamSource(new ByteArrayInputStream(byteData));
+		}
 		if(url!=null) 
 			return new StreamSource(url);
 		if (strBuff!=null) 
@@ -128,5 +133,12 @@ public class XMLStreamBuffer implements ExecBuffer {
 				logger.warn("problem streaming output",e);
 			}
 		}
+	}
+
+	/**
+	 * @param byteArrayInputStream
+	 */
+	public void setStreamSource(byte[] data) {
+		this.byteData  = data;
 	}
 }

@@ -47,6 +47,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 
+import org.deri.pipes.core.Context;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.utils.UrlLoader;
 import org.openrdf.model.Statement;
