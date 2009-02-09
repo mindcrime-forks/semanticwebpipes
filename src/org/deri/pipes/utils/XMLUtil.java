@@ -43,6 +43,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -137,7 +138,9 @@ public class XMLUtil {
 
 	   public static Element createElmWithText(Document doc,String tagName,String text){
 		   Element elm =doc.createElement(tagName);
-		   elm.appendChild(doc.createCDATASection(text!=null?text.trim():""));
+		   text = text!=null?text.trim():"";
+		   Node node = (text.indexOf('>')>=0 || text.indexOf('\n')>=0)?doc.createCDATASection(text):doc.createTextNode(text);
+		   elm.appendChild(node);
 		   return elm;
 	   }
 }
