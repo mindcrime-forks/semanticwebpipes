@@ -49,10 +49,9 @@ import java.util.List;
 import java.util.Properties;
 
 import org.deri.pipes.endpoints.PipeConfig;
-import org.deri.pipes.ui.PipeEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zkoss.zk.ui.Executions;
+//import org.zkoss.zk.ui.Executions;
 
 public class DatabasePipeManager implements PipeStore {
 	static Logger logger = LoggerFactory.getLogger(DatabasePipeManager.class);
@@ -63,7 +62,8 @@ public class DatabasePipeManager implements PipeStore {
 		Properties prop = new Properties();
 		try
 		{
-			prop.load(new FileInputStream(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+DB_PROP)));
+//			prop.load(new FileInputStream(Executions.getCurrent().getDesktop().getWebApp().getRealPath("/WEB-INF/"+DB_PROP)));
+			prop.load(DatabasePipeManager.class.getClassLoader().getResourceAsStream(DB_PROP));
 
 			StringBuffer connStr= new StringBuffer("jdbc:mysql://");
 			connStr.append(prop.getProperty("host"));
