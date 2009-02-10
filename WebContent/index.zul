@@ -27,8 +27,10 @@
 	<borderlayout>
 	  
 	<center border="none" flex="true">
+	
    	  <borderlayout>					
 			<north>
+						<hbox width="100%">
 						<vbox>
 						<menubar id="menubar">
 		<menu label="File">
@@ -76,8 +78,11 @@
         </vbox>
 		</bandpopup>
 	</bandbox>		
-	</hbox>					
+	  </hbox>					
+	
 						</vbox>
+    		  <button href="http://pipes.deri.org/" image="/img/pipeslogo.png" style="float:right;"/>
+		</hbox>
 						</north>			
     		
 						<center>
@@ -113,7 +118,6 @@
 										
 										</tabpanels>
 									    </tabbox>
-										
 							
 						</center>
 						<south id="debugViewArea" size="10%" splittable="true" minsize="80"  >
@@ -198,27 +202,32 @@
 				<treechildren>
 					<treeitem>
 						<treerow>
-							<treecell id="rdffetchop"  draggable="true"  label="RDF Fetch" />
+							<treecell id="rdffetch"  draggable="true"  label="RDF Fetch" />
 						</treerow>	
 					</treeitem>
 					<treeitem>
 						<treerow>
-							<treecell id="htmlfetchop"  draggable="true"  label="HTML Fetch" />
+							<treecell id="htmlfetch"  draggable="true"  label="HTML Fetch" />
 						</treerow>	
 					</treeitem>
 					<treeitem>
 						<treerow>
-							<treecell id="sparqlresultfetchop"  draggable="true"  label="Sparql Result Fetch" />
+							<treecell id="http-get"  draggable="true"  label="HTTP GET" />
 						</treerow>	
 					</treeitem>
 					<treeitem>
 						<treerow>
-							<treecell id="xmlfetchop"  draggable="true"  label="XML Fetch" />
+							<treecell id="sparqlresultfetch"  draggable="true"  label="Sparql Result Fetch" />
 						</treerow>	
 					</treeitem>
 					<treeitem>
 						<treerow>
-							<treecell id="xslfetchop"  draggable="true"  label="XSL Fetch" />
+							<treecell id="xmlfetch"  draggable="true"  label="XML Fetch" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="xslfetch"  draggable="true"  label="XSL Fetch" />
 						</treerow>	
 					</treeitem>
 				</treechildren>
@@ -227,22 +236,22 @@
 				<treechildren>		
 					<treeitem>
 						<treerow>
-							<treecell id="simplemixop"  draggable="true"  label="Simple Mix" />
+							<treecell id="simplemix"  draggable="true"  label="Simple Mix" />
 						</treerow>	
 					</treeitem>				
 					<treeitem>
 						<treerow>
-							<treecell id="rdfsmixop"  draggable="true"  label="RDFS Mix" />
+							<treecell id="rdfsmix"  draggable="true"  label="RDFS Mix" />
 						</treerow>	
 					</treeitem>	
 					<treeitem>
 						<treerow>
-							<treecell id="constructop"  draggable="true"  label="Construct" />
+							<treecell id="construct"  draggable="true"  label="Construct" />
 						</treerow>	
 					</treeitem>
 					<treeitem>
 						<treerow>
-							<treecell id="selectop"  draggable="true"  label="Select" />
+							<treecell id="select"  draggable="true"  label="Select" />
 						</treerow>	
 					</treeitem>
 					<treeitem>
@@ -257,17 +266,17 @@
 					</treeitem>
 					<treeitem>
 						<treerow>
-							<treecell id="smoosherop"  draggable="true"  label="Smoosher" />
+							<treecell id="smoosher"  draggable="true"  label="Smoosher" />
 						</treerow>	
 					</treeitem>
 					<treeitem>
 						<treerow>
-							<treecell id="forop"  draggable="true"  label="FOR loop" />
+							<treecell id="for"  draggable="true"  label="FOR loop" />
 						</treerow>	
 					</treeitem>
 					<treeitem>
 						<treerow>
-							<treecell id="xsltop"  draggable="true"  label="XSLT" />
+							<treecell id="xslt"  draggable="true"  label="XSLT" />
 						</treerow>	
 					</treeitem>
 				</treechildren>

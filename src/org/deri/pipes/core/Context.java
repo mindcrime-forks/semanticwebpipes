@@ -67,6 +67,7 @@ public class Context {
 	 */
 	public Context(Engine engine){
 		this.engine = engine;
+		this.httpClient = engine.getHttpClient();
 	}
 	/**
 	 * Get the operator having this id.

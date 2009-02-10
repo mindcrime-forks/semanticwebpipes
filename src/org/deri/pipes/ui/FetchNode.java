@@ -109,7 +109,8 @@ public class FetchNode extends InPipeNode implements ConnectingInputNode{
 			((Element)srcCode).setAttribute("format", getFormat());
 			
 			Element locElm =doc.createElement("location");
-			locElm.appendChild(getConnectedCode(doc, urlTextbox, urlPort, config));
+			Node connectedCode = getConnectedCode(doc, urlTextbox, urlPort, config);
+			locElm.appendChild(connectedCode);
 			srcCode.appendChild(locElm);
 			return srcCode;
 		}

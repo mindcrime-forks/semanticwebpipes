@@ -36,72 +36,92 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.deri.pipes.ui;
 
 import org.deri.pipes.utils.XMLUtil;
+import org.integratedmodelling.zk.diagram.components.CustomPort;
+import org.integratedmodelling.zk.diagram.components.Port;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.zkoss.zul.Hbox;
-import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Vbox;
 
-public class VariableNode extends InPipeNode implements ConnectingOutputNode{
-	final Logger logger = LoggerFactory.getLogger(VariableNode.class);
-	Textbox nameBox;
-	public VariableNode(int x,int y){
-		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,200,50);
-		wnd.setTitle("Variable");
-        Vbox vbox=new Vbox();
-        Hbox hbox= new Hbox();
-        hbox= new Hbox();
-		hbox.appendChild(new Label("Name:"));
-		hbox.appendChild(nameBox=createBox(120,16));
-		vbox.appendChild(hbox);
-		wnd.appendChild(vbox);
-		tagName="variable";
+/**
+ * @author robful
+ *
+ */
+public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
+	final transient Logger logger = LoggerFactory.getLogger(FetchNode.class);
+	protected Textbox urlTextbox=null;
+	protected Port urlPort=null;
+
+	public HttpGetNode(int x,int y){
+		super(PipePortType.getPType(PipePortType.ANYOUT),x,y,230,60);
+		this.tagName="http-get";
+		wnd.setTitle("HTTP Get");
+		org.zkoss.zul.Label label=new org.zkoss.zul.Label(" URL: ");
+        wnd.appendChild(label);
+        urlTextbox =new Textbox();
+        urlTextbox.setWidth("200px");
+		wnd.appendChild(urlTextbox);
+        
+	}
+
+
+	protected void initialize(){
+		super.initialize();
+		urlPort =createPort(PipePortType.TEXTIN,35,36);
+		((CustomPort)urlPort).setMaxFanIn(1);
 	}
 	
-	public void setName(String name){
-		nameBox.setValue(name);
+	public void onConnected(Port port){
+		urlTextbox.setValue("text [wired]");
+		urlTextbox.setReadonly(true);
+	}
+
+	public void onDisconnected(Port port){
+		urlTextbox.setValue("");
+		urlTextbox.setReadonly(false);
 	}
 	
-	public String getCode(){
-		return "${{"+nameBox.getValue()+"}}";
+	public void setURL(String url){
+		urlTextbox.setValue(url);
 	}
 	
-	public String getConfig(){
+	public Port getURLPort(){
+		return urlPort;
+	}
+	
+	@Override
+	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-			code+=nameBox.getValue();			
-			code+="</"+tagName+">\n";
-			return code;
+			Element srcCode = doc.createElement(tagName);
+			if(config){
+				super.setPosition(srcCode);
+			}
+			
+			Element locElm =doc.createElement("location");
+			locElm.appendChild(getConnectedCode(doc, urlTextbox, urlPort, config));
+			srcCode.appendChild(locElm);
+			return srcCode;
 		}
 		return null;
 	}
-	
+	/**
+	 * Creates a new HttpGetNode and adds it into the configuration.
+	 * @param elm The element defining this http-get
+	 * @param wsp The PipeEditor workspace
+	 * @return
+	 */
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		VariableNode node= new VariableNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		HttpGetNode node= new HttpGetNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
-		node.setName(XMLUtil.getTextData(elm));
+		Element locElm=XMLUtil.getFirstSubElementByName(elm, "location");
+		node.loadConnectedConfig(locElm, node.urlPort, node.urlTextbox);
 		return node;
 	}
-	public void debug(){
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.deri.pipes.ui.PipeNode#getSrcCode(org.w3c.dom.Document, boolean)
-	 */
-	@Override
-	public Node getSrcCode(Document doc, boolean config) {
-		// TODO Auto-generated method stub
-		return doc.createTextNode(getCode());
-	}
-
 
 }
-

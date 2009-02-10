@@ -219,6 +219,9 @@ public abstract class PipeNode extends ZKNode{
 	public String getSrcCode(boolean config){
 		DocumentImpl doc =new DocumentImpl();
 		Node srcCode = getSrcCode(doc,config);
+		if(srcCode.getNodeType() != Node.ELEMENT_NODE){
+			return srcCode.getTextContent();
+		}
 		java.io.StringWriter  strWriter =new java.io.StringWriter(); 
 		try{
 			Properties props = 

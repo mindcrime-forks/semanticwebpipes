@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,7 +58,9 @@ import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.Pipe;
 import org.deri.pipes.core.PipeParser;
+import org.deri.pipes.model.BinaryContentBuffer;
 import org.deri.pipes.model.SesameMemoryBuffer;
+import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.rdf.RDFBox;
 import org.deri.pipes.store.DatabasePipeManager;
 import org.deri.pipes.utils.XMLUtil;
@@ -90,16 +93,21 @@ public class Pipes extends HttpServlet {
 		String format=req.getParameter("format");
 		String acceptHeaderValue = getMimeHeader(req.getHeader("Accept") + "",format + "");	
 
-		res.setStatus(HttpServletResponse.SC_OK);
 		REQ.set(req);
 		try{
+			if("raw".equals(format)){
+				sendRawResult(req, res);
+				return;
+			}
+			res.setStatus(HttpServletResponse.SC_OK);
 			RDFFormat rdfFormat=RDFFormat.forMIMEType(acceptHeaderValue); 
 			if (rdfFormat!=null) {
 				logger.info("return type is "+acceptHeaderValue);
+				ServletOutputStream outputStream = res.getOutputStream();
 				res.setContentType(acceptHeaderValue); 
 				SesameMemoryBuffer buffer=getRDFBuffer(req, res); 		  
 				if(buffer!=null){
-					buffer.stream(res.getOutputStream(),rdfFormat);
+					buffer.stream(outputStream,rdfFormat);
 				}else{
 					logger.error("Empty buffer was returned in the result - cannot display rdf");
 					return;
@@ -133,12 +141,12 @@ public class Pipes extends HttpServlet {
 				}catch(Exception e){
 					logger.info("couldn't write json",e);
 				}
-			}
-			else{
+			}else{
 				logger.info("response type is text/html");
 				res.setContentType("text/html");
 
 				String rdfSourceUrl = new String(req.getRequestURL()+"?format=rdfxml&" + req.getQueryString());
+				String rawSourceUrl = new String(req.getRequestURL()+"?format=raw&" + req.getQueryString());
 
 				// read HTML template from file
 				FileInputStream file = new FileInputStream (getServletContext().getRealPath("/") + "template/generic_exhibit_result_viewer.html");
@@ -151,7 +159,7 @@ public class Pipes extends HttpServlet {
 
 				// replace $rdf_source$ placeholder in the HTML template with the URL of the requested pipe.
 				outputString = outputString.replace("$rdf_source$", rdfSourceUrl); // this links to the absolute path of pipes.deri.org for now. It does not work with local resources.
-
+				outputString = outputString.replace("$raw_source$", rawSourceUrl);
 				// get pipe code 
 				SesameMemoryBuffer buffer=getRDFBuffer(req, res);
 				String json="";
@@ -235,7 +243,62 @@ public class Pipes extends HttpServlet {
 		}
 	}
 
+	private void sendRawResult(HttpServletRequest req, HttpServletResponse res) throws IOException {
+		ExecBuffer result = executePipe(req,res);
+		if(result == null){
+			res.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+			res.setContentType("text/html");
+			PrintWriter writer = res.getWriter();
+			writer.append("<html><head><title>Pipe Error</title></head><body>The pipe could not be executed, contact the system adminstrator for details</body></html>");
+			return;
+		}else{
+			ServletOutputStream outputStream = res.getOutputStream();
+			res.setStatus(HttpServletResponse.SC_OK);
+			if(result instanceof BinaryContentBuffer){
+				BinaryContentBuffer bcb = (BinaryContentBuffer)result;
+				res.setContentType(bcb.getContentType());
+				res.setCharacterEncoding(bcb.getCharacterEncoding());
+				byte[] content = bcb.getContent();
+				res.setContentLength(content.length);
+				result.stream(outputStream);
+			}else if(result instanceof SesameMemoryBuffer){
+				res.setContentType(RDFFormat.RDFXML.getDefaultMIMEType());
+				result.stream(outputStream);
+			}else {
+				res.setContentType("application/octet-stream");
+				result.stream(outputStream);
+			}
+		}
+		return;
+	}
+
 	public SesameMemoryBuffer getRDFBuffer(HttpServletRequest req, HttpServletResponse res){
+
+		ExecBuffer result = executePipe(req,res);
+		if(result != null){
+			try{
+				if (result instanceof SesameMemoryBuffer) {
+					return (SesameMemoryBuffer)result;
+				} else {
+					logger.debug("stream did not return a SesameMemoryBuffer - it was a "+result.getClass()+" (will coerce if possible)");
+					SesameMemoryBuffer x = new SesameMemoryBuffer();
+					result.stream(x);
+					return x;
+				}
+			}catch (Exception e) {
+				logger.warn("Problem converting result to SesameMemoryBuffer");
+			}
+		}
+		return new SesameMemoryBuffer();
+	}
+
+	/**
+	 * @param req2
+	 * @param res
+	 * @return
+	 */
+	private ExecBuffer executePipe(HttpServletRequest req,
+			HttpServletResponse res) {
 		String pipeid = req.getParameter("id");
 		PipeConfig config = engine.getPipeStore().getPipe(pipeid);
 		if (config == null) {
@@ -251,20 +314,12 @@ public class Pipes extends HttpServlet {
 					pipe.setParameter(key, value);
 				}
 			}
-			ExecBuffer result = pipe.execute(engine.newContext());
-			if (result instanceof SesameMemoryBuffer) {
-				return (SesameMemoryBuffer)result;
-			} else {
-				logger.debug("stream did not return a SesameMemoryBuffer - it was a "+result.getClass()+" (will coerce if possible)");
-				SesameMemoryBuffer x = new SesameMemoryBuffer();
-				result.stream(x);
-				return x;
-			}
-		}catch (Exception e) {				
+			return pipe.execute(engine.newContext());
+		}catch(Exception e){
 			logger.debug("Problem executing pipe from syntax:"+syntax);
 			logger.error("Couldn't execute pipes from syntax (see debug for syntax)",e);
 		}
-		return new SesameMemoryBuffer();
+		return null;
 	}
 
 	private String getMimeHeader(String accept,String format){

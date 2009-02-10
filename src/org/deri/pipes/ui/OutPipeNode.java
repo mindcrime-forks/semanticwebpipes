@@ -58,7 +58,7 @@ public class OutPipeNode extends PipeNode{
 		}
 		
 		protected void initialize(){
-			input =createPort(PipePortType.RDFIN,"top");
+			input =createPort(PipePortType.ANYIN,"top");
 		}
 		
 		public Port getInputPort(){

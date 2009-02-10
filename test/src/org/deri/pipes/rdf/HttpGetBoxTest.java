@@ -36,72 +36,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
 
-import org.deri.pipes.utils.XMLUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.zkoss.zul.Hbox;
-import org.zkoss.zul.Label;
-import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Vbox;
+package org.deri.pipes.rdf;
 
-public class VariableNode extends InPipeNode implements ConnectingOutputNode{
-	final Logger logger = LoggerFactory.getLogger(VariableNode.class);
-	Textbox nameBox;
-	public VariableNode(int x,int y){
-		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,200,50);
-		wnd.setTitle("Variable");
-        Vbox vbox=new Vbox();
-        Hbox hbox= new Hbox();
-        hbox= new Hbox();
-		hbox.appendChild(new Label("Name:"));
-		hbox.appendChild(nameBox=createBox(120,16));
-		vbox.appendChild(hbox);
-		wnd.appendChild(vbox);
-		tagName="variable";
-	}
-	
-	public void setName(String name){
-		nameBox.setValue(name);
-	}
-	
-	public String getCode(){
-		return "${{"+nameBox.getValue()+"}}";
-	}
-	
-	public String getConfig(){
-		if(getWorkspace()!=null){
-			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
-			code+=nameBox.getValue();			
-			code+="</"+tagName+">\n";
-			return code;
-		}
-		return null;
-	}
-	
-	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		VariableNode node= new VariableNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
-		wsp.addFigure(node);
-		node.setName(XMLUtil.getTextData(elm));
-		return node;
-	}
-	public void debug(){
-		
-	}
+import org.deri.pipes.core.Engine;
+import org.deri.pipes.core.ExecBuffer;
 
-	/* (non-Javadoc)
-	 * @see org.deri.pipes.ui.PipeNode#getSrcCode(org.w3c.dom.Document, boolean)
-	 */
-	@Override
-	public Node getSrcCode(Document doc, boolean config) {
-		// TODO Auto-generated method stub
-		return doc.createTextNode(getCode());
+import junit.framework.TestCase;
+
+/**
+ * @author robful
+ *
+ */
+public class HttpGetBoxTest extends TestCase {
+	public void test() throws Exception{
+		HttpGetBox box = new HttpGetBox();
+		box.setLocation("http://www.deri.org/");
+		ExecBuffer result = box.execute(Engine.defaultEngine().newContext());
+		System.out.println(result);
 	}
-
-
 }
-

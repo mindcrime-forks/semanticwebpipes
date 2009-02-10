@@ -54,6 +54,11 @@
 </head>
 <body onLoad="onLoad();">
 <div class="query_div">
+    <div style="float:right">
+      <a href="http://pipes.deri.org/" title="Read more about Semantic Web Pipes">
+      <img src="../img/pipeslogo.png" height="100px" alt="Semantic Web Pipes Logo"/>
+      </a>
+    </div>
   <h2> $pipe_name$ pipe</h2>
   <div align="center">$query_form$</div>
   <div class="error_messages_div">$error_messages$</div>
@@ -63,6 +68,10 @@
       <tr>
         <td><h2>Results</h2></td>
         <td align="right"><div><img src="../img/rdf_icon.gif" align="absmiddle" /> <a href="$rdf_source$">Show results as RDF/XML</a></div></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td align="right"><div> <a href="$raw_source$">Show raw results</a></div></td>
       </tr>
     </table>
   <table width="100%">
