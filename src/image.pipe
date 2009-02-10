@@ -1,0 +1,25 @@
+<pipeConfig>
+  <id>image</id>
+  <name>Fetch an image using HTTP GET, and view the image in the raw output format</name>
+  <syntax><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+<parameters/>
+<code>
+<http-get>
+<location>http://www.google.ie/images/experiments/nav_control_sw.png</location>
+</http-get>
+</code>
+</pipe>
+]]></syntax>
+  <config><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+<parameters/>
+<code x="264" y="260">
+<http-get x="72" y="23">
+<location>http://www.google.ie/images/experiments/nav_control_sw.png</location>
+</http-get>
+</code>
+</pipe>
+]]></config>
+  <password></password>
+</pipeConfig>

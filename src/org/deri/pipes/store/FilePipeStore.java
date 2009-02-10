@@ -39,16 +39,19 @@
 
 package org.deri.pipes.store;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.lf5.util.StreamUtils;
 import org.deri.pipes.endpoints.PipeConfig;
 import org.deri.pipes.utils.CDataEnabledDomDriver;
 import org.slf4j.Logger;
@@ -100,6 +103,67 @@ public class FilePipeStore implements PipeStore {
 		}
 		this.xstream = configureXstream();
 		logger.info("Storing pipes in folder "+rootFolder);
+		if(rootFolder.list()==null){
+			copyDemonstrationPipes();
+		}
+	}
+	/**
+	 * 
+	 */
+	private void copyDemonstrationPipes() {
+		//TODO Move this functionality elsewhere.
+		rootFolder.mkdirs();
+		String rn = "pipes.list";
+		logger.debug("attempting to copy demonstration pipes to "+rootFolder+", reading list from "+rn);
+		InputStream in = this.getClass().getClassLoader().getResourceAsStream(rn);
+		if(in == null){
+			logger.info("Not copying in demonstration pipes, cannot load "+rn);
+			return;
+		}
+		try{
+			BufferedReader r = new BufferedReader(new InputStreamReader(in));
+			try{
+				String line;
+				while((line = r.readLine())!= null){
+					if(line.trim().startsWith("#")){
+						continue;
+					}
+					String pipeId = line.trim();
+					if(pipeId.length() > 0){
+						copyPipeResource(pipeId);
+					}
+				}
+			}finally{
+				r.close();
+			}
+		}catch(IOException e){
+			logger.warn("Couldn't copy demonstration pipes to "+rootFolder+" because "+e,e);
+		}
+	}
+	/**
+	 * @param pipeId
+	 */
+	private void copyPipeResource(String pipeId) {
+		logger.info("copying "+pipeId+" to "+rootFolder);
+		InputStream in = this.getClass().getClassLoader().getResourceAsStream(pipeId);
+		try{
+			try{
+				if(in == null){
+					logger.info("couldn't read "+pipeId);
+					return;
+				}
+				FileOutputStream out = new FileOutputStream(new File(rootFolder,pipeId));
+				try{
+					StreamUtils.copy(in, out);
+				}finally{
+					out.close();
+				}
+			}finally{
+				in.close();
+			}
+		}catch(IOException e){
+			logger.warn("couldn't copy "+pipeId+" to "+rootFolder+" because "+e,e);
+		}
 	}
 	/**
 	 * Create a FilePipeStore at the given path

@@ -1,0 +1,53 @@
+<pipeConfig>
+  <id>mixingfoaf</id>
+  <name></name>
+  <syntax><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+<parameters/>
+<code>
+<for>
+<sourcelist>
+<select>
+<source>
+<rdffetch format="RDF/XML">
+<location>http://www.w3.org/People/Berners-Lee/card#i</location>
+</rdffetch>
+</source>
+<query><![CDATA[PREFIX foaf: <http://xmlns.com/foaf/0.1/> select ?url  where{<http://www.w3.org/People/Berners-Lee/card#i> foaf:knows ?url. FILTER regex(str(?url), "dbpedia") } order by ?url]]]]><![CDATA[></query>
+</select>
+</sourcelist>
+<forloop>
+<rdffetch format="RDF/XML">
+<location>${{url}}</location>
+</rdffetch>
+</forloop>
+</for>
+</code>
+</pipe>
+]]></syntax>
+  <config><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+<parameters/>
+<code x="400" y="400">
+<for x="237" y="339">
+<sourcelist>
+<select x="589" y="227">
+<source>
+<rdffetch format="RDF/XML" x="455" y="80">
+<location>http://www.w3.org/People/Berners-Lee/card#i</location>
+</rdffetch>
+</source>
+<query><![CDATA[PREFIX foaf: <http://xmlns.com/foaf/0.1/> select ?url  where{<http://www.w3.org/People/Berners-Lee/card#i> foaf:knows ?url. FILTER regex(str(?url), "dbpedia") } order by ?url]]]]><![CDATA[></query>
+</select>
+</sourcelist>
+<forloop>
+<rdffetch format="RDF/XML" x="150" y="142">
+<location>${{url}}</location>
+</rdffetch>
+</forloop>
+</for>
+</code>
+</pipe>
+]]></config>
+  <password></password>
+</pipeConfig>

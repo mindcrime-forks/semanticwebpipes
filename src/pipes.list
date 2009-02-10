@@ -1,0 +1,5 @@
+#list of pipes to copy in when using an
+#empty temporary folder for pipe storage.
+image.pipe
+mixingfoaf.pipe
+TBLonTheSW.pipe

@@ -43,6 +43,12 @@ package org.deri.pipes.core;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
-public interface Operator{	
+public interface Operator{
+	/**
+	 * Execute an operation and return the output.
+	 * @param context The current pipe execution context.
+	 * @return A buffer containing the results of the execution.
+	 * @throws Exception
+	 */
      public ExecBuffer execute(Context context) throws Exception;
 }
