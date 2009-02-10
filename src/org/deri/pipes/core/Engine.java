@@ -71,7 +71,7 @@ public class Engine {
 		}
 		return pipeStore;
 	}
-	void setPipeStore(PipeStore pipeStore){
+	public void setPipeStore(PipeStore pipeStore){
 		this.pipeStore = pipeStore;
 		logger.info("Set pipe store to "+pipeStore);
 	}

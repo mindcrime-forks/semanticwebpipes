@@ -43,6 +43,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.Operator;
+import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.model.XMLStreamBuffer;
 import org.deri.pipes.utils.XSLTUtil;
@@ -50,26 +51,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class XSLTBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(XSLTBox.class);
-	String xmlStrID;
-	String xslStrID;
+	Source xmlsource;
+	Source xslsource;
 	
 	@Override
 	public ExecBuffer execute(Context context) throws Exception {
 		XMLStreamBuffer buffer = new XMLStreamBuffer();
 		boolean cancel = false;
-		if(xmlStrID==null){
-			logger.warn("xmlStrID is not set, cancelling operation");
+		if(xmlsource==null){
+			logger.warn("xmlsource is not set, cancelling operation");
 			cancel = true;
 		}
-		if(xslStrID==null){
-			logger.warn("xslStrID is not set, cancelling operation");
+		if(xslsource==null){
+			logger.warn("xslsource is not set, cancelling operation");
 			cancel = true;
 		}
 		if(cancel){
 			return buffer;
 		}
-		StreamSource xmlSrc=executeXMLOp(xmlStrID,context);
-		StreamSource xslSrc=executeXMLOp(xslStrID,context);
+		StreamSource xmlSrc=convert(xmlsource.execute(context));
+		StreamSource xslSrc=convert(xslsource.execute(context));
 		if((xmlSrc!=null)&&(xslSrc!=null)){
 			buffer=new XMLStreamBuffer();	
 			buffer.setStreamSource(XSLTUtil.transform(xmlSrc,xslSrc));				
@@ -77,11 +78,10 @@ public class XSLTBox implements Operator {
 		return buffer;
 	}
 	
-    private StreamSource executeXMLOp(String strID, Context context) throws Exception{
-    	
-    	Operator xmlOp=context.getOperator(strID);
-		ExecBuffer xmlBuff=xmlOp.execute(context);
-		
+    private StreamSource convert(ExecBuffer xmlBuff) throws Exception{
+		if(xmlBuff == null){
+			return null;
+		}
 		StreamSource xmlSrc=null;
 		if(xmlBuff instanceof XMLStreamBuffer) 
 			xmlSrc=((XMLStreamBuffer)xmlBuff).getStreamSource();
@@ -89,6 +89,9 @@ public class XSLTBox implements Operator {
 			XMLStreamBuffer tmpBuff= new XMLStreamBuffer();
 			xmlBuff.stream(tmpBuff);
 			xmlSrc=tmpBuff.getStreamSource();
+		}
+		if(xmlSrc == null){
+			logger.warn("Could not convert buffer from "+xmlBuff.getClass()+" to StreamSource");
 		}
 		
 		return xmlSrc;

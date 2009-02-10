@@ -26,6 +26,16 @@ class represented by that element.
     <string>sourcelist</string>
     <java-class>org.deri.pipes.core.internals.Source</java-class>
   </entry>
+  <entry>
+    <!--  required for normal operation of pipes -->
+    <string>xmlsource</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
+  <entry>
+    <!--  required for normal operation of pipes -->
+    <string>xslsource</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
   
   <entry>
     <string>text</string>
@@ -78,5 +88,21 @@ class represented by that element.
   <entry>
     <string>http-get</string>
     <java-class>org.deri.pipes.rdf.HttpGetBox</java-class>
+  </entry>
+  <entry>
+    <string>xslt</string>
+    <java-class>org.deri.pipes.rdf.XSLTBox</java-class>
+  </entry>
+  <entry>
+    <string>xmlfetch</string>
+    <java-class>org.deri.pipes.rdf.XMLFetchBox</java-class>
+  </entry>
+  <entry>
+    <string>xslfetch</string>
+    <java-class>org.deri.pipes.rdf.XMLFetchBox</java-class>
+  </entry>
+  <entry>
+    <string>rdfs</string>
+    <java-class>org.deri.pipes.rdf.RDFSMixBox</java-class>
   </entry>
 </map>

@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.lf5.util.StreamUtils;
@@ -256,6 +258,14 @@ public class FilePipeStore implements PipeStore {
 			public boolean accept(File root, String name) {
 				return name.endsWith(PIPE_FILE_EXTENSION);
 			}
+		});
+		Arrays.sort(pipeFiles, new Comparator<File>(){
+
+			@Override
+			public int compare(File arg0, File arg1) {
+				return arg0.getName().compareToIgnoreCase(arg1.getName());
+			}
+			
 		});
 		for(File pipeFile: pipeFiles){
 			PipeConfig config = getPipeConfigFromFile(pipeFile);

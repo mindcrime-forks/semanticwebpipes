@@ -60,7 +60,11 @@
     </target>
 	
 	<target name="jar" depends="compile">
-		<jar destfile="${jar.file}" basedir="${temp.dir.classes}" />
+		<jar destfile="${jar.file}">
+			<fileset dir="${temp.dir.classes}" />
+			<fileset dir="${src.dir}" includes="*.pipe,*.xml,*.properties,*.list,*.groovy" />
+	        <fileset dir="${webcontent.dir}/WEB-INF/classes" includes="*.xml,*.properties" />
+		</jar>
     </target>
 
     <target name="war" depends="jar">
@@ -68,6 +72,8 @@
         <fileset dir="${webcontent.dir}"/>
         <lib dir="${lib.dir}" />
       	<lib file="${jar.file}" />
+		<classes dir="${src.dir}" includes="*.pipe,*.xml,*.properties,*.list,*.groovy" />
+        <classes dir="${webcontent.dir}/WEB-INF/classes" includes="*.xml,*.properties" />
       </war>
     </target>
 

@@ -109,7 +109,7 @@ public class ThreadedExecutor {
 		for(Future<ExecBuffer> future : result){
 			try {
 				buffers.add(future.get());
-			} catch (ExecutionException e) {
+			} catch (Exception e) {
 				logger.warn("An execution error occurred",e);
 				buffers.add(null);
 			}
