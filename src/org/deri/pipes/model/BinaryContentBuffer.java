@@ -39,9 +39,12 @@
 
 package org.deri.pipes.model;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
@@ -110,6 +113,22 @@ public class BinaryContentBuffer implements ExecBuffer {
 			} catch (UnsupportedEncodingException e1) {
 				throw new RuntimeException("UTF-8 support must be provided by the JVM");
 			}
+		}
+	}
+	/**
+	 * Get an InputStream to the content.
+	 * @return
+	 */
+	public InputStream getInputStream(){
+		return new ByteArrayInputStream(content.toByteArray());
+	}
+	
+	public BufferedReader getBufferedReader() {
+		try {
+			return new BufferedReader(new InputStreamReader(getInputStream(),charset));
+		} catch (UnsupportedEncodingException e) {
+			logger.warn("The charset ["+charset+"] is not supported - was the charset changed - will use UTF-8?");
+			return new BufferedReader(new InputStreamReader(getInputStream()));
 		}
 	}
 

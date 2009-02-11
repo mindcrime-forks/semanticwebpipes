@@ -108,4 +108,11 @@ public class Pipe implements Operator{
 		}
 		return xml;
 	}
+	public void addOperator(Operator operator){
+		if(code == null){
+			code = new ArrayList<Operator>();
+		}
+		code.add(operator);
+		
+	}
 }

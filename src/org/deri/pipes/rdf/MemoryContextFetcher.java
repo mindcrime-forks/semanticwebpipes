@@ -39,82 +39,79 @@
 
 package org.deri.pipes.rdf;
 
-import java.util.Vector;
-
-import org.apache.bsf.BSFDeclaredBean;
-import org.apache.bsf.BSFEngine;
-import org.apache.bsf.BSFManager;
-import org.apache.bsf.util.CodeBuffer;
+import org.apache.log4j.Logger;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
-import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.model.SesameTupleBuffer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
+ * Fetches content from the processing context. This is
+ * used where an application wishes to use pipes to
+ * process objects held by the application rather than
+ * on a server.
  * @author robful
  *
  */
-@XStreamAlias("scripting")
-public class ScriptingBox implements Operator {
-	final transient Logger logger = LoggerFactory.getLogger(ScriptingBox.class);
+@XStreamAlias("memory-context")
+public class MemoryContextFetcher implements Operator {
+	transient Logger logger = Logger.getLogger(MemoryContextFetcher.class);
+	String key;
+	String contentType;
+	String defaultValue;
 	
-	private String language;
-	private String script;
-	private Source source;
-	
-	public String getLanguage() {
-		return language;
-	}
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-	public String getScript() {
-		return script;
-	}
-	public void setScript(String script) {
-		this.script = script;
-	}
-	/* 
-	 * Execute the script, which receives input and context
-	 * as parameters.
-	 **/
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.Operator#execute(org.deri.pipes.core.Context)
+	 */
 	@Override
 	public ExecBuffer execute(Context context) throws Exception {
-		BSFManager manager = new BSFManager();
-		manager.declareBean("context", context, Context.class);
-		Vector args = new Vector();
-		Vector<String> argNames = new Vector<String>();
-		if(source != null){
-			ExecBuffer input = source.execute(context);
-			args.add(input);
-			argNames.add("input");
-			manager.declareBean("input", input, ExecBuffer.class);
+		BinaryContentBuffer result = new BinaryContentBuffer();
+		if(contentType != null){
+			result.setContentType(contentType);
 		}
-		args.add(context);
-		argNames.add("context");
-		BSFEngine engine = manager.loadScriptingEngine(language);
-		Object result = engine.apply(language,0, 0,script, argNames, args);
-		if(result instanceof ExecBuffer){
-			return(ExecBuffer)result;
+		logger.debug("retrieving value from context using key=["+key+"]");
+		Object obj = context.get(key);
+		if(obj == null){
+			logger.warn("No value was retrieved from context using key=["+key+"], will use default value");
+			result.setContent(defaultValue);
+		}else{
+			if(obj instanceof CharSequence){
+				result.setContent(obj.toString());
+			}else if(obj instanceof byte[]){
+				result.setContent((byte[])obj);
+			}else{
+				logger.warn("Not able to convert object to String or byte array:"+obj.getClass());
+			}
+
 		}
-		logger.warn("converting results to String for "+this.getClass());
-		BinaryContentBuffer content = new BinaryContentBuffer();
-		content.setContentType("text/plain");
-		content.setContent(result.toString());
-		return content;
+		return result;
 	}
-	/**
-	 * @param source
-	 */
-	public void setSource(Source source) {
-		this.source = source;
+	public String getKey() {
+		return key;
 	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	
 
 }

@@ -40,7 +40,9 @@
 package org.deri.pipes.rdf;
 
 import org.deri.pipes.core.Context;
+import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.ExecBuffer;
+import org.deri.pipes.core.Pipe;
 import org.deri.pipes.core.internals.Source;
 
 import junit.framework.TestCase;
@@ -64,6 +66,45 @@ public class ScriptingBoxTest extends TestCase {
 		x.setScript("'Hello, this is the answer, thanks to groovy scripting!'");
 		ExecBuffer output = x.execute(new Context());
 		System.out.println(output);
-
+	}
+	
+	public void testGiovanni() throws Exception{
+		MemoryContextFetcher mcf = new MemoryContextFetcher();
+		mcf.setContentType("text/plain");
+		mcf.setKey("people");
+		String people="Giovanni Tummarello\nRobert Fuller\nDanh Le pouch";
+		mcf.setDefaultValue(people);
+		
+		ScriptingBox x = new ScriptingBox();
+		x.setLanguage("groovy");
+		x.setSource(new Source(mcf));
+		Context context = new Context();
+		context.put("people", people);
+		String script = "import groovy.xml.MarkupBuilder" +
+				"\n def writer = new StringWriter()" +
+				"\n def xml = new MarkupBuilder(writer)" +
+				"\n xml.'rdf:RDF'('xmlns:rdf':'http://www.w3.org/1999/02/22-rdf-syntax-ns#','xmlns:foaf':'http://xmlns.com/foaf/0.1/'){" +
+				"\n   input.inputStream.eachLine{ " +
+				"\n    name -> parts=name.split(/\\s/,2);" +
+				"\n     xml.'foaf:person'('rdf:about':\"http://example.com/${name.replaceAll(' ','_')}\"){" +
+				"\n      'foaf:name'(name)" +
+				"\n      'foaf:firstName'(parts[0])" +
+				"\n      'foaf:surname'(parts[1])" +
+				"\n     }" +
+				"\n   }" +
+				"\n }" +
+				"" +
+				"" +
+				"" +
+				"" +
+				"" +
+				"" +
+				"\nwriter.toString();";
+		x.setScript(script);
+		ExecBuffer output = x.execute(context);
+		System.out.println(output);
+		Pipe pipe = new Pipe();
+		pipe.addOperator(x);
+		System.out.println(Engine.defaultEngine().serialize(pipe));
 	}
 }

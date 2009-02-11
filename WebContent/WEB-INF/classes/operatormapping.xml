@@ -105,4 +105,12 @@ class represented by that element.
     <string>rdfs</string>
     <java-class>org.deri.pipes.rdf.RDFSMixBox</java-class>
   </entry>
+  <entry>
+    <string>scripting</string>
+    <java-class>org.deri.pipes.rdf.ScriptingBox</java-class>
+  </entry>
+  <entry>
+    <string>memory-context</string>
+    <java-class>org.deri.pipes.rdf.MemoryContextFetcher</java-class>
+  </entry>
 </map>
