@@ -17,7 +17,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  *
  */
 public class Pipe implements Operator{
-	private transient Logger logger = LoggerFactory.getLogger(Pipe.class);
+	static Logger logger = LoggerFactory.getLogger(Pipe.class);
 	private transient List<Operator> codeWithVariablesExpanded;
 	@XStreamAsAttribute
 	private String id;
@@ -75,6 +75,7 @@ public class Pipe implements Operator{
 	private synchronized void expandVariables(Context context) {
 		if(parameters == null || parameters.size() == 0){
 			codeWithVariablesExpanded = code;
+			return;
 		}
 		/*
 		 * Temporarily hide the parameters and serialize the code.
@@ -88,10 +89,10 @@ public class Pipe implements Operator{
 		}finally{
 			this.parameters = tmpParameters;
 		}
-		if(tmpParameters != null){
-			xml = expandParameters(tmpParameters, xml);
+		xml = expandParameters(tmpParameters, xml);
+		if(logger.isDebugEnabled()){
+			logger.debug("expanded pipe with variables to:"+xml);
 		}
-		logger.info("expanded pipe with variables to:"+xml);
 		Pipe pipe = (Pipe) context.getEngine().parse(xml);
 		this.codeWithVariablesExpanded = pipe.code;
 		

@@ -39,82 +39,38 @@
 
 package org.deri.pipes.rdf;
 
-import java.util.Vector;
+import java.io.ByteArrayOutputStream;
 
-import org.apache.bsf.BSFDeclaredBean;
-import org.apache.bsf.BSFEngine;
-import org.apache.bsf.BSFManager;
-import org.apache.bsf.util.CodeBuffer;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.model.SesameTupleBuffer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
+ * Loads the contents of the Source operator
+ * into memory. This Operator can be used where
+ * an InputStream needs to be consumed more
+ * than once.
  * @author robful
  *
  */
-@XStreamAlias("scripting")
-public class ScriptingBox implements Operator {
-	final transient Logger logger = LoggerFactory.getLogger(ScriptingBox.class);
-	
-	private String language;
-	private String script;
+public class MemoryBox implements Operator {
+
 	private Source source;
-	
-	public String getLanguage() {
-		return language;
-	}
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-	public String getScript() {
-		return script;
-	}
-	public void setScript(String script) {
-		this.script = script;
-	}
-	/* 
-	 * Execute the script, which receives input and context
-	 * as parameters.
-	 **/
+	/**
+	 * Loads the result of the source operation into memory.
+	 */
 	@Override
 	public ExecBuffer execute(Context context) throws Exception {
-		BSFManager manager = new BSFManager();
-		manager.declareBean("context", context, Context.class);
-		Vector args = new Vector();
-		Vector<String> argNames = new Vector<String>();
+		BinaryContentBuffer result = new BinaryContentBuffer();
 		if(source != null){
 			ExecBuffer input = source.execute(context);
-			args.add(input);
-			argNames.add("input");
-			manager.declareBean("input", input, ExecBuffer.class);
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			input.stream(output);
+			result.setContent(output.toByteArray());
 		}
-		args.add(context);
-		argNames.add("context");
-		BSFEngine engine = manager.loadScriptingEngine(language);
-		Object result = engine.apply(language,0, 0,script, argNames, args);
-		if(result instanceof ExecBuffer){
-			return(ExecBuffer)result;
-		}
-		logger.info("converting results to String for "+this.getClass());
-		BinaryContentBuffer content = new BinaryContentBuffer();
-		content.setContentType("text/plain");
-		content.setContent(result.toString());
-		return content;
-	}
-	/**
-	 * @param source
-	 */
-	public void setSource(Source source) {
-		this.source = source;
+		return result;
 	}
 
 }

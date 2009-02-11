@@ -39,82 +39,28 @@
 
 package org.deri.pipes.rdf;
 
-import java.util.Vector;
-
-import org.apache.bsf.BSFDeclaredBean;
-import org.apache.bsf.BSFEngine;
-import org.apache.bsf.BSFManager;
-import org.apache.bsf.util.CodeBuffer;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
-import org.deri.pipes.core.internals.Source;
-import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.model.SesameTupleBuffer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.deri.pipes.model.Stream;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
+ * Reads from STDIN
  * @author robful
  *
  */
-@XStreamAlias("scripting")
-public class ScriptingBox implements Operator {
-	final transient Logger logger = LoggerFactory.getLogger(ScriptingBox.class);
-	
-	private String language;
-	private String script;
-	private Source source;
-	
-	public String getLanguage() {
-		return language;
-	}
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-	public String getScript() {
-		return script;
-	}
-	public void setScript(String script) {
-		this.script = script;
-	}
-	/* 
-	 * Execute the script, which receives input and context
-	 * as parameters.
+@XStreamAlias("stdin")
+public class StdinBox implements Operator{
+
+	/*
+	 * Returns the STDIN InputStream.
 	 **/
 	@Override
 	public ExecBuffer execute(Context context) throws Exception {
-		BSFManager manager = new BSFManager();
-		manager.declareBean("context", context, Context.class);
-		Vector args = new Vector();
-		Vector<String> argNames = new Vector<String>();
-		if(source != null){
-			ExecBuffer input = source.execute(context);
-			args.add(input);
-			argNames.add("input");
-			manager.declareBean("input", input, ExecBuffer.class);
-		}
-		args.add(context);
-		argNames.add("context");
-		BSFEngine engine = manager.loadScriptingEngine(language);
-		Object result = engine.apply(language,0, 0,script, argNames, args);
-		if(result instanceof ExecBuffer){
-			return(ExecBuffer)result;
-		}
-		logger.info("converting results to String for "+this.getClass());
-		BinaryContentBuffer content = new BinaryContentBuffer();
-		content.setContentType("text/plain");
-		content.setContent(result.toString());
-		return content;
+		return new Stream(System.in);
 	}
-	/**
-	 * @param source
-	 */
-	public void setSource(Source source) {
-		this.source = source;
-	}
+
 
 }

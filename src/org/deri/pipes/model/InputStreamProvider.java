@@ -36,94 +36,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.core;
 
-import java.util.HashMap;
-import java.util.Map;
+package org.deri.pipes.model;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.core.internals.ThreadedExecutor;
+import java.io.IOException;
+import java.io.InputStream;
 
-import com.thoughtworks.xstream.XStream;
 /**
- * Operators belonging to a PipeConfig.
- * @author rfuller
+ * Implemented to provide an InputStream.
+ * @author robful
  *
  */
-public class Context {
-	Map <String,Operator> operators = new HashMap<String,Operator>();
-	Map map = new HashMap();
-	private HttpClient httpClient;
-	private Engine engine;
+public interface InputStreamProvider {
 	/**
-	 * Default constructor.
-	 */
-	public Context(){
-		
-	}
-	/**
-	 * Create a Context for this engine.
-	 * @param engine
-	 */
-	public Context(Engine engine){
-		this.engine = engine;
-	}
-	/**
-	 * Get the operator having this id.
-	 * @param id
-	 * @return The operator having the given id, or null if there is no such operator.
-	 */
-	public Operator getOperator(String id){
-		return operators.get(id);
-	}
-	/**
-	 * Add this operator into the context.
-	 * @param id
-	 * @param operator
-	 */
-	void addOperator(String id,Operator operator){
-		operators.put(id, operator);
-	}
-	/**
-	 * Whether the context contains an operator having this id.
-	 * @param id
-	 * @return true if there is an operator having this id, false otherwise.
-	 */
-	public boolean contains(String id) {
-		return operators.containsKey(id);
-	}
-
-	public HttpClient getHttpClient(){
-		if(engine != null){
-			return engine.getHttpClient();
-		}
-		if(httpClient == null){
-			httpClient = new HttpClient();
-		}
-		return httpClient;
-	}
-	/**
-	 * @param obj
+	 * Get the InputStream.
 	 * @return
+	 * @throws IOException 
 	 */
-	public Object get(Object obj) {
-		return map.get(obj);
-	}
-	/**
-	 * @param obj
-	 * @param invoke
-	 */
-	public void put(Object key, Object value) {
-		map.put(key, value);
-	}
-
-	/**
-	 * @return
-	 */
-	public Engine getEngine() {
-		if(engine == null){
-			engine = new Engine();
-		}
-		return engine;
-	}
+	public InputStream getInputStream() throws IOException;
 }

@@ -71,7 +71,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zml.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zul.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/zweb.jar"/>
-	<classpathentry kind="lib" path="lib/xmlunit-1.2.jar"/>
 	<classpathentry kind="lib" path="test/lib/easymockclassextension.jar"/>
 	<classpathentry kind="lib" path="test/lib/easymock.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>

@@ -117,6 +117,7 @@ public class PipeParser {
 		DEFAULT_ALIAS_MAPPINGS.put("regex", RegExBox.class);
 		DEFAULT_ALIAS_MAPPINGS.put("rule",RegExBox.Rule.class);
 		DEFAULT_ALIAS_MAPPINGS.put("text",TextBox.class);
+		logger.debug("starting load alias mappings");
 		InputStream in = PipeParser.class.getResourceAsStream(OPERATORMAPPING_XML);
 		String cannotLoadMsg = "Could not load operator mappings "+ OPERATORMAPPING_XML+" from classpath, using defaults";
 		if(in == null){
@@ -214,15 +215,19 @@ public class PipeParser {
 	}
 
 	private XStream createXStream() {
-		XStream xstream = new XStream(new OperatorMemoizerProvider(),
-			    new CDataEnabledDomDriver()			){
-			@Override
-			 protected MapperWrapper wrapMapper(MapperWrapper next) {
-			        return new BypassCGLibMapper(next);
-			    }
+		logger.debug("starting create xstream");
+		XStream xstream = new XStream(new PureJavaReflectionProvider(),
+			    new CDataEnabledDomDriver()			);
+//		XStream xstream = new XStream(new OperatorMemoizerProvider(),
+//		XStream xstream = new XStream(
+//			    new CDataEnabledDomDriver()			){
+		//	@Override
+		//	 protected MapperWrapper wrapMapper(MapperWrapper next) {
+		//	        return new BypassCGLibMapper(next);
+		//	    }
 
-		};
-		xstream.registerConverter(new BypassCGLibConverter(xstream));
+//		};
+		//xstream.registerConverter(new BypassCGLibConverter(xstream));
 		xstream.alias("pipe",Pipe.class);
 		xstream.registerLocalConverter(Pipe.class, "parameters", new ParameterConverter());
 		SourceConverter sourceConverter = new SourceConverter(aliasMappings);
@@ -231,7 +236,8 @@ public class PipeParser {
 		xstream.aliasSystemAttribute("REFID", "reference");
 		xstream.aliasSystemAttribute("ID", "id");
 		sourceConverter.registerAliases(xstream);
-		xstream.autodetectAnnotations(true);
+		//xstream.autodetectAnnotations(true);
+		logger.debug("xstream created");
 		return xstream;
 	}
 

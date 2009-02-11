@@ -113,4 +113,12 @@ class represented by that element.
     <string>memory-context</string>
     <java-class>org.deri.pipes.rdf.MemoryContextFetcher</java-class>
   </entry>
+  <entry>
+    <string>stdin</string>
+    <java-class>org.deri.pipes.rdf.StdinBox</java-class>
+  </entry>
+  <entry>
+    <string>remember</string>
+    <java-class>org.deri.pipes.rdf.MemoryBox</java-class>
+  </entry>
 </map>

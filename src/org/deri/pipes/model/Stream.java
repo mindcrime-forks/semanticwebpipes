@@ -36,94 +36,60 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.core;
 
-import java.util.HashMap;
-import java.util.Map;
+package org.deri.pipes.model;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.core.internals.ThreadedExecutor;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import com.thoughtworks.xstream.XStream;
+import org.apache.log4j.lf5.util.StreamUtils;
+import org.deri.pipes.core.ExecBuffer;
+
 /**
- * Operators belonging to a PipeConfig.
- * @author rfuller
+ * Wrapper for an InputStream
+ * @author robful
  *
  */
-public class Context {
-	Map <String,Operator> operators = new HashMap<String,Operator>();
-	Map map = new HashMap();
-	private HttpClient httpClient;
-	private Engine engine;
-	/**
-	 * Default constructor.
+public class Stream implements ExecBuffer,InputStreamProvider{
+
+	private InputStream input;
+
+	public Stream(InputStream in){
+		this.input = in;
+	}
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.ExecBuffer#stream(org.deri.pipes.core.ExecBuffer)
 	 */
-	public Context(){
+	@Override
+	public void stream(ExecBuffer outputBuffer) throws IOException {
+		throw new IOException("stream(ExecBuffer) not implemented. Use getInputStream() instead");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.ExecBuffer#stream(org.deri.pipes.core.ExecBuffer, java.lang.String)
+	 */
+	@Override
+	public void stream(ExecBuffer outputBuffer, String context)
+			throws IOException {
+		throw new IOException("stream(ExecBuffer,String) not implemented. Use getInputStream() instead");
 		
 	}
-	/**
-	 * Create a Context for this engine.
-	 * @param engine
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.ExecBuffer#stream(java.io.OutputStream)
 	 */
-	public Context(Engine engine){
-		this.engine = engine;
+	@Override
+	public void stream(OutputStream output) throws IOException {
+		StreamUtils.copy(getInputStream(), output);
 	}
 	/**
-	 * Get the operator having this id.
-	 * @param id
-	 * @return The operator having the given id, or null if there is no such operator.
+	 * Get the underlying input stream.
+	 * @return
+	 * @throws IOException 
 	 */
-	public Operator getOperator(String id){
-		return operators.get(id);
-	}
-	/**
-	 * Add this operator into the context.
-	 * @param id
-	 * @param operator
-	 */
-	void addOperator(String id,Operator operator){
-		operators.put(id, operator);
-	}
-	/**
-	 * Whether the context contains an operator having this id.
-	 * @param id
-	 * @return true if there is an operator having this id, false otherwise.
-	 */
-	public boolean contains(String id) {
-		return operators.containsKey(id);
+	public synchronized InputStream getInputStream() throws IOException{
+		return input;
 	}
 
-	public HttpClient getHttpClient(){
-		if(engine != null){
-			return engine.getHttpClient();
-		}
-		if(httpClient == null){
-			httpClient = new HttpClient();
-		}
-		return httpClient;
-	}
-	/**
-	 * @param obj
-	 * @return
-	 */
-	public Object get(Object obj) {
-		return map.get(obj);
-	}
-	/**
-	 * @param obj
-	 * @param invoke
-	 */
-	public void put(Object key, Object value) {
-		map.put(key, value);
-	}
-
-	/**
-	 * @return
-	 */
-	public Engine getEngine() {
-		if(engine == null){
-			engine = new Engine();
-		}
-		return engine;
-	}
 }
