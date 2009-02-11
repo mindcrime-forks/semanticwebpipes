@@ -63,7 +63,6 @@
 		<jar destfile="${jar.file}">
 			<fileset dir="${temp.dir.classes}" />
 			<fileset dir="${src.dir}" includes="*.pipe,*.xml,*.properties,*.list,*.groovy" />
-	        <fileset dir="${webcontent.dir}/WEB-INF/classes" includes="*.xml,*.properties" />
 		</jar>
     </target>
 
@@ -73,7 +72,6 @@
         <lib dir="${lib.dir}" />
       	<lib file="${jar.file}" />
 		<classes dir="${src.dir}" includes="*.pipe,*.xml,*.properties,*.list,*.groovy" />
-        <classes dir="${webcontent.dir}/WEB-INF/classes" includes="*.xml,*.properties" />
       </war>
     </target>
 	<target name="engine" depends="jar">
