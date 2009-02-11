@@ -88,7 +88,9 @@ public class Pipe implements Operator{
 		}finally{
 			this.parameters = tmpParameters;
 		}
-		xml = expandParameters(tmpParameters, xml);
+		if(tmpParameters != null){
+			xml = expandParameters(tmpParameters, xml);
+		}
 		logger.info("expanded pipe with variables to:"+xml);
 		Pipe pipe = (Pipe) context.getEngine().parse(xml);
 		this.codeWithVariablesExpanded = pipe.code;
