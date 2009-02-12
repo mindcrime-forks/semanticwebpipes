@@ -105,9 +105,12 @@ public class FilePipeStore implements PipeStore {
 		}
 		this.xstream = configureXstream();
 		logger.info("Storing pipes in folder "+rootFolder);
-		if(rootFolder.list()==null){
+                String[] listing = rootFolder.list();
+		if(listing==null||listing.length == 0){
 			copyDemonstrationPipes();
-		}
+		}else{ 
+                  logger.info("Not adding demonstration pipes - there is content in the PipeStore already");
+                }
 	}
 	/**
 	 * 
