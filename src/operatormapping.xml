@@ -121,4 +121,8 @@ class represented by that element.
     <string>remember</string>
     <java-class>org.deri.pipes.rdf.MemoryBox</java-class>
   </entry>
+  <entry>
+    <string>xquery</string>
+    <java-class>org.deri.pipes.rdf.SaxonXqueryBox</java-class>
+  </entry>
 </map>

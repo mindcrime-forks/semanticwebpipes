@@ -56,12 +56,21 @@ import org.slf4j.Logger;
  * @author robful
  *
  */
-public class BinaryContentBuffer implements ExecBuffer {
+public class BinaryContentBuffer implements ExecBuffer, InputStreamProvider {
 	Logger logger = LoggerFactory.getLogger(BinaryContentBuffer.class);
 	ByteArrayOutputStream content = new ByteArrayOutputStream();
 	String contentType = "application/octet-stream";
 	private String charset = "UTF-8";
 	
+	public BinaryContentBuffer(){
+	}
+	public BinaryContentBuffer(ByteArrayOutputStream content){
+		this.content = content;
+	}
+	public BinaryContentBuffer(ExecBuffer in) throws IOException{
+		content = new ByteArrayOutputStream();
+		in.stream(content);
+	}
 	public byte[] getContent() {
 		return content.toByteArray();
 	}
