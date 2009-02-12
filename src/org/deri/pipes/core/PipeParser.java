@@ -236,7 +236,7 @@ public class PipeParser {
 		xstream.aliasSystemAttribute("REFID", "reference");
 		xstream.aliasSystemAttribute("ID", "id");
 		sourceConverter.registerAliases(xstream);
-		//xstream.autodetectAnnotations(true);
+		xstream.autodetectAnnotations(true);
 		logger.debug("xstream created");
 		return xstream;
 	}
