@@ -1,0 +1,96 @@
+<pipeConfig>
+  <id>TBLonTheSW</id>
+  <name>Structured data about Tim Berners-Lee, found on the Semantic Web and adapted on the fly (FOAF, DBLP, DBPedia)</name>
+  <syntax><![CDATA[<pipe>
+<parameters>
+</parameters>
+<code>
+<simplemix>
+<source>
+<construct>
+<source>
+<rdffetch format="RDF/XML">
+<location><![CDATA[http://dblp.l3s.de/d2r/resource/authors/Tim_Berners-Lee]]]]><![CDATA[></location>
+</rdffetch>
+</source>
+<query>
+<![CDATA[
+CONSTRUCT {<http://www.w3.org/People/Berners-Lee/card#i> ?p ?o. 
+   ?s2 ?p2 <http://www.w3.org/People/Berners-Lee/card#i>} where {{<http://dblp.l3s.de/d2r/resource/authors/Tim_Berners-Lee> ?p ?o}
+  UNION 
+{?s2 ?p2 <http://dblp.l3s.de/d2r/resource/authors/Tim_Berners-Lee>}}
+]]]]><![CDATA[></query>
+</construct>
+</source>
+<source>
+<construct>
+<source>
+<rdffetch format="RDF/XML">
+<location><![CDATA[http://dbpedia.org/resource/Tim_Berners-Lee]]]]><![CDATA[></location>
+</rdffetch>
+</source>
+<query>
+<![CDATA[
+CONSTRUCT {<http://www.w3.org/People/Berners-Lee/card#i> ?p ?o. 
+ ?s2 ?p2 <http://www.w3.org/People/Berners-Lee/card#i>} where   {{<http://dbpedia.org/resource/Tim_Berners-Lee> ?p ?o}
+  UNION 
+      {?s2 ?p2 <http://dbpedia.org/resource/Tim_Berners-Lee>}}
+]]]]><![CDATA[></query>
+</construct>
+</source>
+<source>
+<rdffetch format="RDF/XML">
+<location><![CDATA[http://www.w3.org/People/Berners-Lee/card]]]]><![CDATA[></location>
+</rdffetch>
+</source>
+</simplemix>
+</code>
+</pipe>
+]]></syntax>
+  <config><![CDATA[<pipe>
+<parameters>
+</parameters>
+<code x="27" y="314">
+<simplemix x="173" y="258">
+<source>
+<construct x="12" y="129">
+<source>
+<rdffetch format="RDF/XML" x="13" y="22">
+<location><![CDATA[http://dblp.l3s.de/d2r/resource/authors/Tim_Berners-Lee]]]]><![CDATA[></location>
+</rdffetch>
+</source>
+<query>
+<![CDATA[
+CONSTRUCT {<http://www.w3.org/People/Berners-Lee/card#i> ?p ?o. 
+   ?s2 ?p2 <http://www.w3.org/People/Berners-Lee/card#i>} where {{<http://dblp.l3s.de/d2r/resource/authors/Tim_Berners-Lee> ?p ?o}
+  UNION 
+{?s2 ?p2 <http://dblp.l3s.de/d2r/resource/authors/Tim_Berners-Lee>}}
+]]]]><![CDATA[></query>
+</construct>
+</source>
+<source>
+<construct x="266" y="120">
+<source>
+<rdffetch format="RDF/XML" x="258" y="19">
+<location><![CDATA[http://dbpedia.org/resource/Tim_Berners-Lee]]]]><![CDATA[></location>
+</rdffetch>
+</source>
+<query>
+<![CDATA[
+CONSTRUCT {<http://www.w3.org/People/Berners-Lee/card#i> ?p ?o. 
+ ?s2 ?p2 <http://www.w3.org/People/Berners-Lee/card#i>} where   {{<http://dbpedia.org/resource/Tim_Berners-Lee> ?p ?o}
+  UNION 
+      {?s2 ?p2 <http://dbpedia.org/resource/Tim_Berners-Lee>}}
+]]]]><![CDATA[></query>
+</construct>
+</source>
+<source>
+<rdffetch format="RDF/XML" x="493" y="18">
+<location><![CDATA[http://www.w3.org/People/Berners-Lee/card]]]]><![CDATA[></location>
+</rdffetch>
+</source>
+</simplemix>
+</code>
+</pipe>
+]]></config>
+</pipeConfig>

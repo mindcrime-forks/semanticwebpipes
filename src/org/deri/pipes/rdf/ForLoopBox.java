@@ -42,7 +42,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
@@ -105,38 +107,35 @@ public class ForLoopBox extends RDFBox{
     		return new SesameMemoryBuffer();    		
     	}
  		ExecBuffer operatorResult = sourcelist.execute(context);
-		if (!(operatorResult instanceof SesameTupleBuffer)){
-    		logger.warn("sourcelist must contain Tuple set result, the FOR LOOP cannot not be executed, the input buffer is "+operatorResult);   
+		if (!(operatorResult instanceof Iterable)){
+    		logger.warn("sourcelist must contain an iterable result the input buffer is "+operatorResult);   
     		return new SesameMemoryBuffer();    		
-    	}
- 		SesameTupleBuffer tupleBuffer = (SesameTupleBuffer) operatorResult;
-   	
- 		return executeForLoop(context, tupleBuffer);
+    	}   	
+ 		return executeForLoop(context, (Iterable<Map<String,String>>)operatorResult);
     }
 
-	private ExecBuffer executeForLoop(Context context,SesameTupleBuffer tupleBuffer) throws Exception {
-		SesameMemoryBuffer buffer = new SesameMemoryBuffer();
-		try{
- 			TupleQueryResult tupleQueryResult = tupleBuffer.getTupleQueryResult();
- 			List<String> bindingNames=tupleQueryResult.getBindingNames();
- 			int maxConcurrent = 10;
- 			List<Operator> execJobs = new ArrayList<Operator>();
- 			while (tupleQueryResult.hasNext()) {
- 				String operatorXml=context.getEngine().serialize(forloop);	    	    
- 				BindingSet bindingSet = tupleQueryResult.next();		   
- 				operatorXml = bindVariables(operatorXml, bindingNames, bindingSet);
- 				logger.debug("parsing:"+operatorXml);
- 				Operator op = context.getEngine().parse(operatorXml);
- 				execJobs.add(op);
- 				if(execJobs.size() == maxConcurrent){
- 					executeJobsConcurrentlyAndClearList(context, buffer,execJobs);
- 				}
- 			}
-			executeJobsConcurrentlyAndClearList(context, buffer,execJobs);
- 		}catch(QueryEvaluationException e){
- 			logger.warn("error in for loop",e);
- 		}
- 		return buffer;
+    private ExecBuffer executeForLoop(Context context,Iterable<Map<String, String>> result) throws Exception {
+    	SesameMemoryBuffer buffer = new SesameMemoryBuffer();
+    	int maxConcurrent = 10;
+    	List<Operator> execJobs = new ArrayList<Operator>();
+    	try{
+    		for(Map<String,String> map : result){
+
+    			String operatorXml=context.getEngine().serialize(forloop);    	    
+    			operatorXml = bindVariables(operatorXml, map);
+    			logger.debug("parsing:"+operatorXml);
+    			Operator op = context.getEngine().parse(operatorXml);
+    			execJobs.add(op);
+    			if(execJobs.size() == maxConcurrent){
+    				executeJobsConcurrentlyAndClearList(context, buffer,execJobs);
+    			}
+    			executeJobsConcurrentlyAndClearList(context, buffer,execJobs);
+
+    		}
+    	}catch(Exception e){
+    		logger.warn("error in for loop",e);
+    	}
+    	return buffer;
 	}
 
 	private void executeJobsConcurrentlyAndClearList(Context context,
@@ -153,15 +152,13 @@ public class ForLoopBox extends RDFBox{
 		}
 	}
 
-	private String bindVariables(String operatorXml, List<String> bindingNames,
-			BindingSet bindingSet) {
-		for(int i=0;i<bindingNames.size();i++){				   
-		       String bindingName = bindingNames.get(i);
-				String bindingValue = bindingSet.getValue(bindingName).stringValue();
-				operatorXml=operatorXml.replace("${{"+bindingName+"}}",bindingValue);
+	private String bindVariables(String operatorXml, Map<String,String> bindings) {
+		for(String key : bindings.keySet()){				   
+				String value = bindings.get(key);
+				operatorXml=operatorXml.replace("${{"+key+"}}",value);
 		       try{
-					operatorXml=operatorXml.replace(URLEncoder.encode("${{" + bindingName + "}}","UTF-8"),
-											URLEncoder.encode(bindingValue,"UTF-8"));						
+					operatorXml=operatorXml.replace(URLEncoder.encode("${{" + key + "}}","UTF-8"),
+											URLEncoder.encode(value,"UTF-8"));						
 			   }
 			   catch(UnsupportedEncodingException e){
 					logger.warn("UTF-8 support is required by the JVM specification");

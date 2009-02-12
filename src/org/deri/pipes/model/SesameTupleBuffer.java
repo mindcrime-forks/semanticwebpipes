@@ -38,12 +38,19 @@
  */
 package org.deri.pipes.model;
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.utils.EmptyTupleQueryResult;
 import org.deri.pipes.utils.UrlLoader;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.MutableTupleQueryResult;
@@ -52,7 +59,7 @@ import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-public class SesameTupleBuffer implements ExecBuffer{
+public class SesameTupleBuffer implements ExecBuffer, Iterable<Map<String,String>>, Closeable{
 	private transient Logger logger = LoggerFactory.getLogger(SesameTupleBuffer.class);
 	private MutableTupleQueryResult buffer= null;
 
@@ -165,6 +172,56 @@ public class SesameTupleBuffer implements ExecBuffer{
 		}catch(Exception e){
 			logger.warn("sreaming error",e);
 		}
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Iterable#iterator()
+	 */
+	@Override
+	public Iterator<Map<String, String>> iterator() {
+		final TupleQueryResult tupleQueryResult = getTupleQueryResult();
+		final List<String> bindingNames = tupleQueryResult.getBindingNames();
+
+		return new Iterator<Map<String,String>>(){
+
+			@Override
+			public boolean hasNext() {
+				try{
+					return tupleQueryResult.hasNext();
+				}catch(Throwable t){
+					logger.warn("problem iterating through results"+t,t);
+					return false;
+				}
+			}
+
+			@Override
+			public Map<String, String> next() {
+				Map<String,String> map = new HashMap<String,String>();
+				try{
+					BindingSet bindingSet = tupleQueryResult.next();
+					for(String name : bindingNames){
+						map.put(name, bindingSet.getValue(name).stringValue());
+					}
+				}catch(Exception e){
+					logger.warn("problem reading tupleQueryResult "+e,e);
+				}
+				return map;
+			}
+
+			@Override
+			public void remove() {
+				throw new RuntimeException("remove not implemented");
+				
+			}
+			
+		};
+	}
+	/* (non-Javadoc)
+	 * @see java.io.Closeable#close()
+	 */
+	@Override
+	public void close() throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
