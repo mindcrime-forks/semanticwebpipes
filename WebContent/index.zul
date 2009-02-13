@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?page title="DERI Pipes" ?>
+ <?link href="favicon.ico" rel="shortcut icon" ?>
 <zk>
 <style src="/CSS/recycling.css"/>
 	<window id="passwordchecking" border="normal" width="350px" visible="false" sizable="false" >
@@ -30,8 +31,9 @@
 	
    	  <borderlayout>					
 			<north>
-						<hbox width="100%">
-						<vbox>
+						<hbox>
+    		  <button width="66px" href="http://pipes.deri.org/" image="/img/SWP_logo_66x50.png" style="float:left;"/>
+						<vbox align="left">
 						<menubar id="menubar">
 		<menu label="File">
 			<menupopup>
@@ -81,7 +83,6 @@
 	  </hbox>					
 	
 						</vbox>
-    		  <button href="http://pipes.deri.org/" image="/img/SWP_logo_66x50.png" style="float:right;"/>
 		</hbox>
 						</north>			
     		
