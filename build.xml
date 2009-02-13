@@ -8,12 +8,13 @@
 	    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
 	
     <!-- project-specific variables -->
-	<property name="version" value="0.6.1" />
+	<property name="version" value="0.6.2" />
     <property name="dest.dir" value="target" />
     <property name="jsp.dir.name" value="pipes" />
 	<property name="jar.name" value="${jsp.dir.name}-${version}.jar" />
 	<property name="jar.file" value="${dest.dir}/${jar.name}" />
-    <property name="package.name" value="${jsp.dir.name}.war" />
+    <property name="package.name" value="${jsp.dir.name}-${version}.war" />
+    <property name="engine.name" value="${jsp.dir.name}-engine-${version}" />
 
     <property environment="env" />
     <property name="build.dir" value="build" />
@@ -77,12 +78,12 @@
         <fileset dir="${webcontent.dir}"/>
         <lib dir="${lib.dir}" />
       	<lib file="${jar.file}" />
-		<classes dir="${src.dir}" includes="*.pipe,*.xml,*.properties,*.list,*.groovy" />
+		<classes dir="${src.dir}" includes="*.pipe,*.xml,*.properties,*.list,*.groovy,cache.ccf" />
       </war>
     </target>
 	<target name="engine" depends="jar">
 		<copy file="${jar.file}" tofile="${temp.dir}/pipes.jar"/>
-		<zip destfile="${dest.dir}/pipes-engine.zip">
+		<zip destfile="${dest.dir}/${engine.name}.zip">
 			<zipfileset dir="${weblib.dir}" prefix="pipes-engine/lib">
 				<include name="bsf.jar"/>
 				<include name="cglib-nodep-2.2.jar"/>
@@ -103,15 +104,17 @@
 				<include name="commons-cli-1.1.jar"/>
 				<include name="xstream-1.3.1.jar"/>
 				<include name="saxon9.jar"/>
+				<include name="jcs-1.3.jar"/>
+				<include name="nekohtml.jar"/>
 			</zipfileset>
 			<zipfileset dir="${temp.dir}" includes="pipes.jar" prefix="pipes-engine/lib"/>
 			<zipfileset dir="bin" includes="*" prefix="pipes-engine/bin"/>
-			<zipfileset dir="src" includes="db.properties,*.xml,*.groovy" prefix="pipes-engine/resources"/>
+			<zipfileset dir="src" includes="db.properties,*.xml,*.groovy,cache.ccf" prefix="pipes-engine/resources"/>
 			<zipfileset file="src/log4j-engine.properties" fullpath="pipes-engine/resources/log4j.properties"/>
 			<zipfileset file="doc/pipe-engine-readme.txt" fullpath="pipes-engine/readme.txt"/>
 		</zip>
-		<tar destfile="${dest.dir}/pipes-engine.tar.gz" compression="gzip">
-		  <zipfileset src="${dest.dir}/pipes-engine.zip"/>
+		<tar destfile="${dest.dir}/${engine.name}.tar.gz" compression="gzip">
+		  <zipfileset src="${dest.dir}/${engine.name}.zip"/>
 		</tar>
 	</target>
 

@@ -54,6 +54,8 @@ import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+@XStreamAlias("sparqlresultfetch")
 public class TupleQueryResultFetchBox extends FetchBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchBox.class);
 	private TupleQueryResultFormat format=TupleQueryResultFormat.SPARQL;
