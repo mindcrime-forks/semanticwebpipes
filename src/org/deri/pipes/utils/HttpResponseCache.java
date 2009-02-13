@@ -130,20 +130,25 @@ public class HttpResponseCache {
 					HeadMethod headMethod = new HeadMethod(location);
 					addRequestHeaders(headMethod,requestHeaders);
 				
-					int response = client.executeMethod(headMethod);
-					Header lastModifiedHeader = headMethod.getResponseHeader(HEADER_LAST_MODIFIED);
-					if(response == data.getResponse()){
-						if(lastModifiedHeader == null){
-							logger.debug("Not using cache (No last modified header available) for "+location);
-						}else if(lastModifiedHeader !=null && data.getLastModified().equals(lastModifiedHeader.getValue())){
-							data.setLastVerified(checkTimeMillis);
-							jcs.put(cacheKey, data);
-							logger.info("Retrieved from cache (used HTTP HEAD request to check "+HEADER_LAST_MODIFIED+") :"+location);
-							return data;
-						}else{
-							logger.debug("Not using cache (last modified changed) for "+location);
+					try{
+						int response = client.executeMethod(headMethod);
+						Header lastModifiedHeader = headMethod.getResponseHeader(HEADER_LAST_MODIFIED);
+						if(response == data.getResponse()){
+							if(lastModifiedHeader == null){
+								logger.debug("Not using cache (No last modified header available) for "+location);
+							}else if(lastModifiedHeader !=null && data.getLastModified().equals(lastModifiedHeader.getValue())){
+								data.setLastVerified(checkTimeMillis);
+								jcs.put(cacheKey, data);
+								logger.info("Retrieved from cache (used HTTP HEAD request to check "+HEADER_LAST_MODIFIED+") :"+location);
+								return data;
+							}else{
+								logger.debug("Not using cache (last modified changed) for "+location);
+							}
 						}
+					}finally{
+						headMethod.releaseConnection();
 					}
+
 				}
 			}catch(Exception e){
 				logger.warn("Problem retrieving from cache for "+location,e);
@@ -152,6 +157,7 @@ public class HttpResponseCache {
 		HttpResponseData data = getDataFromRequest(client, getMethod,
 				requestHeaders);
 		Header lastModifiedHeader = getMethod.getResponseHeader(HEADER_LAST_MODIFIED);
+		getMethod.releaseConnection();
 		if(lastModifiedHeader != null){
 			data.setLastModified(lastModifiedHeader.getValue());
 		}
