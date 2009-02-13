@@ -39,56 +39,67 @@
 
 package org.deri.pipes.rdf;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.HeadMethod;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.Properties;
+
+import org.apache.xerces.parsers.DOMParser;
+import org.apache.xerces.xni.parser.XMLParserConfiguration;
+import org.cyberneko.html.HTMLConfiguration;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
+import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.utils.HttpResponseCache;
-import org.deri.pipes.utils.HttpResponseData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.deri.pipes.model.InputStreamProvider;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Performs a Http Get into a binary content buffer using the
- * HttpClient provided by the Context.
+ * Converts html to xml using nekohtml.
  * @author robful
  *
  */
-@XStreamAlias("http-get")
-public class HttpGetBox implements Operator{
-	transient Logger logger = LoggerFactory.getLogger(HttpGetBox.class);
-	String location;
-	public String getLocation() {
-		return location;
-	}
-	public void setLocation(String location) {
-		this.location = location;
-	}
+@XStreamAlias("html2xml")
+public class Html2XmlBox implements Operator{
+	Source source;
 	/* (non-Javadoc)
 	 * @see org.deri.pipes.core.Operator#execute(org.deri.pipes.core.Context)
 	 */
 	@Override
 	public ExecBuffer execute(Context context) throws Exception {
-		HttpClient client = context.getHttpClient();
-		HttpResponseData data = HttpResponseCache.getResponseData(client, location);
-		if(data.getResponse() != 200){
-			logger.warn("The http get request to ["+location+"] response code was  ["+data.getResponse()+"]");
+		ExecBuffer buff = source.execute(context);
+		if(!(buff instanceof InputStreamProvider)){
+			buff = new BinaryContentBuffer(buff);
 		}
-		
-		BinaryContentBuffer buffer = new BinaryContentBuffer();
-		buffer.setContent(data.getBody());
-		buffer.setCharacterEncoding(data.getCharSet());
-		if(data.getContentType() != null){
-			buffer.setContentType(data.getContentType());
-		}
-		return buffer;
+
+		XMLParserConfiguration config = new HTMLConfiguration();
+		config.setFeature("http://cyberneko.org/html/features/augmentations", true);
+		config.setProperty("http://cyberneko.org/html/properties/names/elems", "match");
+		DOMParser parser = new DOMParser(config);
+		parser.parse(new InputSource(((InputStreamProvider)buff).getInputStream()));
+		Document document = parser.getDocument();
+		ByteArrayOutputStream out = new ByteArrayOutputStream(0);
+		Properties props = 
+			org.apache.xml.serializer.OutputPropertiesFactory.getDefaultMethodProperties(org.apache.xml.serializer.Method.XML);
+		props.setProperty("omit-xml-declaration", "true");
+		org.apache.xml.serializer.Serializer ser = org.apache.xml.serializer.SerializerFactory.getSerializer(props);
+		OutputStreamWriter outputStreamWriter = new OutputStreamWriter(out,"UTF-8");
+		ser.setWriter(outputStreamWriter);
+		ser.asDOMSerializer().serialize(document);
+		outputStreamWriter.close();
+		BinaryContentBuffer result = new BinaryContentBuffer(out);
+		result.setContentType("text/xml");
+		return result;
+
 	}
-	
+	public Source getSource() {
+		return source;
+	}
+	public void setSource(Source source) {
+		this.source = source;
+	}
 
 }

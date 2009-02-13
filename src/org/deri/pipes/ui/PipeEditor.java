@@ -41,7 +41,9 @@ package org.deri.pipes.ui;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 
+import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
@@ -318,14 +320,25 @@ public class PipeEditor extends Workspace {
 					logger.warn("Unable to hotDebug buffer of type "+buff.getClass());
 				}
 			}catch(Exception e){
-				logger.warn("Problem encountered getting tuples from pipe result");
+				textResult = getStack(e);
+				logger.warn("Problem encountered getting tuples from pipe result",e);
 			}
 		} catch (Exception e) {
+			textResult=getStack(e);
 			logger.warn("could not hotDebug",e);
 		}finally{
 			reloadTextDebug(textResult);
 			reloadTabularDebug(tuple);
 		}
+	}
+
+	private String getStack(Exception e) {
+		String textResult;
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(stringWriter);
+		e.printStackTrace(printWriter);
+		textResult = stringWriter.toString();
+		return textResult;
 	}
 
 	public void reload(String config){

@@ -279,6 +279,16 @@
 							<treecell id="xslt"  draggable="true"  label="XSLT" />
 						</treerow>	
 					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="xquery"  draggable="true"  label="XQuery" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="html2xml"  draggable="true"  label="HTML-&gt;XML" />
+						</treerow>	
+					</treeitem>
 				</treechildren>
 			</treeitem>	
 		    <treeitem label="Url">
@@ -394,7 +404,9 @@
 	       alert("There are some errors in your pipe, please check it again and make sure that all required fields are filled out");
 	    else{
 	     alert("Your pipe was successfully saved");
-	     Executions.sendRedirect(".");
+	     passwordchecking.visible=false;
+	     confirmation.visible=false;
+	     //Executions.sendRedirect(".");
 	    }
 	    }
 	}

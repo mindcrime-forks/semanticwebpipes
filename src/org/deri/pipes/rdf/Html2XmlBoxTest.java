@@ -36,56 +36,49 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.deri.pipes.rdf;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
+import org.deri.pipes.core.Engine;
+import org.deri.pipes.core.ExecBuffer;
+import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.HttpResponseCache;
-import org.deri.pipes.utils.HttpResponseData;
-import org.openrdf.rio.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import junit.framework.TestCase;
+
 /**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
+ * @author robful
  *
  */
-public class RDFFetchBox extends FetchBox {
-	private transient Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
-	@XStreamAsAttribute
-	protected String format="RDF/XML";		
+public class Html2XmlBoxTest extends TestCase {
+ public void test() throws Exception{
+	 MemoryContextFetcher x = new MemoryContextFetcher();
+	 x.setKey("html");
+	 x.setContentType("text/html");
+	 x.setDefaultValue("x");
+	 Html2XmlBox box = new Html2XmlBox();
+	 box.setSource(new Source(x));
+	 Context context = Engine.defaultEngine().newContext();
+	 context.put("html", getHtml());
+	 BinaryContentBuffer result = (BinaryContentBuffer) box.execute(context);
+	 result.stream(System.out);
+	 assertEquals("wrong content type","text/xml",result.getContentType());
+	 
+ }
+
+/**
+ * @return
+ */
+private Object getHtml() {
+	StringBuilder sb = new StringBuilder();
+	sb.append("\n<html>");
+	sb.append("\n<head><title>some html page</title></head>");
+	sb.append("\n<body>");
+	sb.append("\n<p>some text with " +
+			"\n<br> line break (not well formed)</p>");
+	sb.append("\n</body>");
+	return sb.toString();
 	
-	public ExecBuffer execute(Context context) throws Exception{
-		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-		HttpClient client= context.getHttpClient();
-		RDFFormat fileFormat = getRDFFormat();
-		Map<String,String> requestHeaders = new HashMap<String,String>();
-		requestHeaders.put("Accept", fileFormat.getDefaultMIMEType());
-		HttpResponseData data = HttpResponseCache.getResponseData(client, location,requestHeaders);
-		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
-		rdfBuffer.load(inputBuffer.getInputStream(), location,fileFormat);
-		return rdfBuffer;
-	}
-    
-
-	public void setFormat(String format) {
-		this.format = format;
-	}
-
-	public RDFFormat getRDFFormat() {
-		if(null==format){
-    		logger.info("No format given, assuming rdfxml");
-			return RDFFormat.RDFXML;
-		}else{	
-			return(RDFFormat.valueOf(format));
-		}
-	}
-
+}
 }

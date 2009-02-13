@@ -19,6 +19,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new ForNode(x,y);
 				case "htmlfetch":
 					return new  HTMLFetchNode(x,y);
+				case "html2xml":
+					return new  Html2XmlNode(x,y);
 				case "http-get":
 				    return new HttpGetNode(x,y);
 				case "parameter":
@@ -49,6 +51,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new XSLTNode(x,y);
 				case "xmlfetch":
 					return new XMLFetchNode(x,y);
+				case "xquery":
+					return new XQueryNode(x,y);
 				case "xslfetch":
 					return new XSLFetchNode(x,y);
 				default:
@@ -68,6 +72,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return ForNode.loadConfig(element,pipeEditor);
 				case "htmlfetch":    
 					return HTMLFetchNode.loadConfig(element,pipeEditor);
+				case "html2xml":    
+					return Html2XmlNode.loadConfig(element,pipeEditor);
 				case "http-get":
 					return HttpGetNode.loadConfig(element,pipeEditor);
 				case "parameter":  
@@ -96,6 +102,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return XMLFetchNode.loadConfig(element,pipeEditor);
 				case "xslfetch":    
 					return XSLFetchNode.loadConfig(element,pipeEditor);
+				case "xquery":    
+					return XQueryNode.loadConfig(element,pipeEditor);
 				case "xslt":   
 					return XSLTNode.loadConfig(element,pipeEditor);
 				case "rdfs":   

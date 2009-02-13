@@ -36,56 +36,69 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
 
-import java.util.HashMap;
-import java.util.Map;
+package org.deri.pipes.utils;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.Context;
+import java.io.IOException;
+import java.io.Serializable;
+
 import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.HttpResponseCache;
-import org.deri.pipes.utils.HttpResponseData;
-import org.openrdf.rio.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 /**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
+ * @author robful
  *
  */
-public class RDFFetchBox extends FetchBox {
-	private transient Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
-	@XStreamAsAttribute
-	protected String format="RDF/XML";		
-	
-	public ExecBuffer execute(Context context) throws Exception{
-		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-		HttpClient client= context.getHttpClient();
-		RDFFormat fileFormat = getRDFFormat();
-		Map<String,String> requestHeaders = new HashMap<String,String>();
-		requestHeaders.put("Accept", fileFormat.getDefaultMIMEType());
-		HttpResponseData data = HttpResponseCache.getResponseData(client, location,requestHeaders);
-		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
-		rdfBuffer.load(inputBuffer.getInputStream(), location,fileFormat);
-		return rdfBuffer;
+public class HttpResponseData implements Serializable{
+	byte[] body;
+	int response;
+	long lastVerified;
+	String charSet;
+	String contentType;
+	String lastModified;
+	void setBody(byte[] body) {
+		this.body = body;
 	}
-    
-
-	public void setFormat(String format) {
-		this.format = format;
+	void setResponse(int response) {
+		this.response = response;
 	}
-
-	public RDFFormat getRDFFormat() {
-		if(null==format){
-    		logger.info("No format given, assuming rdfxml");
-			return RDFFormat.RDFXML;
-		}else{	
-			return(RDFFormat.valueOf(format));
-		}
+	void setCharSet(String charSet) {
+		this.charSet = charSet;
 	}
-
+	void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+	void setLastModified(String lastModified) {
+		this.lastModified = lastModified;
+	}
+	public byte[] getBody() {
+		return body;
+	}
+	public int getResponse() {
+		return response;
+	}
+	public String getCharSet() {
+		return charSet;
+	}
+	public String getContentType() {
+		return contentType;
+	}
+	public String getLastModified() {
+		return lastModified;
+	}
+	long getLastVerified() {
+		return lastVerified;
+	}
+	void setLastVerified(long lastVerified) {
+		this.lastVerified = lastVerified;
+	}
+	/**
+	 * @return
+	 */
+	public BinaryContentBuffer toBinaryContentBuffer() throws IOException {
+		BinaryContentBuffer buffer = new BinaryContentBuffer();
+		buffer.setCharacterEncoding(getCharSet());
+		buffer.setContentType(getContentType());
+		buffer.setContent(getBody());
+		return buffer;
+	}
 }

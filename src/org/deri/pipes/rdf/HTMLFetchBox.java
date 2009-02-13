@@ -44,9 +44,13 @@ import java.util.Hashtable;
 
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.httpclient.HttpClient;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
+import org.deri.pipes.model.BinaryContentBuffer;
 import org.deri.pipes.model.SesameMemoryBuffer;
+import org.deri.pipes.utils.HttpResponseCache;
+import org.deri.pipes.utils.HttpResponseData;
 import org.deri.pipes.utils.MappedStreamSource;
 import org.deri.pipes.utils.XSLTUtil;
 import org.slf4j.Logger;
@@ -108,15 +112,18 @@ public class HTMLFetchBox extends FetchBox {
 		return xsltFile.keySet();
 	}
 	@Override
-	public ExecBuffer execute(Context context) {
+	public ExecBuffer execute(Context context) throws Exception{
 		SesameMemoryBuffer buffer=new SesameMemoryBuffer();
 		Enumeration<String> k = xsltFile.keys();
-		StreamSource stream=new StreamSource(location);
+		HttpClient client= context.getHttpClient();
+		HttpResponseData data = HttpResponseCache.getResponseData(client, location);
+		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
+		
 		while (k.hasMoreElements()) {
 			String key=k.nextElement();
 			if(format.indexOf(key)>=0){
 				StreamSource xsltStreamSource = xsltFile.get(key).getStreamSource();
-				StringBuffer textBuff=XSLTUtil.transform(stream, xsltStreamSource);
+				StringBuffer textBuff=XSLTUtil.transform(new StreamSource(inputBuffer.getInputStream()), xsltStreamSource);
 				((SesameMemoryBuffer)buffer).loadFromText(textBuff.toString(), location);
 			}
 		}

@@ -125,4 +125,8 @@ class represented by that element.
     <string>xquery</string>
     <java-class>org.deri.pipes.rdf.SaxonXqueryBox</java-class>
   </entry>
+  <entry>
+    <string>html2xml</string>
+    <java-class>org.deri.pipes.rdf.Html2XmlBox</java-class>
+  </entry>
 </map>

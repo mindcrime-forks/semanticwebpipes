@@ -38,11 +38,19 @@
  */
 package org.deri.pipes.rdf;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.httpclient.HttpClient;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.Operator;
+import org.deri.pipes.model.BinaryContentBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
+import org.deri.pipes.utils.HttpResponseCache;
+import org.deri.pipes.utils.HttpResponseData;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +58,14 @@ public class TupleQueryResultFetchBox extends FetchBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchBox.class);
 	private TupleQueryResultFormat format=TupleQueryResultFormat.SPARQL;
 		
-	public ExecBuffer execute(Context context){				
+	public ExecBuffer execute(Context context) throws Exception{				
 		SesameTupleBuffer buffer=new SesameTupleBuffer();
-		buffer.loadFromURL(location,format);		
+		HttpClient client= context.getHttpClient();
+		Map<String,String> requestHeaders = new HashMap<String,String>();
+		requestHeaders.put("Accept", format.getDefaultMIMEType());
+		HttpResponseData data = HttpResponseCache.getResponseData(client, location,requestHeaders);
+		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
+		buffer.load(inputBuffer.getInputStream(), format);
 		return buffer;
 	}
 	public static TupleQueryResultFormat formatOf(String format){
