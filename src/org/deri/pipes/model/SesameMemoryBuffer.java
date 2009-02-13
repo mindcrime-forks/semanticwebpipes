@@ -133,7 +133,13 @@ public class SesameMemoryBuffer implements ExecBuffer {
 	}
 
 	public void load(InputStream in, String url, RDFFormat format) throws RDFParseException, RepositoryException, IOException {
-		load(new InputStreamReader(in),url,format);
+		RepositoryConnection conn=this.getConnection() ;
+		try{
+			logger.debug("loading from "+url);
+			conn.add(in, url, format);
+		}finally{
+			in.close();
+		}		
 	}
 
 	private void load(Reader in, String url,

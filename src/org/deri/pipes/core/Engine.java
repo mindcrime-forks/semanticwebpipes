@@ -109,6 +109,8 @@ public class Engine {
 	public HttpClient getHttpClient(){
 		if(httpClient == null){
 			httpClient = new HttpClient();
+			httpClient.getParams().setParameter("http.protocol.content-charset", "UTF-8");
+
 		}
 		return httpClient;
 	}

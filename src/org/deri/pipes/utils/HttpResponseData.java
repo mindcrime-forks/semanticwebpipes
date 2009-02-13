@@ -41,6 +41,7 @@ package org.deri.pipes.utils;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 
 import org.deri.pipes.model.BinaryContentBuffer;
 
@@ -49,14 +50,19 @@ import org.deri.pipes.model.BinaryContentBuffer;
  *
  */
 public class HttpResponseData implements Serializable{
-	byte[] body;
+	final static String ENCODING= "ISO-8859-1";
+	String body;
 	int response;
 	long lastVerified;
 	String charSet;
 	String contentType;
 	String lastModified;
 	void setBody(byte[] body) {
-		this.body = body;
+		try {
+			this.body = new String(body,ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	void setResponse(int response) {
 		this.response = response;
@@ -71,7 +77,11 @@ public class HttpResponseData implements Serializable{
 		this.lastModified = lastModified;
 	}
 	public byte[] getBody() {
-		return body;
+		try {
+			return body.getBytes(ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	public int getResponse() {
 		return response;
