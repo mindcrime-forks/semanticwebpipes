@@ -129,4 +129,8 @@ class represented by that element.
     <string>html2xml</string>
     <java-class>org.deri.pipes.rdf.Html2XmlBox</java-class>
   </entry>
+  <entry>
+    <string>sparqlresultfetch</string>
+    <java-class>org.deri.pipes.rdf.TupleQueryResultFetchBox</java-class>
+  </entry>  
 </map>
