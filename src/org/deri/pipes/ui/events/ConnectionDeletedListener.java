@@ -43,10 +43,12 @@ import org.integratedmodelling.zk.diagram.components.Node;
 import org.integratedmodelling.zk.diagram.events.ConnectionDeletedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 public class ConnectionDeletedListener implements EventListener {	
+	public ConnectionDeletedListener(){
+		
+	}
 	final Logger logger = LoggerFactory.getLogger(ConnectionDeletedListener.class);
 	   public void onEvent(Event event) throws org.zkoss.zk.ui.UiException {    
 		     logger.debug("deleted");

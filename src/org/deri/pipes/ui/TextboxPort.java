@@ -36,35 +36,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.deri.pipes.ui;
 
-import org.deri.pipes.ui.events.ConnectionDeletedListener;
-import org.integratedmodelling.zk.diagram.components.Port;
-import org.integratedmodelling.zk.diagram.components.PortType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.integratedmodelling.zk.diagram.components.CustomPort;
+import org.integratedmodelling.zk.diagram.components.Workspace;
+import org.zkoss.zul.Textbox;
 
-public abstract class InPipeNode extends PipeNode{
-	final Logger logger = LoggerFactory.getLogger(InPipeNode.class);
-	
-    protected Port output =null;
-	PortType pType;
-	
-	public InPipeNode(PortType pType,int x,int y,int width,int height){
-		super(x,y,width,height);
-		this.pType=pType;   
-        setToobar();
+/**
+ * @author robful
+ *
+ */
+class TextboxPort extends CustomPort{
+	final Textbox textbox;
+	/**
+	 * @param arg0
+	 * @param arg1
+	 */
+	public TextboxPort(Workspace workspace, Textbox textbox) {
+		this(workspace,textbox,"none");
 	}
-	
-	protected void initialize(){
-		output =createPort(pType,"bottom");
+	@Override
+	public void detach() {
+		super.detach();
+		textbox.setText("");
+		textbox.setReadonly(false);
 	}
-	
-	public void connectTo(Port port){
-		getWorkspace().connect(output,port,false);
-		if(port.getParent() instanceof ConnectingInputNode){
-			((ConnectingInputNode)port.getParent()).onConnected(port);
+	/**
+	 * @param workspace
+	 * @param textbox2
+	 * @param string
+	 */
+	public TextboxPort(Workspace workspace, Textbox textbox, String position) {
+		super(((PipeEditor)workspace).getPTManager(), PipePortType.getPType(PipePortType.TEXTIN));
+		setPosition(position);
+		setPortType("custom");
+		this.textbox = textbox;
+	}
+	Textbox getTextbox(){
+		return textbox;
+	}
 
-		}
-	}
 }

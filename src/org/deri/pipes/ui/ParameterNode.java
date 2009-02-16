@@ -80,6 +80,10 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 		nameBox.setValue(name);
 	}
 	
+	public String getName(){
+		return nameBox.getValue();
+	}
+	
 	public void setLabel(String label){
 		labelBox.setValue(label);
 	}
@@ -117,11 +121,17 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	}
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		ParameterNode node= new ParameterNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		String nodeId = XMLUtil.getTextFromFirstSubEleByName(elm, "id");
+		ParameterNode node = wsp.getParameter(nodeId);
+		if(node != null){
+			return node;
+		}
+		node= new ParameterNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);	
-		node.setName(XMLUtil.getTextFromFirstSubEleByName(elm, "id"));
+		node.setName(nodeId);
 		node.setLabel(XMLUtil.getTextFromFirstSubEleByName(elm, "label"));
 		node.setDefaultValue(XMLUtil.getTextFromFirstSubEleByName(elm, "default"));
+		wsp.addParameter(node);
 		return node;
 	}
 

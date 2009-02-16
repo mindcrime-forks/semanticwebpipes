@@ -58,6 +58,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.zkoss.zk.ui.AbstractComponent;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbarbutton;
@@ -77,7 +79,7 @@ public abstract class PipeNode extends ZKNode{
 		super(x,y,width,height);
 		this.canDelete=false;
 		wnd =new Window();
-		appendChild(wnd); 	   
+		appendChild(wnd);
 	}
 
 	abstract void initialize();

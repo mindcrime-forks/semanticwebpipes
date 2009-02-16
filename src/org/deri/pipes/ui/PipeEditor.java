@@ -58,6 +58,7 @@ import org.deri.pipes.model.SesameTupleBuffer;
 import org.deri.pipes.rdf.RDFBox;
 import org.deri.pipes.rdf.SelectBox;
 import org.deri.pipes.store.DatabasePipeManager;
+import org.deri.pipes.ui.events.ConnectionDeletedListener;
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
 import org.integratedmodelling.zk.diagram.components.PortTypeMask;
 import org.integratedmodelling.zk.diagram.components.Shape;
@@ -187,14 +188,23 @@ public class PipeEditor extends Workspace {
 	}
 
 	public void addParameter(ParameterNode paraNode){
-		if (paraList.indexOf(paraNode)<0)
+		if (paraList.indexOf(paraNode)<0){
+			if(paraNode.getName()!= null){
+				for(ParameterNode p : paraList){
+					if(paraNode.getName().equals(p.getName())){
+						return;
+					}
+				}
+			}
 			paraList.add(paraNode);
+		}
 	}
 
 	public ParameterNode getParameter(String nodeId){
 		for(int i=0;i<paraList.size();i++){
-			if((nodeId.equals("${"+paraList.get(i).getParaId()+"}"))&&(paraList.get(i).getWorkspace()!=null)){
-				return paraList.get(i);
+			ParameterNode parameterNode = paraList.get(i);
+			if((nodeId.equals(parameterNode.getParaId()) || nodeId.equals("${"+parameterNode.getParaId()+"}"))&&(parameterNode.getWorkspace()!=null)){
+				return parameterNode;
 			}
 		}
 		logger.debug("No parameter set for ["+nodeId+"]");
