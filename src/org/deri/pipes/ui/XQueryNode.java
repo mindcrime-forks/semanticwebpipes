@@ -72,7 +72,7 @@ public class XQueryNode extends InOutNode{
 		queryBox.setQuery("xquery version \"1.0\";\n<html>\n <head>\n  <title>xquery</title>" +
 				"\n </head>" +
 				"\n <body>" +
-				"\n{for $link //a return\n"
+				"\n{for $link in //a return\n"
 				+"\n<p>{$link}</p>" +
 				"</body>" +
 		"\n</html>");
