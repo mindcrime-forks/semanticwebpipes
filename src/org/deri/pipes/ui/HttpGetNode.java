@@ -47,33 +47,63 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Textbox;
-
+import org.zkoss.zul.Vbox;
+import org.zkoss.zul.Label;
 /**
  * @author robful
  *
  */
 public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
+	/**
+	 * 
+	 */
+	private static final String ATTR_ACCEPT_CONTENT_TYPE = "acceptContentType";
+	/**
+	 * 
+	 */
+	private static final String ATTR_RESOLVE_HTML_LINKS = "resolveHtmlLinks";
 	final transient Logger logger = LoggerFactory.getLogger(FetchNode.class);
-	protected Textbox urlTextbox=null;
+	protected Textbox urlTextbox;
+	protected Textbox acceptContentTypeTextbox;
+	protected Checkbox resolveLinksCheckbox;
 	protected Port urlPort=null;
 
 	public HttpGetNode(int x,int y){
-		super(PipePortType.getPType(PipePortType.ANYOUT),x,y,230,60);
+		super(PipePortType.getPType(PipePortType.ANYOUT),x,y,300,100);
 		this.tagName="http-get";
 		wnd.setTitle("HTTP Get");
-		org.zkoss.zul.Label label=new org.zkoss.zul.Label(" URL: ");
-        wnd.appendChild(label);
-        urlTextbox =new Textbox();
+		Vbox vbox = new Vbox();
+		wnd.appendChild(vbox);
+        Hbox hbox = new Hbox();
+        Label urlLabel = new Label(" URL: ");
+        urlLabel.setWidth("60px");
+		hbox.appendChild(urlLabel);
+		urlTextbox = new Textbox();
         urlTextbox.setWidth("200px");
-		wnd.appendChild(urlTextbox);
+        hbox.appendChild(urlTextbox);
+        vbox.appendChild(hbox);
         
+        hbox = new Hbox();
+        Label acceptLabel = new Label(" Accept: ");
+        acceptLabel.setWidth("60px");
+		hbox.appendChild(acceptLabel);
+		acceptContentTypeTextbox = new Textbox();
+        acceptContentTypeTextbox.setWidth("200px");
+        acceptContentTypeTextbox.setTooltiptext("(Optional) value for the Accept HTTP Header");
+        hbox.appendChild(acceptContentTypeTextbox);
+        vbox.appendChild(hbox);
+        resolveLinksCheckbox =  new Checkbox("Resolve HTML Links");
+        resolveLinksCheckbox.setTooltip("Change relative href links to absolute URLs");
+        vbox.appendChild(resolveLinksCheckbox);
 	}
 
 
 	protected void initialize(){
 		super.initialize();
-		urlPort =createPort(PipePortType.TEXTIN,35,36);
+		urlPort =createPort(PipePortType.TEXTIN,280,36);
 		((CustomPort)urlPort).setMaxFanIn(1);
 	}
 	
@@ -102,7 +132,12 @@ public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
 			if(config){
 				super.setPosition(srcCode);
 			}
-			
+			if(acceptContentTypeTextbox.getText().trim().length()>0){
+				srcCode.setAttribute(ATTR_ACCEPT_CONTENT_TYPE,acceptContentTypeTextbox.getText().trim());
+			}
+			if(resolveLinksCheckbox.isChecked()){
+				srcCode.setAttribute(ATTR_RESOLVE_HTML_LINKS, "true");
+			}
 			Element locElm =doc.createElement("location");
 			locElm.appendChild(getConnectedCode(doc, urlTextbox, urlPort, config));
 			srcCode.appendChild(locElm);
@@ -118,6 +153,12 @@ public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
 	 */
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
 		HttpGetNode node= new HttpGetNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		if(elm.hasAttribute(ATTR_RESOLVE_HTML_LINKS)){
+			node.resolveLinksCheckbox.setChecked("true".equals(elm.getAttribute(ATTR_RESOLVE_HTML_LINKS)));
+		}
+		if(elm.hasAttribute(ATTR_ACCEPT_CONTENT_TYPE)){
+			node.acceptContentTypeTextbox.setText(elm.getAttribute(ATTR_ACCEPT_CONTENT_TYPE));
+		}
 		wsp.addFigure(node);
 		Element locElm=XMLUtil.getFirstSubElementByName(elm, "location");
 		node.loadConnectedConfig(locElm, node.urlPort, node.urlTextbox);

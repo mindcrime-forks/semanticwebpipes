@@ -39,6 +39,9 @@
 
 package org.deri.pipes.rdf;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -53,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
  * Performs a Http Get into a binary content buffer using the
@@ -64,6 +68,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class HttpGetBox implements Operator{
 	transient Logger logger = LoggerFactory.getLogger(HttpGetBox.class);
 	String location;
+	@XStreamAsAttribute
+	boolean resolveHtmlLinks = false;
+	/**
+	 * HTTP ACCEPT header (optional)
+	 */
+	@XStreamAsAttribute
+	String acceptContentType;
 	public String getLocation() {
 		return location;
 	}
@@ -76,6 +87,10 @@ public class HttpGetBox implements Operator{
 	@Override
 	public ExecBuffer execute(Context context) throws Exception {
 		HttpClient client = context.getHttpClient();
+		Map<String,String> headers = new HashMap<String,String>();
+		if(acceptContentType != null && acceptContentType.trim().length()>0){
+			headers.put("Accept",acceptContentType.trim());
+		}
 		HttpResponseData data = HttpResponseCache.getResponseData(client, location);
 		if(data.getResponse() != 200){
 			logger.warn("The http get request to ["+location+"] response code was  ["+data.getResponse()+"]");
@@ -86,6 +101,13 @@ public class HttpGetBox implements Operator{
 		buffer.setCharacterEncoding(data.getCharSet());
 		if(data.getContentType() != null){
 			buffer.setContentType(data.getContentType());
+		}
+		if(resolveHtmlLinks && buffer.getContentType().toLowerCase().indexOf("html")>=0){
+			try{
+				return LinkResolver.rewriteUrls(buffer, location);
+			}catch(Exception e){
+				logger.warn("Could not rewrite URLs",e);
+			}
 		}
 		return buffer;
 	}
