@@ -45,6 +45,9 @@ package org.deri.pipes.ui;
 import java.net.URLEncoder;
 import java.util.List;
 
+import org.apache.xerces.dom.DocumentImpl;
+import org.deri.pipes.core.Engine;
+import org.deri.pipes.rdf.URLBuilderBox;
 import org.deri.pipes.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.slf4j.Logger;
@@ -232,7 +235,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		hbox.appendChild(addImage("img/edit_remove-48x48.png"));
 		ParameterizableTextbox pathBox = createParaBox(180,16);
 		hbox.appendChild(pathBox);		
-		TextboxPort nPort = new TextboxPort(getWorkspace(),pathBox);
+		TextboxPort nPort = new SourceOrStringPort(getWorkspace(),pathBox);
 		pathBox.setPort(nPort);
 		int yPosition = PORT_BASE_Y_POSITION+(pathVbox.getChildren().size())*HBOX_HEIGHT;
 		addPort(nPort,PORT_X_POSITION,yPosition);
@@ -258,7 +261,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		hbox.appendChild(new Label(" = "));
 		ParameterizableTextbox valueBox = createParaBox(80,16);
 		hbox.appendChild(valueBox);
-		TextboxPort nPort = new TextboxPort(getWorkspace(),valueBox);
+		TextboxPort nPort = new SourceOrStringPort(getWorkspace(),valueBox);
 		int yPosition = PORT_BASE_Y_POSITION+(pathVbox.getChildren().size()+paraVbox.getChildren().size())*HBOX_HEIGHT;
 		addPort(nPort,PORT_X_POSITION,yPosition);
 		valueBox.setPort(nPort);
@@ -306,55 +309,8 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		box.setWidth(w+"px");
 		return box;
 	}
-	@Override	
-	public String getSrcCode(boolean config){
-		if(config){
-			return super.getSrcCode(config);
-		}
-		StringBuilder code=new StringBuilder();
-		code.append(getConnectedCode(baseURL, basePort));
-
-		String tmp=null;
-		for(int i=1;i<pathVbox.getChildren().size();i++){
-
-			Hbox hbox=(Hbox)pathVbox.getChildren().get(i);
-			ParameterizableTextbox ptb = (ParameterizableTextbox)hbox.getLastChild();
-			Port port = ptb.getPort();
-			tmp=getConnectedCode(ptb, port).trim();
-			if(tmp.length() == 0){
-				continue;
-			}
-			code.append(tmp);
-
-		}
-		String and="?";
-
-		for(int i=1;i<paraVbox.getChildren().size();i++){
-			try{
-				Hbox hbox=(Hbox)paraVbox.getChildren().get(i);
-				if(((Textbox)hbox.getFirstChild().getNextSibling()).getValue().trim()!=""){
-					ParameterizableTextbox ptb = (ParameterizableTextbox)hbox.getLastChild();
-					Port port = ptb.getPort();
-					tmp=getConnectedCode(ptb, port);											
-					//TODO : encoding location fragments here?
-
-					if(tmp.indexOf('}')>=0){
-						tmp=URLEncoder.encode(tmp,"UTF-8");
-					}
-					code.append(and)
-					.append(URLEncoder.encode(((Textbox)hbox.getFirstChild().getNextSibling()).getValue(),"UTF-8"))
-					.append("=").append(tmp);
-					and="&";
-				}
-			}
-			catch(java.io.UnsupportedEncodingException e){
-				logger.info("UTF-8 support is required by the JVM specification",e);
-			}
-		}
-
-		return code.toString();
-	}
 	
+
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()==null){
@@ -386,6 +342,18 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 			paraElm.appendChild(getConnectedCode(doc,ptb,port,config));
 			srcCode.appendChild(paraElm);	
 		}
+		if(!config){
+			//Does this urlbuilder use a source? If not just return the string.
+			String code = super.serializeNode(doc, srcCode);
+			URLBuilderBox box = (URLBuilderBox)Engine.defaultEngine().parse(code);
+			if(!box.usesSource()){
+				try {
+					return doc.createTextNode(box.getUrl(Engine.defaultEngine().newContext()));
+				} catch (Exception e) {
+					logger.warn("Couldn't get location",e);
+				}
+			}
+		}
 		return srcCode;
 	}
 	
@@ -396,8 +364,13 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	}
 	
 	public void debug(){
-		((PipeEditor)getWorkspace()).reloadTextDebug(getSrcCode(false)) ;
-		((PipeEditor)getWorkspace()).reloadTabularDebug(null);
+		String srcCode = getSrcCode(false);
+		if(srcCode.indexOf('<')>=0){
+			((PipeEditor)getWorkspace()).hotDebug(srcCode);
+		}else{
+			((PipeEditor)getWorkspace()).reloadTextDebug(srcCode) ;
+			((PipeEditor)getWorkspace()).reloadTabularDebug(null);
+		}
 	}
 
 

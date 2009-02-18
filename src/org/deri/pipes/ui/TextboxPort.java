@@ -40,6 +40,7 @@
 package org.deri.pipes.ui;
 
 import org.integratedmodelling.zk.diagram.components.CustomPort;
+import org.integratedmodelling.zk.diagram.components.PortTypeManager;
 import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.zkoss.zul.Textbox;
 
@@ -68,7 +69,18 @@ class TextboxPort extends CustomPort{
 	 * @param string
 	 */
 	public TextboxPort(Workspace workspace, Textbox textbox, String position) {
-		super(((PipeEditor)workspace).getPTManager(), PipePortType.getPType(PipePortType.TEXTIN));
+		this(((PipeEditor)workspace).getPTManager(), PipePortType.getPType(PipePortType.TEXTIN),textbox,position);
+	}
+	/**
+	 * @param manager
+	 * @param type
+	 * @param position
+	 * @param portType TODO
+	 * @param textbox2
+	 */
+	public TextboxPort(PortTypeManager manager, PipePortType type,
+			Textbox textbox, String position) {
+		super(manager, type);
 		setPosition(position);
 		setPortType("custom");
 		this.textbox = textbox;

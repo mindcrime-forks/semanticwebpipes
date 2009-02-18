@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.httpclient.HttpMethodBase;
 import org.deri.pipes.model.BinaryContentBuffer;
 
 /**
@@ -57,6 +58,7 @@ public class HttpResponseData implements Serializable{
 	String charSet;
 	String contentType;
 	String lastModified;
+	transient HttpMethodBase method;
 	void setBody(byte[] body) {
 		try {
 			this.body = new String(body,ENCODING);

@@ -36,58 +36,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
 
-import java.util.HashMap;
-import java.util.Map;
+package org.deri.pipes.core.internals;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
-import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.HttpResponseCache;
-import org.deri.pipes.utils.HttpResponseData;
-import org.openrdf.rio.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.deri.pipes.model.TextBuffer;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-/**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
- *
- */
-public class RDFFetchBox extends FetchBox {
-	private transient Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
-	@XStreamAsAttribute
-	protected String format="RDF/XML";		
-	
-	public ExecBuffer execute(Context context) throws Exception{
-		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-		HttpClient client= context.getHttpClient();
-		RDFFormat fileFormat = getRDFFormat();
-		Map<String,String> requestHeaders = new HashMap<String,String>();
-		requestHeaders.put("Accept", fileFormat.getDefaultMIMEType());
-		String url = location.expand(context);
-		HttpResponseData data = HttpResponseCache.getResponseData(client, url,requestHeaders);
-		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-		rdfBuffer.load(inputBuffer.getInputStream(), url,fileFormat);
-		return rdfBuffer;
+@XStreamConverter(StringOrSourceConverter.class)
+public class StringOrSource{
+	public final String string;
+	public final Source source;
+	/**
+	 * @param value
+	 */
+	public StringOrSource(String string) {
+		this.string = string;
+		this.source = null;
 	}
-    
-
-	public void setFormat(String format) {
-		this.format = format;
+	public StringOrSource(Source source) {
+		this.source = source;
+		this.string = null;
 	}
-
-	public RDFFormat getRDFFormat() {
-		if(null==format){
-    		logger.info("No format given, assuming rdfxml");
-			return RDFFormat.RDFXML;
-		}else{	
-			return(RDFFormat.valueOf(format));
+	/**
+	 * @param context
+	 * @return
+	 */
+	public String expand(Context context) throws Exception{
+		if(string != null){
+			return string;
 		}
+		return new TextBuffer(source.execute(context)).toString();
 	}
-
 }

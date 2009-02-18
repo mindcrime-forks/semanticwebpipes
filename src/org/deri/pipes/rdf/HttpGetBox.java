@@ -49,6 +49,7 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
+import org.deri.pipes.core.internals.StringOrSource;
 import org.deri.pipes.model.BinaryContentBuffer;
 import org.deri.pipes.utils.HttpResponseCache;
 import org.deri.pipes.utils.HttpResponseData;
@@ -67,7 +68,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @XStreamAlias("http-get")
 public class HttpGetBox implements Operator{
 	transient Logger logger = LoggerFactory.getLogger(HttpGetBox.class);
-	String location;
+	StringOrSource location;
 	@XStreamAsAttribute
 	boolean resolveHtmlLinks = false;
 	/**
@@ -75,11 +76,9 @@ public class HttpGetBox implements Operator{
 	 */
 	@XStreamAsAttribute
 	String acceptContentType;
-	public String getLocation() {
-		return location;
-	}
+
 	public void setLocation(String location) {
-		this.location = location;
+		this.location = new StringOrSource(location);
 	}
 	/* (non-Javadoc)
 	 * @see org.deri.pipes.core.Operator#execute(org.deri.pipes.core.Context)
@@ -91,7 +90,8 @@ public class HttpGetBox implements Operator{
 		if(acceptContentType != null && acceptContentType.trim().length()>0){
 			headers.put("Accept",acceptContentType.trim());
 		}
-		HttpResponseData data = HttpResponseCache.getResponseData(client, location);
+		String url = location.expand(context);
+		HttpResponseData data = HttpResponseCache.getResponseData(client, url);
 		if(data.getResponse() != 200){
 			logger.warn("The http get request to ["+location+"] response code was  ["+data.getResponse()+"]");
 		}
@@ -104,7 +104,7 @@ public class HttpGetBox implements Operator{
 		}
 		if(resolveHtmlLinks && buffer.getContentType().toLowerCase().indexOf("html")>=0){
 			try{
-				return LinkResolver.rewriteUrls(buffer, location);
+				return LinkResolver.rewriteUrls(buffer, url);
 			}catch(Exception e){
 				logger.warn("Could not rewrite URLs",e);
 			}

@@ -36,58 +36,63 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
 
-import java.util.HashMap;
-import java.util.Map;
+package org.deri.pipes.core.internals;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.Context;
-import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.HttpResponseCache;
-import org.deri.pipes.utils.HttpResponseData;
-import org.openrdf.rio.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+
 /**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
+ * @author robful
  *
  */
-public class RDFFetchBox extends FetchBox {
-	private transient Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
-	@XStreamAsAttribute
-	protected String format="RDF/XML";		
-	
-	public ExecBuffer execute(Context context) throws Exception{
-		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-		HttpClient client= context.getHttpClient();
-		RDFFormat fileFormat = getRDFFormat();
-		Map<String,String> requestHeaders = new HashMap<String,String>();
-		requestHeaders.put("Accept", fileFormat.getDefaultMIMEType());
-		String url = location.expand(context);
-		HttpResponseData data = HttpResponseCache.getResponseData(client, url,requestHeaders);
-		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
+public class StringOrSourceConverter implements Converter{
 
-		rdfBuffer.load(inputBuffer.getInputStream(), url,fileFormat);
-		return rdfBuffer;
-	}
-    
-
-	public void setFormat(String format) {
-		this.format = format;
-	}
-
-	public RDFFormat getRDFFormat() {
-		if(null==format){
-    		logger.info("No format given, assuming rdfxml");
-			return RDFFormat.RDFXML;
-		}else{	
-			return(RDFFormat.valueOf(format));
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.Converter#marshal(java.lang.Object, com.thoughtworks.xstream.io.HierarchicalStreamWriter, com.thoughtworks.xstream.converters.MarshallingContext)
+	 */
+	@Override
+	public void marshal(Object o, HierarchicalStreamWriter writer,
+			MarshallingContext context) {
+		StringOrSource x = (StringOrSource)o;
+		if(x.source != null){
+			writer.startNode("source");
+			context.convertAnother(x.source);
+			writer.endNode();
+		}else{
+			writer.setValue(x.string);
 		}
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.Converter#unmarshal(com.thoughtworks.xstream.io.HierarchicalStreamReader, com.thoughtworks.xstream.converters.UnmarshallingContext)
+	 */
+	@Override
+	public Object unmarshal(HierarchicalStreamReader reader,
+			UnmarshallingContext context) {
+		if(reader.hasMoreChildren()){
+			reader.moveDown();
+			try{
+				return new StringOrSource((Source)context.convertAnother(context.currentObject(), Source.class));
+			}finally{
+				reader.moveUp();
+			}
+		}else{
+			return new StringOrSource(reader.getValue());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.thoughtworks.xstream.converters.ConverterMatcher#canConvert(java.lang.Class)
+	 */
+	@Override
+	public boolean canConvert(Class cls) {
+		return StringOrSource.class.equals(cls);
 	}
 
 }

@@ -290,6 +290,11 @@
 							<treecell id="html2xml"  draggable="true"  label="HTML-&gt;XML" />
 						</treerow>	
 					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell id="stringify"  draggable="true"  label="Stringify" />
+						</treerow>	
+					</treeitem>
 				</treechildren>
 			</treeitem>	
 		    <treeitem label="Url">

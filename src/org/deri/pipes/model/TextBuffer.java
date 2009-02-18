@@ -36,58 +36,83 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
 
-import java.util.HashMap;
-import java.util.Map;
+package org.deri.pipes.model;
 
-import org.apache.commons.httpclient.HttpClient;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.Context;
-import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.HttpResponseCache;
-import org.deri.pipes.utils.HttpResponseData;
-import org.openrdf.rio.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 /**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
+ * A buffer containing some text.
+ * @author robful
  *
  */
-public class RDFFetchBox extends FetchBox {
-	private transient Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
-	@XStreamAsAttribute
-	protected String format="RDF/XML";		
-	
-	public ExecBuffer execute(Context context) throws Exception{
-		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-		HttpClient client= context.getHttpClient();
-		RDFFormat fileFormat = getRDFFormat();
-		Map<String,String> requestHeaders = new HashMap<String,String>();
-		requestHeaders.put("Accept", fileFormat.getDefaultMIMEType());
-		String url = location.expand(context);
-		HttpResponseData data = HttpResponseCache.getResponseData(client, url,requestHeaders);
-		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
+public class TextBuffer implements ExecBuffer{
 
-		rdfBuffer.load(inputBuffer.getInputStream(), url,fileFormat);
-		return rdfBuffer;
+	private final String text;
+
+	public TextBuffer(String text){
+		this.text = text;
 	}
-    
-
-	public void setFormat(String format) {
-		this.format = format;
-	}
-
-	public RDFFormat getRDFFormat() {
-		if(null==format){
-    		logger.info("No format given, assuming rdfxml");
-			return RDFFormat.RDFXML;
-		}else{	
-			return(RDFFormat.valueOf(format));
+	/**
+	 * @param execute
+	 */
+	public TextBuffer(ExecBuffer buff) throws IOException{
+		if(buff instanceof TextBuffer){
+			this.text = ((TextBuffer)buff).text;
+		}else{
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			buff.stream(out);
+			String encoding = "UTF-8";
+			if(buff instanceof BinaryContentBuffer){
+				encoding = ((BinaryContentBuffer)buff).getCharacterEncoding();
+			}
+			text = new String(out.toByteArray(),encoding);
 		}
+	}
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.ExecBuffer#stream(org.deri.pipes.core.ExecBuffer)
+	 */
+	@Override
+	public void stream(ExecBuffer outputBuffer) throws IOException {
+		toBinaryContentBuffer().stream(outputBuffer);
+	}
+	private BinaryContentBuffer toBinaryContentBuffer() throws IOException {
+		BinaryContentBuffer x = new BinaryContentBuffer();
+		x.setContent(getBytes());
+		return x;
+	}
+
+	/**
+	 * @return
+	 */
+	private byte[] getBytes() {
+		return text.getBytes();
+	}
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.ExecBuffer#stream(org.deri.pipes.core.ExecBuffer, java.lang.String)
+	 */
+	@Override
+	public void stream(ExecBuffer outputBuffer, String context)
+			throws IOException {
+		toBinaryContentBuffer().stream(outputBuffer,context);
+	}
+
+	/**
+	 * Writes bytes to the output stream using the standard encoding.
+	 */
+	@Override
+	public void stream(OutputStream output) throws IOException {
+		output.write(getBytes());
+	}
+	/**
+	 * Returns the text.
+	 */
+	public String toString(){
+		return text;
 	}
 
 }

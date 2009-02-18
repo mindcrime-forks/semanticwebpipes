@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.zkoss.util.logging.Log;
 import org.zkoss.zk.ui.AbstractComponent;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Caption;
@@ -119,16 +120,25 @@ public abstract class PipeNode extends ZKNode{
 
 	protected Node getConnectedCode(Document doc,Textbox txtBox,Port port,boolean config){
 		Collection<Port> incomingConnections = getWorkspace().getIncomingConnections(port.getUuid());
-		for(Port p:incomingConnections)
+		for(Port p:incomingConnections){
 			if(p.getParent() instanceof ConnectingOutputNode){			
-				if(config){
-					return ((PipeNode)p.getParent()).getSrcCode(doc,config);
+				if(config || ((port instanceof SourceOrStringPort)&&!(p.getParent() instanceof ParameterNode))){
+					Node node = ((PipeNode)p.getParent()).getSrcCode(doc,config);
+					if((!config)&&node.getNodeType()==Document.ELEMENT_NODE){
+						if(!"source".equals(((Element)node).getTagName())){
+							Element source = doc.createElement("source");
+							source.appendChild(node);
+							node = source;
+						}
+					}
+					return node;
 				}
 				else {
 					String srcCode = ((PipeNode)p.getParent()).getSrcCode(config);
 					return asTextOrCDataNode(doc, srcCode);
 				}
 			}
+		}
 		return asTextOrCDataNode(doc,txtBox.getValue().trim());
 	}
 
@@ -191,12 +201,17 @@ public abstract class PipeNode extends ZKNode{
 			if(shape !=null && shape instanceof PipeNode){
 				((PipeNode)shape).connectTo(port);
 			}else{
-				logger.warn("cannot connect shape ["+shape+"] to port "+port);
+				logger.warn("cannot connect shape ["+shape+"] to port "+port+" using "+linkedElm.getNodeName());
 			}
 		}else if((txt=XMLUtil.getTextData(elm))!=null){
 			if(txt.indexOf("${")>=0){				
 				ParameterNode paraNode=((PipeEditor)getWorkspace()).getParameter(txt);
-				paraNode.connectTo(port);
+				if(paraNode != null){
+					paraNode.connectTo(port);
+				}else{
+					logger.info("Cannot directly connect parameter referenced variable in "+txt);
+					txtbox.setValue(txt);
+				}
 			}
 			else{
 				txtbox.setValue(txt);
@@ -221,6 +236,16 @@ public abstract class PipeNode extends ZKNode{
 	public String getSrcCode(boolean config){
 		DocumentImpl doc =new DocumentImpl();
 		Node srcCode = getSrcCode(doc,config);
+		return serializeNode(doc, srcCode);
+	}
+
+	/**
+	 * Serialize this node into a String.
+	 * @param doc
+	 * @param srcCode
+	 * @return
+	 */
+	protected String serializeNode(Document doc, Node srcCode) {
 		if(srcCode.getNodeType() != Node.ELEMENT_NODE){
 			return srcCode.getTextContent();
 		}

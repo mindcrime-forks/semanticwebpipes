@@ -43,6 +43,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new SPARQLResultFetchNode(x,y);
 				case "smoosher":
 					return new SmoosherNode(x,y);
+				case "stringify":
+					return new StringifyNode(x,y);
 				case "urlbuilder":
 					return new URLBuilderNode(x,y);
 				case "variable":
@@ -92,6 +94,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return SmoosherNode.loadConfig(element,pipeEditor);
 				case "sparqlendpoint":    
 					return SPARQLEndpointNode.loadConfig(element,pipeEditor);
+				case "stringify":
+					return StringifyNode.loadConfig(element,pipeEditor);
 				case "tuplefetch":    
 					return TupleQueryResultFetchNode.loadConfig(element,pipeEditor);
 				case "urlbuilder":    
@@ -109,6 +113,7 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 				case "rdfs":   
 					return RDFSMixNode.loadConfig(element,pipeEditor);
 				default:
+				println("groovy: don't know how to load "+tagName);
 					return null;
 			}
 		}

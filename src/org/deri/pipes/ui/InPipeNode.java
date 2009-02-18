@@ -60,6 +60,10 @@ public abstract class InPipeNode extends PipeNode{
 		output =createPort(pType,"bottom");
 	}
 	
+	public PortType getOutputPortType(){
+		return pType;
+	}
+	
 	public void connectTo(Port port){
 		getWorkspace().connect(output,port,false);
 		if(port.getParent() instanceof ConnectingInputNode){

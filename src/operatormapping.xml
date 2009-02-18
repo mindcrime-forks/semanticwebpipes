@@ -133,4 +133,12 @@ class represented by that element.
     <string>sparqlresultfetch</string>
     <java-class>org.deri.pipes.rdf.TupleQueryResultFetchBox</java-class>
   </entry>  
+  <entry>
+    <string>urlbuilder</string>
+    <java-class>org.deri.pipes.rdf.URLBuilderBox</java-class>
+  </entry> 
+  <entry>
+    <string>stringify</string>
+    <java-class>org.deri.pipes.rdf.StringifyBox</java-class>
+  </entry>    
 </map>

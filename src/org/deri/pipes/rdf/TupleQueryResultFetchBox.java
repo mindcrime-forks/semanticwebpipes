@@ -65,7 +65,8 @@ public class TupleQueryResultFetchBox extends FetchBox implements Operator {
 		HttpClient client= context.getHttpClient();
 		Map<String,String> requestHeaders = new HashMap<String,String>();
 		requestHeaders.put("Accept", format.getDefaultMIMEType());
-		HttpResponseData data = HttpResponseCache.getResponseData(client, location,requestHeaders);
+		String url = location.expand(context);
+		HttpResponseData data = HttpResponseCache.getResponseData(client, url,requestHeaders);
 		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
 		buffer.load(inputBuffer.getInputStream(), format);
 		return buffer;

@@ -36,58 +36,56 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
 
-import java.util.HashMap;
-import java.util.Map;
+package org.deri.pipes.ui;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.Context;
-import org.deri.pipes.model.BinaryContentBuffer;
-import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.HttpResponseCache;
-import org.deri.pipes.utils.HttpResponseData;
-import org.openrdf.rio.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.deri.pipes.utils.XMLUtil;
+import org.integratedmodelling.zk.diagram.components.PortType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 /**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
+ * @author robful
  *
  */
-public class RDFFetchBox extends FetchBox {
-	private transient Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
-	@XStreamAsAttribute
-	protected String format="RDF/XML";		
+public class StringifyNode extends InOutNode implements ConnectingOutputNode {
+
+	/**
+	 * @param inPType
+	 * @param outPType
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
+	public StringifyNode(int x, int y) {
+    	super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.SOURCEORSTRINGOUT),x,y,150,25);
+    	wnd.setTitle("Stringify");
+    	tagName = "stringify";
+	}
 	
-	public ExecBuffer execute(Context context) throws Exception{
-		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-		HttpClient client= context.getHttpClient();
-		RDFFormat fileFormat = getRDFFormat();
-		Map<String,String> requestHeaders = new HashMap<String,String>();
-		requestHeaders.put("Accept", fileFormat.getDefaultMIMEType());
-		String url = location.expand(context);
-		HttpResponseData data = HttpResponseCache.getResponseData(client, url,requestHeaders);
-		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
 
-		rdfBuffer.load(inputBuffer.getInputStream(), url,fileFormat);
-		return rdfBuffer;
-	}
-    
 
-	public void setFormat(String format) {
-		this.format = format;
+	@Override
+	protected void initialize() {
+		// TODO Auto-generated method stub
+		super.initialize();
 	}
 
-	public RDFFormat getRDFFormat() {
-		if(null==format){
-    		logger.info("No format given, assuming rdfxml");
-			return RDFFormat.RDFXML;
-		}else{	
-			return(RDFFormat.valueOf(format));
-		}
+
+
+	/**
+	 * Creates a new StringifyNode and adds it into the configuration.
+	 * @param elm The element defining this http-get
+	 * @param wsp The PipeEditor workspace
+	 * @return
+	 */
+	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
+		StringifyNode node= new StringifyNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		wsp.addFigure(node);
+		node.connectSource(elm);
+		return node;
 	}
 
 }

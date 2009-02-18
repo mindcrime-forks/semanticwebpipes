@@ -116,7 +116,8 @@ public class HTMLFetchBox extends FetchBox {
 		SesameMemoryBuffer buffer=new SesameMemoryBuffer();
 		Enumeration<String> k = xsltFile.keys();
 		HttpClient client= context.getHttpClient();
-		HttpResponseData data = HttpResponseCache.getResponseData(client, location);
+		String url = location.expand(context);
+		HttpResponseData data = HttpResponseCache.getResponseData(client, url);
 		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
 		
 		while (k.hasMoreElements()) {
@@ -124,7 +125,7 @@ public class HTMLFetchBox extends FetchBox {
 			if(format.indexOf(key)>=0){
 				StreamSource xsltStreamSource = xsltFile.get(key).getStreamSource();
 				StringBuffer textBuff=XSLTUtil.transform(new StreamSource(inputBuffer.getInputStream()), xsltStreamSource);
-				((SesameMemoryBuffer)buffer).loadFromText(textBuff.toString(), location);
+				((SesameMemoryBuffer)buffer).loadFromText(textBuff.toString(), url);
 			}
 		}
 		return buffer;

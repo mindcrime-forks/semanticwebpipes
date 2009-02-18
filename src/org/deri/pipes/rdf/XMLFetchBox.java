@@ -52,8 +52,9 @@ import org.slf4j.LoggerFactory;
 public class XMLFetchBox extends FetchBox implements Operator {
 	private transient Logger logger = LoggerFactory.getLogger(XMLFetchBox.class);	
 	@Override
-	public ExecBuffer execute(Context context) {
-		XMLStreamBuffer buffer = new XMLStreamBuffer(location);
+	public ExecBuffer execute(Context context) throws Exception{
+		String url = location.expand(context);
+		XMLStreamBuffer buffer = new XMLStreamBuffer(url);
 		return buffer;
 	}
 

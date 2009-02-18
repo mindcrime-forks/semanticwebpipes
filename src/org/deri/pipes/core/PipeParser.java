@@ -54,6 +54,7 @@ import org.deri.pipes.core.internals.BypassCGLibMapper;
 import org.deri.pipes.core.internals.OperatorMemoizerProvider;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.SourceConverter;
+import org.deri.pipes.core.internals.StringOrSourceConverter;
 import org.deri.pipes.endpoints.Pipes;
 import org.deri.pipes.rdf.ConstructBox;
 import org.deri.pipes.rdf.ForLoopBox;
@@ -232,6 +233,7 @@ public class PipeParser {
 		xstream.registerLocalConverter(Pipe.class, "parameters", new ParameterConverter());
 		SourceConverter sourceConverter = new SourceConverter(aliasMappings);
 		xstream.registerConverter(sourceConverter);
+		xstream.registerConverter(new StringOrSourceConverter());
 		//xstream normally uses 'reference' for references, we want refid
 		xstream.aliasSystemAttribute("REFID", "reference");
 		xstream.aliasSystemAttribute("ID", "id");

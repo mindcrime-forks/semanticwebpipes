@@ -40,6 +40,7 @@
 package org.deri.pipes.utils;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,8 +51,11 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.jcs.JCS;
 import org.apache.log4j.Logger;
 
@@ -100,10 +104,9 @@ public class HttpResponseCache {
 	 */
 	public static HttpResponseData getResponseData(HttpClient client,
 			String location, Map<String, String> requestHeaders) throws Exception{
-		GetMethod getMethod = new GetMethod(location);
 		if(MINIMUM_CACHE_TIME_MILLIS <=0){
 			logger.debug("caching disabled.");
-			return getDataFromRequest(client, getMethod,requestHeaders);
+			return getDataFromRequest(client, location,requestHeaders);
 		}
 		String cacheKey = makeCacheKey(location,requestHeaders);
 		if(requestHeaders == null){
@@ -127,26 +130,28 @@ public class HttpResponseCache {
 						logger.info("Retrieved from cache (not timed out):" + location);
 						return data;
 					}
-					HeadMethod headMethod = new HeadMethod(location);
-					addRequestHeaders(headMethod,requestHeaders);
-				
-					try{
-						int response = client.executeMethod(headMethod);
-						Header lastModifiedHeader = headMethod.getResponseHeader(HEADER_LAST_MODIFIED);
-						if(response == data.getResponse()){
-							if(lastModifiedHeader == null){
-								logger.debug("Not using cache (No last modified header available) for "+location);
-							}else if(lastModifiedHeader !=null && data.getLastModified().equals(lastModifiedHeader.getValue())){
-								data.setLastVerified(checkTimeMillis);
-								jcs.put(cacheKey, data);
-								logger.info("Retrieved from cache (used HTTP HEAD request to check "+HEADER_LAST_MODIFIED+") :"+location);
-								return data;
-							}else{
-								logger.debug("Not using cache (last modified changed) for "+location);
+					if(location.length()<2000){
+						HeadMethod headMethod = new HeadMethod(location);
+						addRequestHeaders(headMethod,requestHeaders);
+
+						try{
+							int response = client.executeMethod(headMethod);
+							Header lastModifiedHeader = headMethod.getResponseHeader(HEADER_LAST_MODIFIED);
+							if(response == data.getResponse()){
+								if(lastModifiedHeader == null){
+									logger.debug("Not using cache (No last modified header available) for "+location);
+								}else if(lastModifiedHeader !=null && data.getLastModified().equals(lastModifiedHeader.getValue())){
+									data.setLastVerified(checkTimeMillis);
+									jcs.put(cacheKey, data);
+									logger.info("Retrieved from cache (used HTTP HEAD request to check "+HEADER_LAST_MODIFIED+") :"+location);
+									return data;
+								}else{
+									logger.debug("Not using cache (last modified changed) for "+location);
+								}
 							}
+						}finally{
+							headMethod.releaseConnection();
 						}
-					}finally{
-						headMethod.releaseConnection();
 					}
 
 				}
@@ -154,10 +159,10 @@ public class HttpResponseCache {
 				logger.warn("Problem retrieving from cache for "+location,e);
 			}
 		}
-		HttpResponseData data = getDataFromRequest(client, getMethod,
+		HttpResponseData data = getDataFromRequest(client, location,
 				requestHeaders);
-		Header lastModifiedHeader = getMethod.getResponseHeader(HEADER_LAST_MODIFIED);
-		getMethod.releaseConnection();
+		Header lastModifiedHeader = data.method.getResponseHeader(HEADER_LAST_MODIFIED);
+		data.method.releaseConnection();
 		if(lastModifiedHeader != null){
 			data.setLastModified(lastModifiedHeader.getValue());
 		}
@@ -173,19 +178,36 @@ public class HttpResponseCache {
 		return data;
 	}
 	private static HttpResponseData getDataFromRequest(HttpClient client,
-			GetMethod getMethod, Map<String, String> requestHeaders)
+			String location, Map<String, String> requestHeaders)
 			throws IOException, HttpException {
-		addRequestHeaders(getMethod,requestHeaders);
-		int response = client.executeMethod(getMethod);
+		HttpMethodBase method = new GetMethod(location);
+		if(location.length() > 2000 && location.indexOf('?')>=0){
+			logger.info("Using post method because request location is very long");
+			PostMethod postMethod = new PostMethod(location.substring(0,location.indexOf('?')));
+			String urlDecoded = URLDecoder.decode(location.substring(location.indexOf('?')+1),"UTF-8");
+			String[] parts = urlDecoded.split("\\&");
+			for(String part : parts){
+				String[] keyval = part.split("=", 2);
+				if(keyval.length == 2){
+					postMethod.addParameter(keyval[0], keyval[1]);
+				}else{
+					postMethod.addParameter(keyval[0], "");
+				}
+			}
+			method = postMethod;
+		}
+		addRequestHeaders(method,requestHeaders);
+		int response = client.executeMethod(method);
 		HttpResponseData data = new HttpResponseData();
+		data.method = method;
 		data.setLastVerified(System.currentTimeMillis());
 		data.setResponse(response);
-		data.setCharSet(getMethod.getResponseCharSet());
-		Header contentTypeHeader = getMethod.getResponseHeader(HEADER_CONTENT_TYPE);
+		data.setCharSet(method.getResponseCharSet());
+		Header contentTypeHeader = method.getResponseHeader(HEADER_CONTENT_TYPE);
 		if(contentTypeHeader != null){
 			data.setContentType(contentTypeHeader.getValue());
 		}
-		data.setBody(getMethod.getResponseBody(MAX_CONTENT_SIZE));
+		data.setBody(method.getResponseBody(MAX_CONTENT_SIZE));
 		return data;
 	}
 	private static String getDefaultUserAgent() {

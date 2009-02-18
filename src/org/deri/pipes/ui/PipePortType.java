@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class PipePortType implements PortType {	
 	//TODO: Refactor this class.
 	final Logger logger = LoggerFactory.getLogger(PipePortType.class);
-	private static PipePortType typeList[]= new PipePortType[14];
+	private static PipePortType typeList[]= new PipePortType[16];
 	public static final byte NONE=0;
 	public static final byte RDFOUT=1;
 	public static final byte RDFIN=2;
@@ -59,23 +59,9 @@ public class PipePortType implements PortType {
 	public static final byte XSLIN=11;
 	public static final byte ANYOUT=12;
 	public static final byte ANYIN=13;
-//	
-//	private static PipePortType typeList[]= new PipePortType[14];
-//	public static final byte NONE=0;
-//	//NOTE: In types defined first
-//	public static final byte ANYIN=1;
-//	public static final byte RDFIN=2;
-//	public static final byte TEXTIN=3;	
-//	public static final byte XMLIN=4;
-//	public static final byte XSLIN=5;
-//	public static final byte SPARQLRESULTIN=6;
-//	//OUT Types defined after.
-//	public static final byte ANYOUT=7;
-//	public static final byte RDFOUT=8;
-//	public static final byte TEXTOUT=9;
-//	public static final byte SPARQLRESULTOUT=10;
-//	public static final byte XMLOUT=11;
-//	public static final byte XSLOUT=12;
+	public static final byte SOURCEORSTRINGOUT=14;
+	public static final byte SOURCEORSTRINGIN=15;
+
 	
 	byte idx;
     public PipePortType(byte idx){
@@ -91,12 +77,12 @@ public class PipePortType implements PortType {
 	public boolean isConnectableFrom(PortType portType) {
 		PipePortType pType=(PipePortType)portType;
 		if((pType.getIdx() == ANYOUT)&& (idx==RDFIN || idx==SPARQLRESULTIN || idx==XMLIN || idx == XSLIN || idx == ANYIN)) return true;
-		//if((pType.getIdx()==ANYOUT) && idx < ANYOUT && idx > NONE) return true;
 		if((pType.getIdx()==RDFOUT)&&((idx==RDFIN)||(idx==XMLIN) ||(idx == ANYIN)))return true;
-		if((pType.getIdx()==TEXTOUT)&&((idx==TEXTIN)||(idx == ANYIN)))return true;
+		if((pType.getIdx()==TEXTOUT)&&((idx==TEXTIN)||(idx == ANYIN)||(idx==SOURCEORSTRINGIN)))return true;
 		if((pType.getIdx()==SPARQLRESULTOUT)&&((idx==SPARQLRESULTIN)||(idx==XMLIN)||(idx == ANYIN)))return true;
 		if((pType.getIdx()==XMLOUT)&&((idx==XMLIN)||(idx==XSLIN)||(idx==SPARQLRESULTIN)||(idx==RDFIN)||(idx == ANYIN)))return true;
 		if((pType.getIdx()==XSLOUT)&&((idx==XSLIN)||(idx==XMLIN)||(idx == ANYIN)))return true;
+		if((pType.getIdx()==SOURCEORSTRINGOUT)&&(idx==SOURCEORSTRINGIN))return true;
 		return false;
 	}
 	

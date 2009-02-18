@@ -103,18 +103,24 @@ public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
 
 	protected void initialize(){
 		super.initialize();
-		urlPort =createPort(PipePortType.TEXTIN,280,36);
+		urlPort = new SourceOrStringPort(getWorkspace(), urlTextbox);
+		addPort(urlPort,280,36);
+		//urlPort = createPort(PipePortType.SOURCEORSTRINGIN,280,36);
 		((CustomPort)urlPort).setMaxFanIn(1);
 	}
 	
 	public void onConnected(Port port){
-		urlTextbox.setValue("text [wired]");
-		urlTextbox.setReadonly(true);
+		if(port == urlPort){
+			urlTextbox.setValue("text [wired]");
+			urlTextbox.setReadonly(true);
+		}
 	}
 
 	public void onDisconnected(Port port){
-		urlTextbox.setValue("");
-		urlTextbox.setReadonly(false);
+		if(port == urlPort){
+			urlTextbox.setValue("");
+			urlTextbox.setReadonly(false);
+		}
 	}
 	
 	public void setURL(String url){
