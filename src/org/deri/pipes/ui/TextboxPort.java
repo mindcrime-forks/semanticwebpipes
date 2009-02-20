@@ -42,26 +42,28 @@ package org.deri.pipes.ui;
 import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
 import org.integratedmodelling.zk.diagram.components.Workspace;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Textbox;
 
 /**
  * @author robful
  *
  */
-class TextboxPort extends CustomPort{
+public class TextboxPort extends CustomPort{
 	final Textbox textbox;
+	final String[] originalText = {""};
 	/**
 	 * @param arg0
 	 * @param arg1
 	 */
-	public TextboxPort(Workspace workspace, Textbox textbox) {
-		this(workspace,textbox,"none");
+	public TextboxPort(Workspace workspace, Textbox box) {
+		this(workspace,box,"none");
 	}
 	@Override
 	public void detach() {
 		super.detach();
-		textbox.setText("");
-		textbox.setReadonly(false);
+		onDisconnect();
 	}
 	/**
 	 * @param workspace
@@ -87,6 +89,25 @@ class TextboxPort extends CustomPort{
 	}
 	Textbox getTextbox(){
 		return textbox;
+	}
+	/**
+	 * 
+	 */
+	public void onDisconnect() {
+		if(textbox.isReadonly()){
+			textbox.setText(originalText[0]);
+			textbox.setReadonly(false);
+		}
+	}
+	/**
+	 * 
+	 */
+	public void onConnect() {
+		if(!textbox.isReadonly()){
+			originalText[0] = textbox.getValue();
+			textbox.setText("Text [wired]");
+			textbox.setReadonly(true);
+		}
 	}
 
 }

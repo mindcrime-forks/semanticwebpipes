@@ -45,6 +45,7 @@ import java.util.List;
 import org.apache.commons.httpclient.HttpClient;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.ThreadedExecutor;
+import org.deri.pipes.endpoints.PipeConfig;
 import org.deri.pipes.model.MultiExecBuffer;
 import org.deri.pipes.store.FilePipeStore;
 import org.deri.pipes.store.PipeStore;
@@ -135,12 +136,18 @@ public class Engine {
 	 * @param xml
 	 * @return
 	 * @throws Exception
+	 * @deprecated
 	 */
 	public ExecBuffer execute(String xml) throws Exception{
 		Operator parsedObject = getPipeParser().parse(xml);
 		return executeOperator(parsedObject);
 	}
-
+	/**
+	 * @deprecated
+	 * @param parsedObject
+	 * @return
+	 * @throws Exception
+	 */
 	private ExecBuffer executeOperator(Object parsedObject) throws Exception {
 		Operator operator = (Operator)parsedObject;
 		return operator.execute(newContext());
@@ -150,6 +157,7 @@ public class Engine {
 	 * @param xml
 	 * @return
 	 * @throws Exception
+	 * @deprecated
 	 */
 	public ExecBuffer execute(InputStream in) throws Exception{
 		Object parsedObject = getPipeParser().parse(in);
@@ -213,6 +221,18 @@ public class Engine {
 		if(this.executor != null){
 			this.executor.shutdown();
 		}
+	}
+	/**
+	 * @param pipeId
+	 * @return
+	 */
+	public Pipe getStoredPipe(String pipeId) throws Exception{
+		//TODO: cache compiled pipes
+		PipeConfig config = getPipeStore().getPipe(pipeId);
+		if(config == null){
+			throw new NullPointerException("No pipe found having id="+pipeId);
+		}
+		return (Pipe)parse(config.getSyntax());
 	}
 
 

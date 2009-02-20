@@ -39,131 +39,64 @@
 
 package org.deri.pipes.rdf;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
+import org.deri.pipes.core.Pipe;
 import org.deri.pipes.core.internals.Para;
 import org.deri.pipes.core.internals.Source;
-import org.deri.pipes.core.internals.StringOrSource;
-import org.deri.pipes.model.TextBuffer;
-import org.w3c.dom.Node;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.converters.ConverterMatcher;
 
 /**
+ * Calls another pipe with the given parameters.
  * @author robful
  *
  */
-@XStreamAlias("urlbuilder")
-public class URLBuilderBox implements Operator{
-	
-	String base;
-	@XStreamImplicit(itemFieldName="path")
-	List<StringOrSource> paths;
+@XStreamAlias("pipe-call")
+public class PipeCallBox implements Operator{
+
+	@XStreamAsAttribute
+	private String pipeid;
 	@XStreamImplicit(itemFieldName="para")
-	List<Para> paras;
+	private List<Para> paras;
 	/* (non-Javadoc)
 	 * @see org.deri.pipes.core.Operator#execute(org.deri.pipes.core.Context)
 	 */
 	@Override
 	public ExecBuffer execute(Context context) throws Exception {
-		StringBuilder sb = new StringBuilder();
-		sb.append(base);
-		if(paths != null){
-			for(StringOrSource o : paths){
-				sb.append(o.expand(context));
-			}
-		}
-		if(paras != null && paras.size()>0){
-			boolean first = true;
+		Pipe pipe = context.getEngine().getStoredPipe(pipeid);
+		//TODO: make parameters set on context or pass to execute method.
+		if(paras != null){
 			for(Para para : paras){
-				sb.append(first?"?":"&");
-				sb.append(para.name).append("=");
-				StringOrSource value = para.getValue();
-				sb.append(URLEncoder.encode(value.expand(context),"UTF-8"));
-				first=false;
+				pipe.setParameter(para.name, para.getValue().expand(context));
 			}
 		}
-		
-		return new TextBuffer(sb.toString());
+		return pipe.execute(context);
 	}
-	public String getBaseUrl() {
-		return base;
+	public void setPipeId(String pipeId){
+		this.pipeid = pipeId;
 	}
-	public void setBaseUrl(String baseUrl) {
-		this.base = baseUrl;
+	public void addParameter(String name, String value){
+		ensureParameters();
+		paras.add(new Para(name,value));
 	}
-
-	public void addPath(String path) {
-		ensurePathsNotNull();
-		paths.add(new StringOrSource(path));
+	public void addParameter(String name, Source value){
+		ensureParameters();
+		paras.add(new Para(name,value));
 	}
-	
-	public void addPath(Source path) {
-		ensurePathsNotNull();
-		paths.add(new StringOrSource(path));
-	}
-	
-	private void ensurePathsNotNull() {
-		if(paths == null){
-			paths = new ArrayList<StringOrSource>();
-		}
-	}
-	
 	/**
-	 * @param string
-	 * @param value
+	 * 
 	 */
-	public void addParameter(String name, String value) {
-		ensureParasNotNull();
-		Para para = new Para(name,value);
-		paras.add(para);
-	}
-	public void addParameter(String name, Source value) {
-		ensureParasNotNull();
-		Para para = new Para(name,value);
-		paras.add(para);
-	}
-	private void ensureParasNotNull() {
+	private void ensureParameters() {
 		if(paras == null){
 			paras = new ArrayList<Para>();
 		}
-	}
-	/**
-	 * @return
-	 */
-	public boolean usesSource() {
-		if(paths != null){
-			for(StringOrSource x : paths){
-				if(x.source != null){
-					return true;
-				}
-			}
-		}
-		if(paras != null){
-			for(Para x : paras){
-				if(x.getValue().source != null){
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	/**
-	 * @return
-	 */
-	public String getUrl(Context context) throws Exception{
-		TextBuffer tb = (TextBuffer)execute(context);
-		return tb.toString();
 	}
 
 }

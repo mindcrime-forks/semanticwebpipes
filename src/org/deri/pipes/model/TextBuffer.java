@@ -52,9 +52,26 @@ import org.deri.pipes.core.ExecBuffer;
  */
 public class TextBuffer implements ExecBuffer{
 
-	private final String text;
+	private String text;
 
+	/**
+	 * Create an emtpy text buffer
+	 */
+	public TextBuffer() {
+		text = "";
+	}
+	/**
+	 * Create a text buffer containing this text.
+	 * @param text
+	 */
 	public TextBuffer(String text){
+		this.text = text;
+	}
+	/**
+	 * set the text in the buffer.
+	 * @param text
+	 */
+	public void setText(String text){
 		this.text = text;
 	}
 	/**

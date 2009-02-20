@@ -115,12 +115,20 @@ public class PipeConfig {
 	 * one for this PipeConfig.
 	 */
 	public boolean isPasswordCorrect(String password){
-		if(this.password==null && password==null){
+		if(isEmptyOrNull(this.password) && isEmptyOrNull(password)){
 			return true;
 		}
 		if(this.password == null){
 			return false;
 		}
 		return this.password.equals(password);
+	}
+
+	/**
+	 * @param password2
+	 * @return
+	 */
+	private boolean isEmptyOrNull(String s) {
+		return s==null || s.trim().length() ==0;
 	}
 }

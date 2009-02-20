@@ -29,6 +29,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new PatchGeneratorNode(x,y);
 				case "patch-exec":
 					return new PatchExecutorNode(x,y);
+				case "pipe-call":
+				    return new PipeCallNode(x,y);
 	   			case "rdffetch":
 					return new RDFFetchNode(x,y);
 				case "rdfsmix":
@@ -57,8 +59,9 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new XQueryNode(x,y);
 				case "xslfetch":
 					return new XSLFetchNode(x,y);
-				default:
-					return null;
+		}
+		if(tagName.startsWith("pipe:")){
+		   return new PipeCallNode(x,y,tagName.substring(5));
 		}
 	}
 
@@ -84,6 +87,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return PatchExecutorNode.loadConfig(element,pipeEditor);
 				case "patch-generator":    
 					return PatchGeneratorNode.loadConfig(element,pipeEditor);
+				case "pipe-call":    
+					return PipeCallNode.loadConfig(element,pipeEditor);
 				case "rdffetch":    
 					return RDFFetchNode.loadConfig(element,pipeEditor);
 				case "select":    

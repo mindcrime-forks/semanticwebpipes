@@ -176,9 +176,11 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	public void onConnected(Port port){
 		if(port instanceof TextboxPort){
 			Textbox textbox = ((TextboxPort)port).getTextbox();
-			textbox.setValue("text [wired]");
-			textbox.setReadonly(true);
-			logger.info("Attached textbox port");
+			if(!textbox.isReadonly()){
+				textbox.setValue("text [wired]");
+				textbox.setReadonly(true);
+				logger.info("Attached textbox port");
+			}
 			return;			
 		}
 	}
@@ -186,9 +188,11 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	public void onDisconnected(Port port){
 		if(port instanceof TextboxPort){
 			Textbox textbox = ((TextboxPort)port).getTextbox();
-			textbox.setValue("");
-			textbox.setReadonly(false);
-			logger.info("Detached textbox port");
+			if(textbox.isReadonly()){
+				textbox.setValue("");
+				textbox.setReadonly(false);
+				logger.info("Detached textbox port");
+			}
 			return;			
 		}else{
 			logger.info("cannot detach:"+port);

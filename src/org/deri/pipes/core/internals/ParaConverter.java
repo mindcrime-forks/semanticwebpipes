@@ -37,11 +37,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.rdf;
+package org.deri.pipes.core.internals;
 
-import org.deri.pipes.core.internals.Source;
-import org.deri.pipes.core.internals.SourceConverter;
-import org.deri.pipes.core.internals.StringOrSource;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.ConverterMatcher;
@@ -61,7 +58,7 @@ public class ParaConverter implements Converter {
 	 */
 	@Override
 	public boolean canConvert(Class cls) {
-		return(URLBuilderBox.Para.class.isAssignableFrom(cls));
+		return(Para.class.isAssignableFrom(cls));
 	}
 
 	/* (non-Javadoc)
@@ -70,15 +67,16 @@ public class ParaConverter implements Converter {
 	@Override
 	public void marshal(Object o, HierarchicalStreamWriter writer,
 			MarshallingContext context) {
-		URLBuilderBox.Para p = (URLBuilderBox.Para)o;
+		Para p = (Para)o;
 		writer.addAttribute("name", p.name);
 		
-		if(p.source.source != null){
+		StringOrSource stringOrSource = p.getValue();
+		if(stringOrSource.source != null){
 			writer.startNode("source");
-			context.convertAnother(p.source.source);
+			context.convertAnother(stringOrSource.source);
 			writer.endNode();
 		}else{
-			writer.setValue(p.source.string);
+			writer.setValue(stringOrSource.string);
 		}
 		
 		
@@ -90,14 +88,14 @@ public class ParaConverter implements Converter {
 	@Override
 	public Object unmarshal(HierarchicalStreamReader reader,
 			UnmarshallingContext context) {
-		URLBuilderBox.Para p = new URLBuilderBox.Para();
-			p.name = reader.getAttribute("name");
+			String name = reader.getAttribute("name");
+			Para p = new Para(name);
 			if(reader.hasMoreChildren()){
 				reader.moveDown();
-				p.source = new StringOrSource((Source)context.convertAnother(p, Source.class));
+				p.setValue(new StringOrSource((Source)context.convertAnother(p, Source.class)));
 				reader.moveUp();
 			}else{
-				p.source = new StringOrSource(reader.getValue());
+				p.setValue(new StringOrSource(reader.getValue()));
 			}
 			return p;
 	}

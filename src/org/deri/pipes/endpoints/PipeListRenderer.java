@@ -37,8 +37,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.endpoints;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.deri.pipes.core.Engine;
-import org.deri.pipes.store.DatabasePipeManager;
+import org.deri.pipes.store.PipeStore;
 import org.deri.pipes.ui.PipeEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +49,7 @@ import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Grid;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.Menu;
 import org.zkoss.zul.Menubar;
@@ -54,8 +58,11 @@ import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.RowRenderer;
+import org.zkoss.zul.SimpleListModel;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
+
 
 public class PipeListRenderer implements RowRenderer {
 	final Logger logger = LoggerFactory.getLogger(PipeListRenderer.class);
@@ -65,9 +72,13 @@ public class PipeListRenderer implements RowRenderer {
 	Button checkPassEnter,checkPassCancel;
 	CheckPassListener checkPassListener;
 	PipeEditor wsp;
-	public PipeListRenderer(PipeEditor wsp,Window checkPassWin){
+	private String fixedPipeGridId;
+	private String brokenPipeGridId;
+	public PipeListRenderer(PipeEditor wsp,Window checkPassWin,String fixedPipeGridId, String brokenPipeGridId){
 		this.wsp=wsp;
 		this.checkPassWin=checkPassWin;
+		this.fixedPipeGridId = fixedPipeGridId;
+		this.brokenPipeGridId = brokenPipeGridId;
 		init();
 	}
 	public void init(){
@@ -88,6 +99,9 @@ public class PipeListRenderer implements RowRenderer {
 	}
 	
 	String justify(String str,int length){
+		if(str == null){
+			return "";
+		}
 		StringBuffer result=new StringBuffer();
 		String[] words= str.split(" ");
 		int count=0;
@@ -107,33 +121,56 @@ public class PipeListRenderer implements RowRenderer {
     public void render(Row row, Object data) {
       row.setValign("top");	
       String pipeid=((PipeConfig)data).getId();
-      Html pipeLink=new Html("<a target='pipes' href='./pipes/?id="+pipeid+"'>"+pipeid+"</a><br />" + 
+      String displayName = pipeid.startsWith("broken/")?pipeid.substring("broken/".length()):pipeid;
+      Button pipeButton = new Button();
+      pipeButton.setHref("./pipes/?id="+pipeid);
+      pipeButton.setLabel(displayName);
+      pipeButton.setId("pipe:"+pipeid);
+      pipeButton.setDraggable("true");
+      pipeButton.setTooltiptext("Click to execute this pipe, or drag to designer to call this pipe from within another pipe");
+//      Html pipeLink=new Html("<a href='./pipes/?id="+pipeid+"'>"+displayName+"</a><br />" + 
+       Html pipeLink=new Html("<br />" + 
     		  justify(((PipeConfig)data).getName(),30));
-      pipeLink.setParent(row);
-
+       Vbox vbox = new Vbox();
+       vbox.appendChild(pipeButton);
+       vbox.appendChild(pipeLink);
+      row.appendChild(vbox);
       
       Menubar menuBar =new Menubar();
+      menuBar.setWidth("65px");
       Menu action=new Menu("actions");
       Menupopup popup=new Menupopup();
-      popup.setParent(action);
+      //popup.setParent(action);
+      action.appendChild(popup);
        
-      Menuitem  copy2Editor=new Menuitem("Clone this pipe");
+      Menuitem  copy2Editor=new Menuitem("Copy");
       copy2Editor.addEventListener("onClick", new PipeListener(pipeid,PipeListener.CLONE));
-      copy2Editor.setParent(popup);
+      popup.appendChild(copy2Editor);
       if(!(pipeid.equalsIgnoreCase("nested")||pipeid.equalsIgnoreCase("simplemix")||pipeid.equalsIgnoreCase("transform"))){
-    	  Menuitem edit=new Menuitem("Edit this pipe");
+    	  Menuitem edit=new Menuitem("Edit");
 	      edit.addEventListener("onClick", new PipeListener(pipeid,PipeListener.EDIT));
-	      edit.setParent(popup);
-    	  Menuitem delete=new Menuitem("Delete this pipe");
+	      popup.appendChild(edit);
+    	  Menuitem delete=new Menuitem("Delete");
 	      delete.addEventListener("onClick", new PipeListener(pipeid,PipeListener.DELETE));
-	      delete.setParent(popup);
+	      popup.appendChild(delete);
       }
-      Menuitem  debug=new Menuitem("Debug run this pipe");
+      Menuitem  debug=new Menuitem("Debug");
       debug.addEventListener("onClick", new PipeListener(pipeid,PipeListener.DEBUG));
-      debug.setParent(popup);
+      popup.appendChild(debug);
+      if(!pipeid.startsWith("broken/")){
+          Menuitem  broken=new Menuitem("Mark as broken");
+          broken.addEventListener("onClick", new PipeListener(pipeid,PipeListener.BROKEN));
+          popup.appendChild(broken);
+         // broken.setParent(popup);    	  
+      }else{
+          Menuitem  fixed =new Menuitem("Mark as fixed");
+          fixed.addEventListener("onClick", new PipeListener(pipeid,PipeListener.FIXED));
+          popup.appendChild(fixed);
+    	  
+      }
       action.setStyle("color: red;font-weight: bold;");
       action.setParent(menuBar);
-      menuBar.setParent(row);
+      row.appendChild(menuBar);
       row.setNowrap(true);
     }
     public class PipeListener implements EventListener{
@@ -141,6 +178,8 @@ public class PipeListRenderer implements RowRenderer {
         public static final int EDIT=2;
         public static final int DELETE=3;
         public static final int DEBUG=4;
+        public static final int BROKEN=5;
+        public static final int FIXED=6;
     	private String pipeid=null;
     	private int type;
     	public PipeListener(String pipeid,int type){
@@ -152,12 +191,13 @@ public class PipeListRenderer implements RowRenderer {
     		return "http://"+exec.getServerName()+":"+exec.getServerPort()+exec.getContextPath();
     	}
     	public void onEvent(org.zkoss.zk.ui.event.Event event) throws org.zkoss.zk.ui.UiException {
+ 	    	PipeStore pipeStore = engine.getPipeStore();
+			PipeConfig config = pipeStore.getPipe(pipeid);
     		switch(type){
     		    case CLONE:
     		    		wsp.clone(pipeid);
     		    	break;
     		    case DELETE:
-    		    	PipeConfig config = engine.getPipeStore().getPipe(pipeid);
     		    	if(config!= null && config.getPassword()!=null){   
     		    		try{
     		    			checkPassListener.setPipeId(pipeid);
@@ -171,25 +211,60 @@ public class PipeListRenderer implements RowRenderer {
     		    		try{
     		    			if (Messagebox.show("Are you sure want delete this PipeConfig?", "Delete?", Messagebox.YES | Messagebox.NO,
         		    				Messagebox.QUESTION) == Messagebox.YES) {
-    		    				engine.getPipeStore().deletePipe(pipeid);
+    		    				pipeStore.deletePipe(pipeid);
         		    		}
     	    			}
     	    			catch(java.lang.InterruptedException e){
     	    			}    		    		
     		    	}
+    				refreshPipeLists();
 		    		break;	
     		    case EDIT:
     		    	wsp.edit(pipeid);
 		    		break;
     		    case DEBUG:  
-    		    	PipeConfig pipeConfig = engine.getPipeStore().getPipe(pipeid);
-					wsp.debug(pipeConfig.getSyntax());
+					wsp.debug(config.getSyntax());
     	
 		    		break;	    		    	
+    		    case BROKEN:  
+    		    	if(!config.getId().startsWith("broken/")){
+    		    		String newId = "broken/"+config.getId();
+    		    		renamePipe(pipeStore,config,newId);
+    		    		refreshPipeLists();
+    		    	}
+    	
+		    		break;	    		    	
+    		    case FIXED:
+    		    	if(config.getId().startsWith("broken/")){
+    		    		String newId = config.getId().substring("broken/".length());
+    		    		renamePipe(pipeStore,config,newId);
+    		    		refreshPipeLists();
+    		    	}
+    	
+		    		break;
+		    	default:
     		}
     		
   		  
   	    }
+    	
+		/**
+		 * @param pipeStore
+		 * @param config
+		 * @param newId
+		 */
+		private void renamePipe(PipeStore pipeStore, PipeConfig config,
+				String newId) {
+			String oldId = config.getId();
+			if(pipeStore.contains(newId)){
+				newId+="."+System.currentTimeMillis();
+			}
+			config.setId(newId);
+    		if(pipeStore.save(config)){
+    			logger.info("renamed pipe from "+oldId+" to "+newId);
+    			pipeStore.deletePipe(pipeid);
+    		}
+		}
     }
     public class CheckPassListener implements EventListener{
     	String pipeid;
@@ -211,4 +286,37 @@ public class PipeListRenderer implements RowRenderer {
     		}
     	}
     }
+	/**
+	 * @return
+	 */
+	public List getBrokenPipes() {
+		PipeStore pipeStore = engine.getPipeStore();
+		List brokenPipes = new ArrayList();
+		for(PipeConfig config : pipeStore.getPipeList()){
+			if(config.getId().startsWith("broken/")){
+				brokenPipes.add(config);
+			}
+		}			
+		return brokenPipes;
+	}
+	/**
+	 * @return
+	 */
+	public List getOkPipes() {
+		PipeStore pipeStore = engine.getPipeStore();
+		List okPipes = new ArrayList();
+		for(PipeConfig config : pipeStore.getPipeList()){
+			if(!config.getId().startsWith("broken/")){
+				okPipes.add(config);
+			}
+		}			
+		return okPipes;
+	}
+	public void refreshPipeLists() {
+
+		Grid grid = (Grid)wsp.getFellow(fixedPipeGridId);
+		grid.setModel(new SimpleListModel(getOkPipes()));
+		grid = (Grid)wsp.getFellow(brokenPipeGridId);
+		grid.setModel(new SimpleListModel(getBrokenPipes()));
+	}
   }

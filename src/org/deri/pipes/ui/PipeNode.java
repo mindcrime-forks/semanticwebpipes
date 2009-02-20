@@ -39,6 +39,7 @@
 package org.deri.pipes.ui;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -52,6 +53,7 @@ import org.integratedmodelling.zk.diagram.components.CustomPort;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.PortType;
 import org.integratedmodelling.zk.diagram.components.Shape;
+import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.integratedmodelling.zk.diagram.components.ZKNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,6 +188,34 @@ public abstract class PipeNode extends ZKNode{
 				outElm.appendChild(node);
 			parentElm.appendChild(outElm);
 		}
+	}
+
+
+	@Override
+	public void detach() {
+		Workspace ws = getWorkspace();
+		if(ws == null){
+			return;
+		}
+		Collection<Port> ports = new ArrayList<Port>();
+		ports.addAll(getPorts());
+		for(Port port : ports){
+			List<Port> connectedIn = new ArrayList<Port>();
+			connectedIn.addAll(ws.getIncomingConnections(port.getId()));
+			for(Port p : connectedIn){
+				ws.notifyConnection(port, p, "", true);
+				ws.notifyConnection(p, port, "", true);
+			}
+			ws.getIncomingConnections(port.getId()).clear();
+			List<Port> connectedOut = new ArrayList<Port>();
+			connectedOut.addAll(ws.getOutgoingConnections(port.getId()));
+			for(Port p : connectedOut){
+				ws.notifyConnection(port, p, "", true);
+				ws.notifyConnection(p, port, "", true);
+			}
+			ws.getOutgoingConnections(port.getId()).clear();
+		}
+		super.detach();
 	}
 
 	public void setPosition(Element elm){

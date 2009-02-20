@@ -141,4 +141,8 @@ class represented by that element.
     <string>stringify</string>
     <java-class>org.deri.pipes.rdf.StringifyBox</java-class>
   </entry>    
+  <entry>
+    <string>pipe-call</string>
+    <java-class>org.deri.pipes.rdf.PipeCallBox</java-class>
+  </entry>    
 </map>

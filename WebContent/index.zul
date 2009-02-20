@@ -9,7 +9,7 @@
 		Please enter the password for overwriting the current pipe
 		<separator/> 
 		<textbox id="oldpassword" value=""  type="text"></textbox>
-		<button label="Enter" onClick="checkPassword()"/>
+		<button label="Enter" onClick="checkPasswordAndSave()"/>
 		<button label="Cancel" onClick="passwordchecking.visible= false"/>		
     </window>
     <window id="deleteWin" border="normal" width="350px" visible="false" sizable="false" >
@@ -143,14 +143,15 @@
 						</south>
 					</borderlayout>
 				</center>
-	<west  flex="true" border="none" collapsible="true" splittable="true">   
+	<west  flex="true" border="none" collapsible="true" splittable="true" >   
 	 <tabbox>
      <tabs>
      <tab label ="Published pipes"></tab>
      <tab label ="Operators"></tab>
+     <tab label ="(broken)"></tab>
      </tabs>
      <tabpanels>
-     <tabpanel>
+     <tabpanel id="publishedPipes" style="overflow:auto;">
       <vbox align="center">
       <zscript>
       import org.zkoss.zk.ui.event.*;
@@ -182,13 +183,13 @@
 	     workspace.createFigure(x,y,figureType);
     }
     
-    Object[] items=org.deri.pipes.core.Engine.defaultEngine().getPipeStore().getPipeList().toArray();
-    ListModel model = new SimpleListModel(items);
-    RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(workspace,deleteWin);
+    RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(workspace,deleteWin,"pipeGrid","brokenPipeGrid");
+    ListModel okModel = new SimpleListModel(rowRenderer.getOkPipes());
+    ListModel brokenModel = new SimpleListModel(rowRenderer.getBrokenPipes());
     </zscript>
      	      	
 	      	<separator bar="false"/>
-			<grid model="${model}" rowRenderer="${rowRenderer}" mold="paging" pageSize="10" align="left"/>
+			<grid id="pipeGrid" model="${okModel}" rowRenderer="${rowRenderer}" mold="paging" pageSize="10" align="left"/>
       </vbox>
     </tabpanel>
     <tabpanel>
@@ -267,6 +268,11 @@
 					</treeitem>
 					<treeitem>
 						<treerow>
+							<treecell id="pipe-call"  draggable="true"  label="Pipe Call" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
 							<treecell id="smoosher"  draggable="true"  label="Smoosher" />
 						</treerow>	
 					</treeitem>
@@ -330,6 +336,13 @@
 	</tree>
        </vbox>
     </tabpanel>
+    <tabpanel style="overflow:auto;">
+      <vbox align="center">
+      	   <separator bar="false"/>
+      
+			<grid id="brokenPipeGrid" model="${brokenModel}" rowRenderer="${rowRenderer}" mold="paging" pageSize="10" align="left"/>
+      </vbox>
+    </tabpanel>
     </tabpanels>
     </tabbox>
     			
@@ -349,13 +362,10 @@
     import org.deri.pipes.endpoints.PipeConfig;    
     import org.deri.pipes.core.Engine;	
     PipeStore pipeStore = Engine.defaultEngine().getPipeStore();
-    String tmpPass;
     void checkB4Save(){
        if(pipeStore.contains(pipeid.value))
          {
-             if(tmpPass==null)
-                 tmpPass=pipeStore.getPipe(pipeid.value).getPassword();
-             if(tmpPass!=null){
+             if(!pipeStore.getPipe(pipeid.value).isPasswordCorrect(null)){
                  passwordchecking.doModal();
              }
              else{
@@ -366,13 +376,13 @@
            savePipe();
 	   }   	
     }
-    void checkPassword(){
-         if(tmpPass!=null){
-	         if(tmpPass.matches(oldpassword.value)){
+    void checkPasswordAndSave(){
+         String tmp = oldpassword.value;
+         oldpassword.value="";
+         if(pipeStore.getPipe(pipeid.value).isPasswordCorrect(tmp)){
 	            passwordchecking.visible=false;
-	            confirmation.doModal();
+	            savePipe();
 	            return;
-	         }
          }
          alert("Password is incorrect, please re-enter the password for overwriting the Pipe");
     }
@@ -406,15 +416,15 @@
 	    if(x.getId()==null||x.getId().trim().length()==0){
 	       alert("Please assign an id to the pipe before saving");
 	    }else{
-	    if(!pipeStore.save(workspace.getPipeConfig()))
+	    if(!pipeStore.save(x))
 	       alert("There are some errors in your pipe, please check it again and make sure that all required fields are filled out");
 	    else{
 	     alert("Your pipe was successfully saved");
 	     passwordchecking.visible=false;
 	     confirmation.visible=false;
-	     //Executions.sendRedirect(".");
 	    }
 	    }
+	    rowRenderer.refreshPipeLists();
 	}
 	
 	void debugPipe(){

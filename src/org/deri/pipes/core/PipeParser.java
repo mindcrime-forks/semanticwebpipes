@@ -52,6 +52,7 @@ import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.internals.BypassCGLibConverter;
 import org.deri.pipes.core.internals.BypassCGLibMapper;
 import org.deri.pipes.core.internals.OperatorMemoizerProvider;
+import org.deri.pipes.core.internals.ParaConverter;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.SourceConverter;
 import org.deri.pipes.core.internals.StringOrSourceConverter;
@@ -234,6 +235,7 @@ public class PipeParser {
 		SourceConverter sourceConverter = new SourceConverter(aliasMappings);
 		xstream.registerConverter(sourceConverter);
 		xstream.registerConverter(new StringOrSourceConverter());
+		xstream.registerConverter(new ParaConverter());
 		//xstream normally uses 'reference' for references, we want refid
 		xstream.aliasSystemAttribute("REFID", "reference");
 		xstream.aliasSystemAttribute("ID", "id");

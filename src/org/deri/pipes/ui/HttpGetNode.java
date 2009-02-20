@@ -95,7 +95,7 @@ public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
         acceptContentTypeTextbox.setTooltiptext("(Optional) value for the Accept HTTP Header");
         hbox.appendChild(acceptContentTypeTextbox);
         vbox.appendChild(hbox);
-        resolveLinksCheckbox =  new Checkbox("Resolve HTML Links");
+        resolveLinksCheckbox =  new Checkbox("Make Links Absolute");
         resolveLinksCheckbox.setTooltip("Change relative href links to absolute URLs");
         vbox.appendChild(resolveLinksCheckbox);
 	}
@@ -110,17 +110,9 @@ public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
 	}
 	
 	public void onConnected(Port port){
-		if(port == urlPort){
-			urlTextbox.setValue("text [wired]");
-			urlTextbox.setReadonly(true);
-		}
 	}
 
 	public void onDisconnected(Port port){
-		if(port == urlPort){
-			urlTextbox.setValue("");
-			urlTextbox.setReadonly(false);
-		}
 	}
 	
 	public void setURL(String url){

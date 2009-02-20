@@ -107,7 +107,12 @@ public class FilePipeStoreTest extends TestCase {
 		store.deletePipe("xxx/aaa");
 		assertEquals("Wrong number of pipes in store",4,store.getPipeList().size());
 		assertPipesEqual(createPipeConfig("aaa"),store.getPipe("aaa"));
-		}
+	}
+	public void testRename(){
+		resetStore();
+		PipeConfig aaa = createPipeConfig("aaa");
+		store.save(aaa);
+	}
 
 	/**
 	 * @param createPipeConfig

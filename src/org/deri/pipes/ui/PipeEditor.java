@@ -39,7 +39,6 @@
 package org.deri.pipes.ui;
 
 import groovy.lang.GroovyClassLoader;
-import groovy.lang.GroovyObject;
 
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -51,24 +50,17 @@ import org.apache.xerces.parsers.DOMParser;
 import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
-import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.endpoints.PipeConfig;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
-import org.deri.pipes.rdf.RDFBox;
-import org.deri.pipes.rdf.SelectBox;
-import org.deri.pipes.store.DatabasePipeManager;
-import org.deri.pipes.ui.events.ConnectionDeletedListener;
+import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
 import org.integratedmodelling.zk.diagram.components.PortTypeMask;
 import org.integratedmodelling.zk.diagram.components.Shape;
 import org.integratedmodelling.zk.diagram.components.Workspace;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQueryResult;
-import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -99,6 +91,25 @@ public class PipeEditor extends Workspace {
 		setHeight(h);
 		pTypeMag=new PortTypeManager(this);
 		PipePortType.generateAllPortTypes(this);
+	}
+
+	/**
+	 * Overriding this method because the standard connect and delete events
+	 * do not seem to be propogated as expected.
+	 */
+	@Override
+	public void notifyConnection(Port src, Port target, String connId, boolean isDeleted) {
+		super.notifyConnection(src, target, connId, isDeleted);
+		if(isDeleted){
+			if(target instanceof TextboxPort){
+				((TextboxPort)target).onDisconnect();
+			}
+		}else{
+			if(target instanceof TextboxPort){
+				((TextboxPort)target).onConnect();
+			}			
+		}
+		
 	}
 
 	public void setTextDebugPanel(Textbox txtBox){
@@ -372,9 +383,9 @@ public class PipeEditor extends Workspace {
 	public void clone(String pid){
 		PipeConfig config = engine.getPipeStore().getPipe(pid);
 		reload(config == null?"":config.getConfig());
-		pipeid.setValue("");
-		bdid.setValue("");
-		pipename.setValue("");
+		pipeid.setValue("Copy of "+config.getId());
+		bdid.setValue(pipeid.getValue());
+		pipename.setValue(config.getName().length()>0?"(Copy of) "+config.getName():"");
 	}
 
 	public void newPipe(){
@@ -409,6 +420,20 @@ public class PipeEditor extends Workspace {
 			logger.error("Cannot parse pipe xml",t);
 		}
 		return null;
+	}
+
+	@Override
+	public void onConnectionCreated(Port arg0, Port arg1) {
+		// TODO Auto-generated method stub
+		super.onConnectionCreated(arg0, arg1);
+		System.out.println("connectionCreated");
+	}
+
+	@Override
+	public void onConnectionDeleted(Port arg0, Port arg1) {
+		// TODO Auto-generated method stub
+		super.onConnectionDeleted(arg0, arg1);
+		System.out.println("connectionDeleted");
 	}
 
 	private void initialiseGrovePipeNodeFactory()

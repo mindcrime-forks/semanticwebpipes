@@ -36,30 +36,38 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui.events;
-import org.deri.pipes.ui.ConnectingInputNode;
-import org.deri.pipes.ui.ConnectingOutputNode;
-import org.deri.pipes.ui.TextboxPort;
-import org.integratedmodelling.zk.diagram.components.Node;
-import org.integratedmodelling.zk.diagram.events.ConnectionDeletedEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
-public class ConnectionDeletedListener implements EventListener {	
-	public ConnectionDeletedListener(){
-		
+
+package org.deri.pipes.core.internals;
+
+
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+
+@XStreamConverter(ParaConverter.class)
+public class Para{
+	public final String name;
+	private StringOrSource value;
+	public Para(String name,String value){
+		this.name = name;
+		this.value = new StringOrSource(value);
 	}
-	final Logger logger = LoggerFactory.getLogger(ConnectionDeletedListener.class);
-	   public void onEvent(Event event) throws org.zkoss.zk.ui.UiException {    
-		     logger.info("connection has been deleted");
-		     ConnectionDeletedEvent e=(ConnectionDeletedEvent)event;
-	         Node src=(Node)e.getSource().getParent();
-	         Node tag=(Node)e.getDestination().getParent();
-	         if((tag instanceof ConnectingInputNode)&&(src instanceof ConnectingOutputNode))
-	        		 ((ConnectingInputNode)tag).onDisconnected(e.getDestination());
-	   		 if((tag instanceof ConnectingOutputNode)&&(src instanceof ConnectingInputNode))
-	   			((ConnectingInputNode)src).onDisconnected(e.getSource());
-	   }    
- 
+	public Para(String name, Source value){
+		this.name = name;
+		this.value = new StringOrSource(value);
+	}
+	public Para(String name, StringOrSource value){
+		this.name = name;
+		this.value = value;
+	}
+	/**
+	 * @param name2
+	 */
+	public Para(String name) {
+		this.name = name;
+	}
+	public void setValue(StringOrSource value){
+		this.value = value;
+	}
+	public StringOrSource getValue(){
+		return value;
+	}
 }

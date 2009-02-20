@@ -90,9 +90,7 @@ public class Pipe implements Operator{
 			this.parameters = tmpParameters;
 		}
 		xml = expandParameters(tmpParameters, xml);
-		if(logger.isDebugEnabled()){
-			logger.debug("expanded pipe with variables to:"+xml);
-		}
+		logger.debug("expanded pipe with variables to: {}",xml);
 		Pipe pipe = (Pipe) context.getEngine().parse(xml);
 		this.codeWithVariablesExpanded = pipe.code;
 		

@@ -301,6 +301,10 @@ public class FilePipeStore implements PipeStore {
 		File pipeFile = getPipeFile(pipeid);
 		if(pipeFile.exists()){
 			logger.info("Will replace ["+pipeid+"] file = "+pipeFile);
+			PipeConfig oldConfig = getPipeConfigFromFile(pipeFile);
+			if(oldConfig != null && !isEmptyOrNull(oldConfig.getPassword())&& isEmptyOrNull(pipeConfig.getPassword())){
+				pipeConfig.setPassword(oldConfig.getPassword());
+			}
 		}
 		File tmpFile = new File(pipeFile.getAbsolutePath()+".tmp");
 		tmpFile.getParentFile().mkdirs();
@@ -327,6 +331,13 @@ public class FilePipeStore implements PipeStore {
 			logger.error("Problem reading pipe ["+pipeid+"] from file "+pipeFile,ioe);
 		}
 		return false;
+	}
+	/**
+	 * @param password
+	 * @return
+	 */
+	private boolean isEmptyOrNull(String password) {
+		return password ==  null || password.trim().length()==0;
 	}
 
 }

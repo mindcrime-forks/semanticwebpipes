@@ -40,6 +40,7 @@
 package org.deri.pipes.ui;
 
 import org.integratedmodelling.zk.diagram.components.Workspace;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Textbox;
 
 /**

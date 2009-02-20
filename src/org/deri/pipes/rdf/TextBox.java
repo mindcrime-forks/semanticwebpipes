@@ -43,6 +43,7 @@ import org.deri.pipes.core.Context;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
+import org.deri.pipes.model.TextBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +51,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @XStreamAlias("text")
 public class TextBox implements Operator{
-	private static final String SPARQL_FORMAT = "sparqlxml";
-	private static final String RDFXML_FORMAT = "rdfxml";
+	public static final String SPARQL_FORMAT = "sparqlxml";
+	public static final String RDFXML_FORMAT = "rdfxml";
+	public static final String TEXTPLAIN_FORMAT = "text/plain";
 	final static Logger logger = LoggerFactory.getLogger(TextBox.class);
 	private String content=null;
 	@XStreamAsAttribute
@@ -82,7 +84,10 @@ public class TextBox implements Operator{
 			((SesameMemoryBuffer)execBuffer).loadFromText(content);
 		}else if(execBuffer instanceof SesameTupleBuffer){
 			((SesameTupleBuffer)execBuffer).loadFromText(content);
+		}else if(execBuffer instanceof TextBuffer){
+			((TextBuffer)execBuffer).setText(content);
 		}else{
+		
 			throw new RuntimeException("Wrong buffer, expected SesameMemoryBuffer or SesameTupleBuffer not "+execBuffer.getClass());
 		}
 		return execBuffer;
@@ -94,6 +99,9 @@ public class TextBox implements Operator{
 		}
 		if(SPARQL_FORMAT.equals(format)){
 			return new SesameTupleBuffer();
+		}
+		if(TEXTPLAIN_FORMAT.equals(format)){
+			return new TextBuffer();
 		}
 		logger.warn("unexpected format ["+format+"] using "+RDFXML_FORMAT);
 		return new SesameMemoryBuffer();

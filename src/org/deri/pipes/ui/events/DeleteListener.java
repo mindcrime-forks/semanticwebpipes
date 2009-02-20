@@ -40,6 +40,7 @@
 package org.deri.pipes.ui.events;
 
 import org.deri.pipes.ui.PipeNode;
+import org.integratedmodelling.zk.diagram.events.ConnectionDeletedEvent;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
