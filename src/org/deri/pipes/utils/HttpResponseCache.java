@@ -40,7 +40,9 @@
 package org.deri.pipes.utils;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -234,7 +236,7 @@ public class HttpResponseCache {
 	private static String makeCacheKey(String location,
 			Map<String, String> requestHeaders) {
 		if(requestHeaders == null || requestHeaders.size()==0){
-			return location;
+			return getMD5(location);
 		}
 		StringBuilder sb = new StringBuilder();
 		sb.append(location);
@@ -244,6 +246,24 @@ public class HttpResponseCache {
 		for(String key : keys){
 			sb.append('[').append(key).append('=').append(requestHeaders.get(key)).append(']');
 		}
-		return sb.toString();
+		return getMD5(sb.toString());
+	}
+	/**
+	 * @param string
+	 * @return
+	 */
+	static String getMD5(String string) {
+		try{
+			MessageDigest digest = MessageDigest.getInstance("MD5");
+			BigInteger bigInt = new BigInteger(1, digest.digest(string.getBytes("UTF-8")));
+			String md5 = bigInt.toString(16);
+			if(logger.isDebugEnabled()){
+				logger.debug("using md5=["+md5+"] for "+string);
+			}
+			return md5;
+		}catch(Throwable t){
+			logger.info("couldn't calculate md5 because:"+t,t);
+			return string;
+		}
 	}
 }
