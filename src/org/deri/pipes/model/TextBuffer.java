@@ -39,8 +39,10 @@
 
 package org.deri.pipes.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.deri.pipes.core.ExecBuffer;
@@ -130,6 +132,12 @@ public class TextBuffer implements ExecBuffer{
 	 */
 	public String toString(){
 		return text;
+	}
+	/**
+	 * Gets the text encoded in UTF-8.
+	 */
+	public InputStream getInputStream() throws IOException{
+		return new ByteArrayInputStream(text.getBytes("UTF-8"));
 	}
 
 }

@@ -116,4 +116,17 @@ public class Pipe implements Operator{
 		code.add(operator);
 		
 	}
+	/**
+	 * TODO: use Context for setting/expanding parameters.
+	 * @param newContext
+	 * @param params
+	 * @return
+	 * @throws Exception 
+	 */
+	public ExecBuffer execute(Context context, Map<String, String> params) throws Exception {
+		for(String key : params.keySet()){
+			this.setParameter(key, params.get(key));
+		}
+		return this.execute(context);
+	}
 }

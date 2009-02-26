@@ -41,11 +41,13 @@ package org.deri.pipes.rdf;
 
 import java.io.ByteArrayOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.endpoints.PipeConfig;
 
 import junit.framework.TestCase;
 
@@ -86,6 +88,33 @@ public class SaxonXqueryBoxTest extends TestCase {
 		assertEquals("answers differed",answer1,answer2);
 
 	}
+	/**
+	 * Tests another pipe being called from xquery.
+	 * @throws Exception
+	 */
+	public void testCallingPipesFunction() throws Exception{
+		MemoryContextFetcher mcf = new MemoryContextFetcher();
+		mcf.setContentType("text/xml");
+		mcf.setDefaultValue("xxx");
+		mcf.setKey("input");
+		String input = createXmlInput();
+		Engine engine = Engine.defaultEngine();
+		PipeConfig helloConfig = new PipeConfig();
+		String helloWorldExecutedIdentifier = "Tada! The Hello World Pipe Was Invoked From Xquery!!!";
+		helloConfig.setId("hello-world");
+		helloConfig.setSyntax("<pipe><code><text format='text/plain'><content>"+helloWorldExecutedIdentifier+" Hello ${person}</content></text></code></pipe>");
+		engine.getPipeStore().save(helloConfig);
+		
+		Context context = engine.newContext();
+		context.put("input", input);
+		SaxonXqueryBox xquery = new SaxonXqueryBox();
+		xquery.setSource(new Source(mcf));
+		xquery.setContentType("text/html");
+		xquery.setQuery(createXQueryCallingPipesFunction());
+		ExecBuffer result = xquery.execute(context);
+		String x = IOUtils.toString(result.getInputStream());
+		assertTrue("Called pipe was not executed",x.indexOf(helloWorldExecutedIdentifier)>=0);
+	}
 
 	/**
 	 * @return
@@ -109,6 +138,25 @@ public class SaxonXqueryBoxTest extends TestCase {
 		sb.append("\n  </html>");
 		return sb.toString();
 	}
+	private String createXQueryCallingPipesFunction() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("xquery version \"1.0\";");
+		sb.append("\n<html>");
+		sb.append("\n<head>");
+		sb.append("\n<title>A list of people</title>");
+		sb.append("\n    </head>");
+		sb.append("\n    <body>");
+		sb.append("\n      <h1>A list of people</h1>");
+		sb.append("\n      <p>Here are some interesting people:</p>");
+		sb.append("\n      <ul> {");
+		sb.append("\n        for $b in //persons/person");
+		sb.append("\n        order by $b/name return");
+		sb.append("\n          <li>{ pipes:call('hello-world','person',$b/name) }</li>");
+		sb.append("\n      } </ul>");
+		sb.append("\n    </body>");
+		sb.append("\n  </html>");
+		return sb.toString();
+	}
 
 	/**
 	 * @return
@@ -126,6 +174,26 @@ public class SaxonXqueryBoxTest extends TestCase {
 		}
 		sb.append("\n</persons></people>");
 		return sb.toString();
+	}
+	
+	public void testGenerateFunctionMethods(){
+		StringBuilder x = new StringBuilder();
+		for(int i=1;i<20;i++){
+			StringBuilder sb = new StringBuilder();
+			sb.append("    public static Object call(String pipeId");
+			StringBuilder c = new StringBuilder();
+			for(int j=0;j<i;j++){
+				sb.append(", String k").append(j).append(", String v").append(j);
+				c.append(", k").append(j).append(", v").append(j);
+			}
+			sb.append(") throws Exception{\n");
+			sb.append("		return callPipe(pipeId");
+			sb.append(c);
+			sb.append(");\n");
+			sb.append("    }\n\n");
+			x.append(sb);
+		}
+		System.out.println(x);
 	}
 
 }

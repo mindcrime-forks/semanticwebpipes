@@ -39,7 +39,10 @@
 package org.deri.pipes.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.deri.pipes.model.InputStreamProvider;
 
 
 /**
@@ -47,8 +50,13 @@ import java.io.OutputStream;
  *
  */
 
-public interface ExecBuffer {
-     public abstract void stream(ExecBuffer outputBuffer) throws IOException;
-     public abstract void stream(ExecBuffer outputBuffer,String context)throws IOException;
-     public abstract void stream(OutputStream output) throws IOException;
+public interface ExecBuffer extends InputStreamProvider{
+     public void stream(ExecBuffer outputBuffer) throws IOException;
+     public void stream(ExecBuffer outputBuffer,String context)throws IOException;
+     public void stream(OutputStream output) throws IOException;
+     /**
+      * Get an InputStream to the content. Text encoded in the InputStream
+      * must use UTF-8 encoding.
+      */
+     public InputStream getInputStream() throws IOException;
 }

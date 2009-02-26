@@ -40,6 +40,7 @@
 package org.deri.pipes.model;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,5 +114,17 @@ public class MultiExecBuffer implements ExecBuffer{
 	 */
 	public List<ExecBuffer> getExecBuffers(){
 		return buffers;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.ExecBuffer#getInputStream()
+	 */
+	@Override
+	public InputStream getInputStream() throws IOException {
+		BinaryContentBuffer out = new BinaryContentBuffer();
+		for(ExecBuffer buffer : buffers){
+			buffer.stream(out);
+		}
+		return out.getInputStream();
 	}
 }

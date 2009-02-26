@@ -223,5 +223,14 @@ public class SesameTupleBuffer implements ExecBuffer, Iterable<Map<String,String
 		// TODO Auto-generated method stub
 		
 	}
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.ExecBuffer#getInputStream()
+	 */
+	@Override
+	public InputStream getInputStream() throws IOException {
+		SesameMemoryBuffer output = new SesameMemoryBuffer();
+		stream(output);
+		return output.getInputStream();
+	}
 
 }

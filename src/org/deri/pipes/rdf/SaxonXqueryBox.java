@@ -47,6 +47,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import net.sf.saxon.Configuration;
+import net.sf.saxon.functions.ExtensionFunctionFactory;
 import net.sf.saxon.om.DocumentInfo;
 import net.sf.saxon.query.DynamicQueryContext;
 import net.sf.saxon.query.StaticQueryContext;
@@ -59,11 +60,15 @@ import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.model.BinaryContentBuffer;
 import org.deri.pipes.model.InputStreamProvider;
 import org.deri.pipes.model.Stream;
+import org.deri.pipes.xquery.Functions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Runs an XQuery operation on the input.
+ * Pipes functions can be used in the xquery operator by using
+ * the 'pipes:' prefix.
+ * @see org.deri.pipes.xquery.Functions
  * @author robful
  *
  */
@@ -80,6 +85,7 @@ public class SaxonXqueryBox implements Operator {
 		ExecBuffer in = source.execute(context);
 		final Configuration config = new Configuration();
 		final StaticQueryContext sqc = new StaticQueryContext(config);
+		sqc.declareNamespace("pipes", "java:org.deri.pipes.xquery.Functions");
 		final XQueryExpression exp = sqc.compileQuery(query);
 		final DynamicQueryContext dynamicContext = new DynamicQueryContext(config);
 		if(!(in instanceof InputStreamProvider)){
@@ -89,10 +95,13 @@ public class SaxonXqueryBox implements Operator {
 		final DocumentInfo document  = config.buildDocument(new StreamSource(input));
 		dynamicContext.setContextItem(document);
 		final Properties props = new Properties();
-		//props.setProperty(OutputKeys.METHOD, "html");
-		//props.setProperty(OutputKeys.DOCTYPE_PUBLIC, "-//W3C//DTD HTML 4.01 Transitional//EN");
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
-		exp.run(dynamicContext, new StreamResult(bout), props);
+		Functions.context.set(context);
+		try{
+			exp.run(dynamicContext, new StreamResult(bout), props);
+		}finally{
+			Functions.context.remove();
+		}
 		BinaryContentBuffer binaryContentBuffer = new BinaryContentBuffer(bout);
 		binaryContentBuffer.setContentType(contentType);
 		return binaryContentBuffer;

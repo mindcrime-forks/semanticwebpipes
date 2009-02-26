@@ -38,6 +38,7 @@
  */
 package org.deri.pipes.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -254,5 +255,15 @@ public class SesameMemoryBuffer implements ExecBuffer {
 		catch(Exception e){
 			logger.warn("problem exportin",e);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.ExecBuffer#getInputStream()
+	 */
+	@Override
+	public InputStream getInputStream() throws IOException {
+		// TODO fix this...
+		StringBuffer x = toXMLStringBuffer();
+		return new ByteArrayInputStream(x.toString().getBytes("UTF-8"));
 	}
 }
