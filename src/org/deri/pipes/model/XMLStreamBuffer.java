@@ -53,7 +53,7 @@ import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-public class XMLStreamBuffer implements ExecBuffer {
+public class XMLStreamBuffer implements ExecBuffer,InputStreamProvider{
 	private transient Logger logger = LoggerFactory.getLogger(XMLStreamBuffer.class);
 	String url=null;
 	StringBuffer strBuff=null;
@@ -70,15 +70,8 @@ public class XMLStreamBuffer implements ExecBuffer {
 		this.strBuff=strBuff;
 	}
 	
-	public StreamSource getStreamSource(){
-		if(byteData != null){
-			return new StreamSource(new ByteArrayInputStream(byteData));
-		}
-		if(url!=null) 
-			return new StreamSource(url);
-		if (strBuff!=null) 
-		  return new StreamSource(new java.io.StringReader(strBuff.toString()));
-		return null;
+	public StreamSource getStreamSource() throws IOException{
+		return new StreamSource(getInputStream());
 	}
 	
 	public void setStreamSource(StringBuffer strBuff){
@@ -110,28 +103,13 @@ public class XMLStreamBuffer implements ExecBuffer {
 	}
 
 	@Override
-	public void stream(OutputStream output) {
-		// TODO Auto-generated method stub
-		if(url!=null){
-			try {
-				InputStream in = UrlLoader.openConnection(url, RDFFormat.RDFXML);
-				try{
-					IOUtils.copy(in, output);
-				}finally{
-					in.close();
-				}
-			} catch (IOException e) {
-				logger.warn("Couldn't read from location=["+url+"]",e);
-			}
-			
-		}else{
-			try {
-				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(output);
-				outputStreamWriter.write(strBuff.toString());
-				outputStreamWriter.flush();
-			} catch (IOException e) {
-				logger.warn("problem streaming output",e);
-			}
+	public void stream(OutputStream output) throws IOException{
+
+		InputStream in = getInputStream();
+		try{
+			IOUtils.copy(in, output);
+		}finally{
+			in.close();
 		}
 	}
 
@@ -140,5 +118,20 @@ public class XMLStreamBuffer implements ExecBuffer {
 	 */
 	public void setStreamSource(byte[] data) {
 		this.byteData  = data;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.model.InputStreamProvider#getInputStream()
+	 */
+	@Override
+	public InputStream getInputStream() throws IOException {
+		if(byteData != null){
+			return new ByteArrayInputStream(byteData);
+		}
+		if(url!=null) 
+			return UrlLoader.openConnection(url, RDFFormat.RDFXML);
+		if (strBuff!=null) 
+		  return new ByteArrayInputStream(strBuff.toString().getBytes("UTF-8"));
+		return null;
 	}
 }

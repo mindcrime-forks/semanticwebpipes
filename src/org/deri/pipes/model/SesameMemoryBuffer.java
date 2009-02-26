@@ -71,6 +71,10 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class SesameMemoryBuffer implements ExecBuffer {
+	/**
+	 * 
+	 */
+	private static final String DEFAULT_CONTEXT = "http://pipes.deri.org/";
 	private transient Logger logger = LoggerFactory.getLogger(SesameMemoryBuffer.class);
 	Repository buffRepository=null;
 	public static final int NONE=0;
@@ -85,6 +89,10 @@ public class SesameMemoryBuffer implements ExecBuffer {
 
 	public SesameMemoryBuffer(){
 		this(NONE);
+	}
+	public SesameMemoryBuffer(InputStream in) throws RDFParseException, RepositoryException, IOException{
+		this(NONE);
+		load(in);
 	}
 
 	public  RepositoryConnection getConnection(){
@@ -142,6 +150,10 @@ public class SesameMemoryBuffer implements ExecBuffer {
 		}		
 	}
 
+	public void load(InputStream in)throws RDFParseException, RepositoryException, IOException {
+		load(in,DEFAULT_CONTEXT,RDFFormat.RDFXML);
+	}
+	
 	private void load(Reader in, String url,
 			RDFFormat format) throws RDFParseException, RepositoryException, IOException {
 		RepositoryConnection conn=this.getConnection() ;
@@ -155,7 +167,7 @@ public class SesameMemoryBuffer implements ExecBuffer {
 
 	public void loadFromText(String text, String baseURL){
 		try{
-			String url = ((null!=baseURL)&&(baseURL.trim().length()>0))?baseURL.trim():"http://pipes.deri.org/";
+			String url = ((null!=baseURL)&&(baseURL.trim().length()>0))?baseURL.trim():DEFAULT_CONTEXT;
 			load(new StringReader(text),url, RDFFormat.RDFXML);
 		}
 		catch (Exception e) {

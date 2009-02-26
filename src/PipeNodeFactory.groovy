@@ -31,6 +31,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new PatchExecutorNode(x,y);
 				case "pipe-call":
 				    return new PipeCallNode(x,y);
+	   			case "rdf-extract":
+					return new RDFExtractNode(x,y);
 	   			case "rdffetch":
 					return new RDFFetchNode(x,y);
 				case "rdfsmix":
@@ -63,6 +65,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 		if(tagName.startsWith("pipe:")){
 		   return new PipeCallNode(x,y,tagName.substring(5));
 		}
+		println("groovy: don't know how to load "+tagName);
+		return null;
 	}
 
 	@Override
@@ -89,6 +93,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return PatchGeneratorNode.loadConfig(element,pipeEditor);
 				case "pipe-call":    
 					return PipeCallNode.loadConfig(element,pipeEditor);
+				case "rdf-extract":    
+					return RDFExtractNode.loadConfig(element,pipeEditor);
 				case "rdffetch":    
 					return RDFFetchNode.loadConfig(element,pipeEditor);
 				case "select":    

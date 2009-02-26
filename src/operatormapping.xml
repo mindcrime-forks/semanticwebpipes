@@ -145,4 +145,8 @@ class represented by that element.
     <string>pipe-call</string>
     <java-class>org.deri.pipes.rdf.PipeCallBox</java-class>
   </entry>    
+  <entry>
+    <string>rdf-extract</string>
+    <java-class>org.deri.pipes.rdf.RDFExtractBox</java-class>
+  </entry>    
 </map>

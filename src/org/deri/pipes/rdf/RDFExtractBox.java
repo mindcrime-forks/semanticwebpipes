@@ -36,63 +36,67 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.deri.pipes.rdf;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.deri.pipes.core.ExecBuffer;
+import org.apache.commons.io.IOUtils;
 import org.deri.pipes.core.Context;
-import org.deri.pipes.core.PipeException;
-import org.deri.pipes.model.BinaryContentBuffer;
+import org.deri.pipes.core.ExecBuffer;
+import org.deri.pipes.core.Operator;
+import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.model.InputStreamProvider;
 import org.deri.pipes.model.SesameMemoryBuffer;
-import org.deri.pipes.utils.HttpResponseCache;
-import org.deri.pipes.utils.HttpResponseData;
-import org.openrdf.rio.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
+ * Operator to convert any input into RDF. Currently only
+ * supports RDF/XML input, will later be modified to use
+ * Any23.
+ * @author robful
  *
  */
-public class RDFFetchBox extends FetchBox {
-	private transient Logger logger = LoggerFactory.getLogger(RDFFetchBox.class);
-	@XStreamAsAttribute
-	protected String format="RDF/XML";		
+@XStreamAlias("rdf-extract")
+public class RDFExtractBox implements Operator{
 	
-	public ExecBuffer execute(Context context) throws Exception{
-		SesameMemoryBuffer rdfBuffer=new SesameMemoryBuffer();
-		HttpClient client= context.getHttpClient();
-		RDFFormat fileFormat = getRDFFormat();
-		Map<String,String> requestHeaders = new HashMap<String,String>();
-		requestHeaders.put("Accept", fileFormat.getDefaultMIMEType());
-		String url = location.expand(context);
-		logger.debug("loading from "+url);
-		try{
-		HttpResponseData data = HttpResponseCache.getResponseData(client, url,requestHeaders);
-		BinaryContentBuffer inputBuffer = data.toBinaryContentBuffer();
-		rdfBuffer.load(inputBuffer.getInputStream(), url,fileFormat);
-		return rdfBuffer;
-		}catch(Exception e){
-			throw new PipeException("Could not load or parse "+url,e);
-		}
-	}
-    
+	private Source source;
 
-	public void setFormat(String format) {
-		this.format = format;
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.core.Operator#execute(org.deri.pipes.core.Context)
+	 */
+	@Override
+	public ExecBuffer execute(Context context) throws Exception {
+		ExecBuffer input = source.execute(context);
+		return new SesameMemoryBuffer(getInputStream(input));
 	}
 
-	public RDFFormat getRDFFormat() {
-		if(null==format){
-    		logger.info("No format given, assuming rdfxml");
-			return RDFFormat.RDFXML;
-		}else{	
-			return(RDFFormat.valueOf(format));
+	/**
+	 * @param input
+	 * @return
+	 * @throws IOException 
+	 */
+	private InputStream getInputStream(ExecBuffer input) throws IOException {
+		if(input instanceof InputStreamProvider){
+			return((InputStreamProvider)input).getInputStream();
 		}
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		input.stream(output);
+		output.close();
+		return new ByteArrayInputStream(output.toByteArray());
 	}
+
+	public Source getSource() {
+		return source;
+	}
+
+	public void setSource(Source source) {
+		this.source = source;
+	}
+	
 
 }

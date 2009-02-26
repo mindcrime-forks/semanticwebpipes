@@ -273,6 +273,11 @@
 					</treeitem>
 					<treeitem>
 						<treerow>
+							<treecell id="rdf-extract"  draggable="true"  label="RDF Extract" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
 							<treecell id="smoosher"  draggable="true"  label="Smoosher" />
 						</treerow>	
 					</treeitem>

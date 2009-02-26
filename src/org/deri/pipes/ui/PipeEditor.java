@@ -40,6 +40,7 @@ package org.deri.pipes.ui;
 
 import groovy.lang.GroovyClassLoader;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -53,6 +54,7 @@ import org.deri.pipes.core.Operator;
 import org.deri.pipes.endpoints.PipeConfig;
 import org.deri.pipes.model.SesameMemoryBuffer;
 import org.deri.pipes.model.SesameTupleBuffer;
+import org.deri.pipes.model.TextBuffer;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.integratedmodelling.zk.diagram.components.PortTypeManager;
 import org.integratedmodelling.zk.diagram.components.PortTypeMask;
@@ -331,14 +333,21 @@ public class PipeEditor extends Workspace {
 				return;
 			}
 			try{
-				textResult= buff.toString();
 				if(buff instanceof SesameMemoryBuffer){
 					buff = ((SesameMemoryBuffer)buff).toTupleBuffer();
+					textResult= buff.toString();
 				}
 				if(buff instanceof SesameTupleBuffer){
 					tuple=((SesameTupleBuffer)buff).getTupleQueryResult();
+					textResult= buff.toString();
+				}if (buff instanceof TextBuffer){
+					textResult= buff.toString();
 				}else{
-					logger.warn("Unable to hotDebug buffer of type "+buff.getClass());
+					logger.info("Using InputStream to get string for buffer"+buff.getClass());
+					ByteArrayOutputStream bout = new ByteArrayOutputStream();
+					buff.stream(bout);
+					bout.close();
+					textResult = bout.toString("UTF-8");
 				}
 			}catch(Exception e){
 				textResult = getStack(e);
