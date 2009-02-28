@@ -36,60 +36,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zul.Bandbox;
-import org.zkoss.zul.Bandpopup;
-import org.zkoss.zul.Textbox;
+package org.deri.pipes.condition;
 
-public class QueryBox extends Bandbox {
-	final Logger logger = LoggerFactory.getLogger(QueryBox.class);
-	protected class QueryChangeListener implements org.zkoss.zk.ui.event.EventListener {
-		   public void onEvent(Event event) throws  org.zkoss.zk.ui.UiException {
-						 if(event.getTarget()==query){
-							 setValue(query.getValue());
-						 }
-						 else{
-							 query.setValue(getValue());
-						 }
-				
-		   }    
-	}
-	Textbox query;
-	Bandpopup group;
-	public QueryBox(){
-		super();
-		group= new Bandpopup();
-		query= new Textbox();
-		query.setRows(8);
-		query.setCols(60);
-		query.addEventListener("onChange", new QueryChangeListener());
-		group.appendChild(query);
-		appendChild(group);
-		addEventListener("onChange", new QueryChangeListener());
-	}
+import org.deri.pipes.core.Context;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+/**
+ * @author robful
+ *
+ */
+@XStreamAlias("not")
+public class NotCondition implements Condition{
+
+	ConditionWrapper condition;
 	
-	public QueryBox(String q){
-		super(q);
-		group= new Bandpopup();
-		query= new Textbox(q);
-		query.setRows(8);
-		query.setCols(60);
-		query.addEventListener("onChange", new QueryChangeListener());
-		group.appendChild(query);
-		appendChild(group);
-		addEventListener("onChange", new QueryChangeListener());
+	public NotCondition(){
+		
 	}
-	
-	public String getQuery(){
-		return query.getValue();
+	/**
+	 * @param left
+	 */
+	public NotCondition(Condition condition) {
+		this.condition = new ConditionWrapper(condition);
 	}
-	
-	public void setQuery(String q){
-		query.setValue(q);
-		setValue(q);
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.condition.Condition#isTrue(org.deri.pipes.core.Context)
+	 */
+	@Override
+	public boolean isTrue(Context context) throws Exception {
+		return !condition.isTrue(context);
 	}
+
 }

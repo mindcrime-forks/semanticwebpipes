@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class PipePortType implements PortType {	
 	//TODO: Refactor this class.
 	final Logger logger = LoggerFactory.getLogger(PipePortType.class);
-	private static PipePortType typeList[]= new PipePortType[16];
+	private static PipePortType typeList[]= new PipePortType[17];
 	public static final byte NONE=0;
 	public static final byte RDFOUT=1;
 	public static final byte RDFIN=2;
@@ -53,14 +53,16 @@ public class PipePortType implements PortType {
 	public static final byte TEXTIN=4;	
 	public static final byte SPARQLRESULTOUT=5;
 	public static final byte SPARQLRESULTIN=6;
-	public static final byte XMLOUT=8;
-	public static final byte XMLIN=9;
-	public static final byte XSLOUT=10;
-	public static final byte XSLIN=11;
-	public static final byte ANYOUT=12;
-	public static final byte ANYIN=13;
-	public static final byte SOURCEORSTRINGOUT=14;
-	public static final byte SOURCEORSTRINGIN=15;
+	public static final byte XMLOUT=7;
+	public static final byte XMLIN=8;
+	public static final byte XSLOUT=9;
+	public static final byte XSLIN=10;
+	public static final byte ANYOUT=11;
+	public static final byte ANYIN=12;
+	public static final byte SOURCEORSTRINGOUT=13;
+	public static final byte SOURCEORSTRINGIN=14;
+	public static final byte CONDITIONOUT=15;
+	public static final byte CONDITIONIN=16;
 
 	
 	byte idx;
@@ -83,6 +85,7 @@ public class PipePortType implements PortType {
 		if((pType.getIdx()==XMLOUT)&&((idx==XMLIN)||(idx==XSLIN)||(idx==SPARQLRESULTIN)||(idx==RDFIN)||(idx == ANYIN)))return true;
 		if((pType.getIdx()==XSLOUT)&&((idx==XSLIN)||(idx==XMLIN)||(idx == ANYIN)))return true;
 		if((pType.getIdx()==SOURCEORSTRINGOUT)&&(idx==SOURCEORSTRINGIN))return true;
+		if((pType.getIdx()==CONDITIONOUT)&& idx == CONDITIONIN) return true;
 		return false;
 	}
 	

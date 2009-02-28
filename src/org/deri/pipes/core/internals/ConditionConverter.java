@@ -36,68 +36,64 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
-/**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
- *
- */
-import java.util.List;
+package org.deri.pipes.core.internals;
 
-import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.Port;
-import org.integratedmodelling.zk.diagram.components.PortType;
+import org.deri.pipes.condition.Condition;
+import org.deri.pipes.condition.ConditionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-public abstract class InOutNode extends PipeNode{
-	final Logger logger = LoggerFactory.getLogger(InOutNode.class);
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2684001403256691428L;
-	protected Port input;
-	protected Port output;
-	PortType inPType;
-	PortType outPType;
-	public InOutNode(PortType inPType,PortType outPType,int x,int y,int width,int height){
-		super(x,y,width,height);
-		this.inPType=inPType;
-		this.outPType=outPType;
-        setToobar();
+
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+/**
+ * Converts a condition wrapper.
+ * @author robful
+ *
+ */
+public class ConditionConverter implements Converter {
+	Logger logger = LoggerFactory.getLogger(ConditionConverter.class);
+	private final SourceConverter sourceConverter;
+	public ConditionConverter(SourceConverter sourceConverter){
+		this.sourceConverter = sourceConverter;
 	}
-	
-	public Port getInputPort(){
-		return input;
-	}
-	
-	public Port getOutputPort(){
-		return output;
-	}
-	
-	public void connectTo(Port port){
-		getWorkspace().connect(output,port,false);
-	}
-	
-	protected void initialize(){
-		input =createPort(inPType,"top");
-        output =createPort(outPType,"bottom");
-	}
-	
-	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			Element codeElm =doc.createElement(tagName);
-			if(config) setPosition(codeElm);
-			insertInSrcCode(codeElm, input, "source", config);
-			return codeElm;
-		}
-		return null;
-    }
+	@Override
+	public void marshal(Object arg0, HierarchicalStreamWriter writer,
+			MarshallingContext context) {
+		ConditionWrapper wrapper = (ConditionWrapper)arg0;
+		Condition delegate = wrapper.getDelegate();
+		sourceConverter.convertDelegate(writer, context, delegate);
 		
-	public void connectSource(Element elm){
-		String childTagName = "source";
-		connectChildElement(elm, childTagName,getInputPort());  
 	}
+
+	@Override
+	public Object unmarshal(HierarchicalStreamReader reader,
+			UnmarshallingContext context) {
+		ConditionWrapper wrapper = new ConditionWrapper();
+		if(reader.hasMoreChildren()){
+			reader.moveDown();
+			String nodeName = reader.getNodeName();
+			Object delegate = context.convertAnother(wrapper, sourceConverter.getClassForNode(nodeName));
+			if(delegate == null){
+				delegate = sourceConverter.unmarshal(reader);
+			}
+			if(delegate instanceof Condition){
+				Condition condition = (Condition)delegate;
+				wrapper.setDelegate(condition);
+			}else{
+				logger.warn("Ignoring unexpected object in xml tree (was expecting Condition of some kind):"+nodeName);
+			}
+			reader.moveUp();
+		}
+		return wrapper;
+	}
+
+	@Override
+	public boolean canConvert(Class clazz) {
+		return ConditionWrapper.class.equals(clazz);
+	}
+
 
 }

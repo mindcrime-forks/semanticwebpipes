@@ -426,7 +426,7 @@ public class PipeEditor extends Workspace {
 			}
 			return groovyPipeNodeFactory.createPipeNode(element, this);
 		}catch(Throwable t){
-			logger.error("Cannot parse pipe xml",t);
+			logger.error("Cannot parse pipe xml using "+element.getNodeName(),t);
 		}
 		return null;
 	}

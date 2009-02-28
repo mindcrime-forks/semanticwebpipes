@@ -56,7 +56,7 @@ import org.zkoss.zul.Vbox;
 public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNode,ConnectingOutputNode {
 	final Logger logger = LoggerFactory.getLogger(SPARQLEndpointNode.class);
 	Textbox endpoint,defaulturi;
-	QueryBox queryBox;
+	TextBandBox textBandBox;
 	Port endpointPort,defaulturiPort=null;
 	
 	protected Listbox listbox;
@@ -82,7 +82,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 	    
 	    hbox= new Hbox();
 		hbox.appendChild(new Label("Query:"));
-		hbox.appendChild(queryBox=new QueryBox());
+		hbox.appendChild(textBandBox=new TextBandBox());
 		vbox.appendChild(hbox);
 		        
         wnd.appendChild(vbox);
@@ -142,7 +142,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 	}
 	
 	public void setQuery(String query){
-		queryBox.setQuery(query);
+		textBandBox.setTextboxText(query);
 	}
 	
 	public String getSrcCode(boolean config){
@@ -152,7 +152,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 			code+=getConnectedCode(endpoint, endpointPort);
 			String uri=getConnectedCode(defaulturi, defaulturiPort);
 			try{
-				code+="?query="+URLEncoder.encode(queryBox.getValue(),"UTF-8");
+				code+="?query="+URLEncoder.encode(textBandBox.getValue(),"UTF-8");
 				if((null!=uri)&&(uri.indexOf("://")>0))					
 						code+="&default-graph-uri="+URLEncoder.encode(uri.trim(),"UTF-8");
 			}
@@ -178,7 +178,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 			graphElm.appendChild(getConnectedCode(doc, defaulturi, defaulturiPort, config));
 			srcCode.appendChild(endpointElm);
 			
-			srcCode.appendChild(XMLUtil.createElmWithText(doc, "query", queryBox.getQuery()));
+			srcCode.appendChild(XMLUtil.createElmWithText(doc, "query", textBandBox.getText()));
 			return srcCode;
 		}
 		return null;

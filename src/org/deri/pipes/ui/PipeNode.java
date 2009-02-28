@@ -85,7 +85,7 @@ public abstract class PipeNode extends ZKNode{
 		appendChild(wnd);
 	}
 
-	abstract void initialize();
+	protected abstract void initialize();
 	public abstract Node getSrcCode(Document doc,boolean config);
 	public abstract void connectTo(Port port);
 
@@ -320,5 +320,12 @@ public abstract class PipeNode extends ZKNode{
 		((PipeEditor)getWorkspace()).hotDebug(getSrcCode(false));
 	}
 
+	protected void connectChildElement(Element elm, String childTagName, Port port) {
+		List<Element> childNodes=XMLUtil.getSubElementByName(elm, childTagName);
+ 		for(int i=0;i<childNodes.size();i++){		
+ 			PipeNode nextNode=PipeNode.loadConfig(XMLUtil.getFirstSubElement(childNodes.get(i)),(PipeEditor)getWorkspace());
+ 			nextNode.connectTo(port);
+ 		}
+	}
 
 }

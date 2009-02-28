@@ -33,6 +33,11 @@ class represented by that element.
   </entry>
   <entry>
     <!--  required for normal operation of pipes -->
+    <string>condition</string>
+    <java-class>org.deri.pipes.condition.ConditionWrapper</java-class>
+  </entry>
+  <entry>
+    <!--  required for normal operation of pipes -->
     <string>xslsource</string>
     <java-class>org.deri.pipes.core.internals.Source</java-class>
   </entry>
@@ -148,5 +153,25 @@ class represented by that element.
   <entry>
     <string>rdf-extract</string>
     <java-class>org.deri.pipes.rdf.RDFExtractBox</java-class>
+  </entry>    
+  <entry>
+    <string>choose</string>
+    <java-class>org.deri.pipes.condition.ChooseBox</java-class>
+  </entry>    
+  <entry>
+    <string>either</string>
+    <java-class>org.deri.pipes.condition.OrCondition</java-class>
+  </entry>    
+  <entry>
+    <string>both</string>
+    <java-class>org.deri.pipes.condition.AndCondition</java-class>
+  </entry>    
+  <entry>
+    <string>not</string>
+    <java-class>org.deri.pipes.condition.NotCondition</java-class>
+  </entry>    
+  <entry>
+    <string>is-empty</string>
+    <java-class>org.deri.pipes.condition.IsEmptyCondition</java-class>
   </entry>    
 </map>

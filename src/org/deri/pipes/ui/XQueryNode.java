@@ -51,7 +51,7 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
 public class XQueryNode extends InOutNode{
 	final Logger logger = LoggerFactory.getLogger(XQueryNode.class);
-	QueryBox queryBox=null;	
+	TextBandBox textBandBox=null;	
 	Textbox contentTypeBox = null;
 	public XQueryNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.ANYOUT),x,y,250,120);
@@ -68,15 +68,15 @@ public class XQueryNode extends InOutNode{
 		hbox1.appendChild(contentTypeBox);
 		Hbox hbox2 = new Hbox();
 		hbox2.appendChild(new Label("XQuery"));        
-		queryBox=new QueryBox();
-		queryBox.setQuery("xquery version \"1.0\";\n<html>\n <head>\n  <title>xquery</title>" +
+		textBandBox=new TextBandBox();
+		textBandBox.setTextboxText("xquery version \"1.0\";\n<html>\n <head>\n  <title>xquery</title>" +
 				"\n </head>" +
 				"\n <body>" +
 				"\n{for $link in //a return\n"
 				+"\n<p>{$link}</p>" +
 				"</body>" +
 		"\n</html>");
-		hbox2.appendChild(queryBox);
+		hbox2.appendChild(textBandBox);
 		vbox.appendChild(hbox2);
 		wnd.appendChild(vbox);
 	}
@@ -90,7 +90,7 @@ public class XQueryNode extends InOutNode{
 	}
 
 	public void setQuery(String query){
-		queryBox.setQuery(query);
+		textBandBox.setTextboxText(query);
 	}
 
 	public Node getSrcCode(Document doc,boolean config){
@@ -101,7 +101,7 @@ public class XQueryNode extends InOutNode{
 			srcCode.appendChild(contentTypeElm);
 	    	Element queryElm=doc.createElement("query");
 			srcCode.appendChild(queryElm);
-			queryElm.appendChild(doc.createCDATASection(queryBox.getQuery()));
+			queryElm.appendChild(doc.createCDATASection(textBandBox.getText()));
 			return srcCode;
 		}
 		return null;
@@ -118,7 +118,7 @@ public class XQueryNode extends InOutNode{
 		String contentType = XMLUtil.getTextFromFirstSubEleByName(elm, "contentType");
 		String query =XMLUtil.getTextFromFirstSubEleByName(elm, "query");
 		if(query != null){
-			node.queryBox.setQuery(query);
+			node.textBandBox.setTextboxText(query);
 		}
 		if(contentType != null){
 			node.contentTypeBox.setValue(contentType);

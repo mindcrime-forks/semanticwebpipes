@@ -139,7 +139,7 @@ public class XMLUtil {
 	   public static Element createElmWithText(Document doc,String tagName,String text){
 		   Element elm =doc.createElement(tagName);
 		   text = text!=null?text.trim():"";
-		   Node node = (text.indexOf('>')>=0 || text.indexOf('\n')>=0)?doc.createCDATASection(text):doc.createTextNode(text);
+		   Node node = (text.indexOf('<')>=0 || text.indexOf('\n')>=0)?doc.createCDATASection(text):doc.createTextNode(text);
 		   elm.appendChild(node);
 		   return elm;
 	   }

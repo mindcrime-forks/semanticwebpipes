@@ -283,6 +283,11 @@
 					</treeitem>
 					<treeitem>
 						<treerow>
+							<treecell id="text"  draggable="true"  label="Text" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
 							<treecell id="for"  draggable="true"  label="FOR loop" />
 						</treerow>	
 					</treeitem>
@@ -333,6 +338,25 @@
 					<treeitem >
 				       <treerow>
 							<treecell label="For-Variable" id="variable"  draggable="true" />
+						</treerow>
+					</treeitem>
+				</treechildren>
+			</treeitem>
+			<treeitem label="Choose">
+				<treechildren>
+				    <treeitem >
+				       <treerow>
+							<treecell label="Choose (if/then/else)" id="choose"  draggable="true" />
+						</treerow>
+					</treeitem>
+					<treeitem >
+				       <treerow>
+							<treecell label="Condition: Input Is Empty" id="is-empty"  draggable="true" />
+						</treerow>
+					</treeitem>
+					<treeitem >
+				       <treerow>
+							<treecell label="Condition: Not" id="not"  draggable="true" />
 						</treerow>
 					</treeitem>
 				</treechildren>

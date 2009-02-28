@@ -1,4 +1,5 @@
 import org.deri.pipes.ui.*;
+import org.deri.pipes.ui.condition.*;
 import org.integratedmodelling.zk.diagram.components.Shape;
 
 
@@ -13,6 +14,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 	 */
 	public Shape createShape(String tagName, int x, int y) {
 	    switch(tagName.toLowerCase()){
+				case "choose":
+					return new ChooseNode(x,y);	    
 				case "construct":
 					return new ConstructNode(x,y);
 				case "for":
@@ -23,6 +26,10 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new  Html2XmlNode(x,y);
 				case "http-get":
 				    return new HttpGetNode(x,y);
+				case "is-empty":
+					return new  IsEmptyConditionNode(x,y);
+				case "not":
+					return new  NotConditionNode(x,y);
 				case "parameter":
 					return new ParameterNode(x,y);
 				case "patch-gen":
@@ -49,6 +56,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new SmoosherNode(x,y);
 				case "stringify":
 					return new StringifyNode(x,y);
+				case "text":
+					return new TextNode(x,y);
 				case "urlbuilder":
 					return new URLBuilderNode(x,y);
 				case "variable":
@@ -73,6 +82,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 	public PipeNode createPipeNode(Element element, PipeEditor pipeEditor) {
 			String tagName = element.getTagName();
 			switch(tagName.toLowerCase()){
+			    case "choose":
+			        return ChooseNode.loadConfig(element,pipeEditor);
 				case "code":
 					return OutPipeNode.loadConfig(element,pipeEditor);
 				case "construct":    
@@ -85,6 +96,10 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return Html2XmlNode.loadConfig(element,pipeEditor);
 				case "http-get":
 					return HttpGetNode.loadConfig(element,pipeEditor);
+				case "is-empty":    
+					return IsEmptyConditionNode.loadConfig(element,pipeEditor);
+				case "not":    
+					return NotConditionNode.loadConfig(element,pipeEditor);
 				case "parameter":  
 					return ParameterNode.loadConfig(element,pipeEditor);
 				case "patch-executor":    
@@ -107,6 +122,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return SPARQLEndpointNode.loadConfig(element,pipeEditor);
 				case "stringify":
 					return StringifyNode.loadConfig(element,pipeEditor);
+				case "text":
+					return TextNode.loadConfig(element,pipeEditor);
 				case "tuplefetch":    
 					return TupleQueryResultFetchNode.loadConfig(element,pipeEditor);
 				case "urlbuilder":    

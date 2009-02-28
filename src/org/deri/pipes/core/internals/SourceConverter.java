@@ -38,7 +38,9 @@
  */
 package org.deri.pipes.core.internals;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.deri.pipes.core.Operator;
@@ -66,8 +68,11 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 public class SourceConverter implements Converter {
 	Logger logger = LoggerFactory.getLogger(SourceConverter.class);
 	final Map<String,Class> aliases;
-	public SourceConverter(Map<String,Class> aliases){
+	final List<Class> annotationsProcessed = new ArrayList<Class>();
+	final XStream xstream;
+	public SourceConverter(Map<String,Class> aliases, XStream xstream){
 		this.aliases = aliases;
+		this.xstream = xstream;
 	}
 	
 	@Override
@@ -75,18 +80,28 @@ public class SourceConverter implements Converter {
 			MarshallingContext context) {
 		Source source = (Source)arg0;
 		Operator delegate = source.getDelegate();
+		convertDelegate(writer, context, delegate);
+		
+	}
+
+	protected void convertDelegate(HierarchicalStreamWriter writer,
+			MarshallingContext context, Object delegate) {
 		if(delegate != null){
-			Class delegateRealClass = BypassCGLibMapper.isCGLibEnhanced(delegate.getClass())?delegate.getClass().getSuperclass():delegate.getClass();
-			writer.startNode(getNodeForClass(delegateRealClass));
+			Class delegateRealClass = getDelegateRealClass(delegate);
+			String nodeForClass = getNodeForClass(delegateRealClass);
+			writer.startNode(nodeForClass);
 			context.convertAnother(delegate);
 			writer.endNode();
 		}
-		
+	}
+
+	private Class<? extends Object> getDelegateRealClass(Object delegate) {
+		return BypassCGLibMapper.isCGLibEnhanced(delegate.getClass())?delegate.getClass().getSuperclass():delegate.getClass();
 	}
 
 	private String getNodeForClass(Class clazz) {
 		for(String key : aliases.keySet()){
-			if(clazz.equals(aliases.get(key))){
+			if(clazz.equals(getClassForNode(key))){
 				return key;
 			}
 		}
@@ -100,7 +115,10 @@ public class SourceConverter implements Converter {
 		if(reader.hasMoreChildren()){
 			reader.moveDown();
 			String nodeName = reader.getNodeName();
-			Object delegate = context.convertAnother(source, aliases.get(nodeName));
+			Object delegate = context.convertAnother(source, getClassForNode(nodeName));
+			if(delegate == null){
+				delegate = unmarshal(reader);
+			}
 			if(delegate instanceof Operator){
 				Operator operator = (Operator)delegate;
 				source.setDelegate(operator);
@@ -112,6 +130,22 @@ public class SourceConverter implements Converter {
 		return source;
 	}
 
+	Object unmarshal(HierarchicalStreamReader reader) {
+		return xstream.unmarshal(reader);
+	}
+
+	protected Class getClassForNode(String nodeName) {
+		Class clazz = aliases.get(nodeName);
+		if(!annotationsProcessed.contains(clazz)){
+			synchronized(annotationsProcessed){
+				xstream.processAnnotations(clazz);
+				annotationsProcessed.add(clazz);
+			}
+			
+		}
+		return clazz;
+	}
+
 	@Override
 	public boolean canConvert(Class clazz) {
 		return Source.class.equals(clazz);
@@ -119,8 +153,10 @@ public class SourceConverter implements Converter {
 
 	public void registerAliases(XStream xstream) {
 		for(String key : aliases.keySet()){
-			xstream.alias(key, aliases.get(key));
+			xstream.alias(key, getClassForNode(key));
 		}
 	}
+
+
 
 }

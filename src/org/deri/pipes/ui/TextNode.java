@@ -37,67 +37,86 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.ui;
-/**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
- *
- */
-import java.util.List;
 
+import org.deri.pipes.rdf.TextBox;
 import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.Port;
-import org.integratedmodelling.zk.diagram.components.PortType;
+import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-public abstract class InOutNode extends PipeNode{
-	final Logger logger = LoggerFactory.getLogger(InOutNode.class);
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2684001403256691428L;
-	protected Port input;
-	protected Port output;
-	PortType inPType;
-	PortType outPType;
-	public InOutNode(PortType inPType,PortType outPType,int x,int y,int width,int height){
-		super(x,y,width,height);
-		this.inPType=inPType;
-		this.outPType=outPType;
-        setToobar();
+import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Vbox;
+
+public class TextNode extends InPipeNode implements ConnectingOutputNode{
+	final Logger logger = LoggerFactory.getLogger(TextNode.class);
+	Listbox listbox;
+	TextBandBox content;
+	public TextNode(int x,int y){
+		super(PipePortType.getPType(PipePortType.ANYOUT),x,y,250,120);
+		wnd.setTitle("Text");
+        Vbox vbox=new Vbox();
+        Hbox hbox= new Hbox();
+        hbox= new Hbox();
+		hbox.appendChild(new Label("Format:"));
+        listbox =new Listbox();
+        listbox.setMold("select");
+        listbox.appendItem(TextBox.RDFXML_FORMAT,TextBox.RDFXML_FORMAT);
+        listbox.appendItem(TextBox.SPARQL_FORMAT,TextBox.SPARQL_FORMAT);
+        listbox.appendItem(TextBox.TEXTPLAIN_FORMAT,TextBox.TEXTPLAIN_FORMAT);
+        hbox.appendChild(listbox);
+		vbox.appendChild(hbox);
+		content = new TextBandBox();
+		vbox.appendChild(content);
+		wnd.appendChild(vbox);
+		tagName="text";
+	}
+	public String getFormat(){
+		if(listbox.getSelectedItem()!=null)
+			return listbox.getSelectedItem().getValue().toString();
+		return listbox.getItemAtIndex(0).getValue().toString();
 	}
 	
-	public Port getInputPort(){
-		return input;
+	public void setFormat(String format){
+		for(int i=0;i<listbox.getItemCount();i++)
+		 if(listbox.getItemAtIndex(i).getValue().toString().equalsIgnoreCase(format))
+				 listbox.setSelectedIndex(i);
 	}
 	
-	public Port getOutputPort(){
-		return output;
-	}
 	
-	public void connectTo(Port port){
-		getWorkspace().connect(output,port,false);
-	}
-	
-	protected void initialize(){
-		input =createPort(inPType,"top");
-        output =createPort(outPType,"bottom");
-	}
-	
+	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element codeElm =doc.createElement(tagName);
-			if(config) setPosition(codeElm);
-			insertInSrcCode(codeElm, input, "source", config);
-			return codeElm;
+			Element srcCode = doc.createElement(tagName);
+			if(config){
+				setPosition(srcCode);
+			}
+			srcCode.setAttribute("format", getFormat());
+			srcCode.appendChild(XMLUtil.createElmWithText(doc, "content", content.getTextboxText()));
+			return srcCode;
 		}
 		return null;
-    }
-		
-	public void connectSource(Element elm){
-		String childTagName = "source";
-		connectChildElement(elm, childTagName,getInputPort());  
+	}
+	
+	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
+		TextNode node= new TextNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		wsp.addFigure(node);
+		String content = XMLUtil.getTextFromFirstSubEleByName(elm, "content");
+		String format = elm.getAttribute("format");
+		if(format != null){
+			node.setFormat(format);
+		}
+		if(content != null){
+			node.content.setTextboxText(content);
+		}
+		return node;
 	}
 
+
+
 }
+

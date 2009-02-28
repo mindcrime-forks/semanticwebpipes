@@ -46,16 +46,16 @@ import org.w3c.dom.Node;
 public class QueryNode extends InOutNode{
 	final Logger logger = LoggerFactory.getLogger(QueryNode.class);
 	org.zkoss.zul.Label label;
-	QueryBox queryBox=null;	
+	TextBandBox textBandBox=null;	
 	public QueryNode(PortType outPType,int x,int y,String title){
     	super(PipePortType.getPType(PipePortType.RDFIN),outPType,x,y,230,50);
     	label=new org.zkoss.zul.Label("Query:");
     	wnd.setTitle(title);
         wnd.appendChild(label);
         
-		queryBox=new QueryBox();
+		textBandBox=new TextBandBox();
 		
-        wnd.appendChild(queryBox);
+        wnd.appendChild(textBandBox);
         
     }
 	
@@ -64,14 +64,14 @@ public class QueryNode extends InOutNode{
 	}
 	
 	public void setQuery(String query){
-		queryBox.setQuery(query);
+		textBandBox.setTextboxText(query);
 	}
 	
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
 			Node srcCode =super.getSrcCode(doc, config);
 			Element queryElm=doc.createElement("query");
-			queryElm.appendChild(doc.createCDATASection(queryBox.getQuery()));
+			queryElm.appendChild(doc.createCDATASection(textBandBox.getTextboxText()));
 	    	srcCode.appendChild(queryElm);
 	    	return srcCode;
 	    }

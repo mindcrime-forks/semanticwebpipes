@@ -37,67 +37,59 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.ui;
-/**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
- *
- */
-import java.util.List;
 
-import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.Port;
-import org.integratedmodelling.zk.diagram.components.PortType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-public abstract class InOutNode extends PipeNode{
-	final Logger logger = LoggerFactory.getLogger(InOutNode.class);
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2684001403256691428L;
-	protected Port input;
-	protected Port output;
-	PortType inPType;
-	PortType outPType;
-	public InOutNode(PortType inPType,PortType outPType,int x,int y,int width,int height){
-		super(x,y,width,height);
-		this.inPType=inPType;
-		this.outPType=outPType;
-        setToobar();
-	}
-	
-	public Port getInputPort(){
-		return input;
-	}
-	
-	public Port getOutputPort(){
-		return output;
-	}
-	
-	public void connectTo(Port port){
-		getWorkspace().connect(output,port,false);
-	}
-	
-	protected void initialize(){
-		input =createPort(inPType,"top");
-        output =createPort(outPType,"bottom");
-	}
-	
-	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			Element codeElm =doc.createElement(tagName);
-			if(config) setPosition(codeElm);
-			insertInSrcCode(codeElm, input, "source", config);
-			return codeElm;
-		}
-		return null;
-    }
-		
-	public void connectSource(Element elm){
-		String childTagName = "source";
-		connectChildElement(elm, childTagName,getInputPort());  
-	}
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Bandbox;
+import org.zkoss.zul.Bandpopup;
+import org.zkoss.zul.Textbox;
 
+public class TextBandBox extends Bandbox {
+	final Logger logger = LoggerFactory.getLogger(TextBandBox.class);
+	protected class TextChangeListener implements org.zkoss.zk.ui.event.EventListener {
+		   public void onEvent(Event event) throws  org.zkoss.zk.ui.UiException {
+						 if(event.getTarget()==textbox){
+							 setValue(textbox.getValue());
+						 }
+						 else{
+							 textbox.setValue(getValue());
+						 }
+				
+		   }    
+	}
+	Textbox textbox;
+	Bandpopup group;
+	public TextBandBox(){
+		super();
+		group= new Bandpopup();
+		textbox= new Textbox();
+		textbox.setRows(8);
+		textbox.setCols(60);
+		textbox.addEventListener("onChange", new TextChangeListener());
+		group.appendChild(textbox);
+		appendChild(group);
+		addEventListener("onChange", new TextChangeListener());
+	}
+	
+	public TextBandBox(String q){
+		super(q);
+		group= new Bandpopup();
+		textbox= new Textbox(q);
+		textbox.setRows(8);
+		textbox.setCols(60);
+		textbox.addEventListener("onChange", new TextChangeListener());
+		group.appendChild(textbox);
+		appendChild(group);
+		addEventListener("onChange", new TextChangeListener());
+	}
+	
+	public String getTextboxText(){
+		return textbox.getValue();
+	}
+	
+	public void setTextboxText(String q){
+		textbox.setValue(q);
+		setValue(q);
+	}
 }

@@ -36,68 +36,91 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.ui;
-/**
- * @author Danh Le Phuoc, danh.lephuoc@deri.org
- *
- */
+
+package org.deri.pipes.ui.condition;
+
 import java.util.List;
 
+import org.deri.pipes.ui.ParameterNode;
+import org.deri.pipes.ui.PipeEditor;
+import org.deri.pipes.ui.PipeNode;
+import org.deri.pipes.ui.PipePortType;
+import org.deri.pipes.ui.RegExNode;
 import org.deri.pipes.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.Port;
-import org.integratedmodelling.zk.diagram.components.PortType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-public abstract class InOutNode extends PipeNode{
-	final Logger logger = LoggerFactory.getLogger(InOutNode.class);
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2684001403256691428L;
-	protected Port input;
-	protected Port output;
-	PortType inPType;
-	PortType outPType;
-	public InOutNode(PortType inPType,PortType outPType,int x,int y,int width,int height){
-		super(x,y,width,height);
-		this.inPType=inPType;
-		this.outPType=outPType;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.Vbox;
+
+import bsh.This;
+
+import com.sun.xml.internal.ws.util.xml.XmlUtil;
+
+/**
+ * @author robful
+ *
+ */
+public class ChooseNode extends PipeNode{
+
+	Port ifPort;
+	Port thenPort;
+	Port elsePort;
+	Port output;
+	Element config;
+	
+	public ChooseNode(int x, int y){
+		super(x,y,120,80);
         setToobar();
+        Vbox vbox = new Vbox();
+        vbox.appendChild(new Label("if"));
+        vbox.appendChild(new Label("then"));
+        vbox.appendChild(new Label("else"));
+        wnd.appendChild(vbox);
+        wnd.setTitle("Choose");
+        tagName = "choose";
 	}
-	
-	public Port getInputPort(){
-		return input;
-	}
-	
-	public Port getOutputPort(){
-		return output;
-	}
-	
 	public void connectTo(Port port){
 		getWorkspace().connect(output,port,false);
 	}
 	
 	protected void initialize(){
-		input =createPort(inPType,"top");
-        output =createPort(outPType,"bottom");
+		ifPort = createPort(PipePortType.getPType(PipePortType.CONDITIONIN),20,32);
+		thenPort = createPort(PipePortType.getPType(PipePortType.ANYIN),35,49);
+		elsePort = createPort(PipePortType.getPType(PipePortType.ANYIN),34,66);		
+        output =createPort(PipePortType.getPType(PipePortType.ANYOUT),"bottom");
+        if(config != null){
+    		connectChildElement(config, "if", ifPort);
+    		connectChildElement(config, "then", thenPort);
+    		connectChildElement(config, "else", elsePort);
+        }
 	}
-	
-	public Node getSrcCode(Document doc,boolean config){
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getSrcCode(org.w3c.dom.Document, boolean)
+	 */
+	@Override
+	public Node getSrcCode(Document doc, boolean config) {
 		if(getWorkspace()!=null){
-			Element codeElm =doc.createElement(tagName);
-			if(config) setPosition(codeElm);
-			insertInSrcCode(codeElm, input, "source", config);
-			return codeElm;
+			Element elm = doc.createElement(tagName);
+			if(config){
+				setPosition(elm);
+			}
+			insertInSrcCode(elm, ifPort, "if", config);
+			insertInSrcCode(elm, thenPort, "then", config);
+			insertInSrcCode(elm, elsePort, "else", config);
+			return elm;
 		}
 		return null;
-    }
-		
-	public void connectSource(Element elm){
-		String childTagName = "source";
-		connectChildElement(elm, childTagName,getInputPort());  
+	}
+
+	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
+		ChooseNode node= new ChooseNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		node.config = elm;
+		wsp.addFigure(node);
+	
+		return node;
 	}
 
 }
