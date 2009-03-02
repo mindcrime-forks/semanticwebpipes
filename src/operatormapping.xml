@@ -38,6 +38,16 @@ class represented by that element.
   </entry>
   <entry>
     <!--  required for normal operation of pipes -->
+    <string>left</string>
+    <java-class>org.deri.pipes.condition.ConditionWrapper</java-class>
+  </entry>
+  <entry>
+    <!--  required for normal operation of pipes -->
+    <string>right</string>
+    <java-class>org.deri.pipes.condition.ConditionWrapper</java-class>
+  </entry>
+  <entry>
+    <!--  required for normal operation of pipes -->
     <string>xslsource</string>
     <java-class>org.deri.pipes.core.internals.Source</java-class>
   </entry>
@@ -159,11 +169,11 @@ class represented by that element.
     <java-class>org.deri.pipes.condition.ChooseBox</java-class>
   </entry>    
   <entry>
-    <string>either</string>
+    <string>or</string>
     <java-class>org.deri.pipes.condition.OrCondition</java-class>
   </entry>    
   <entry>
-    <string>both</string>
+    <string>and</string>
     <java-class>org.deri.pipes.condition.AndCondition</java-class>
   </entry>    
   <entry>

@@ -356,6 +356,16 @@
 					</treeitem>
 					<treeitem >
 				       <treerow>
+							<treecell label="Condition: And" id="and"  draggable="true" />
+						</treerow>
+					</treeitem>
+					<treeitem >
+				       <treerow>
+							<treecell label="Condition: Or" id="or"  draggable="true" />
+						</treerow>
+					</treeitem>
+					<treeitem >
+				       <treerow>
 							<treecell label="Condition: Not" id="not"  draggable="true" />
 						</treerow>
 					</treeitem>

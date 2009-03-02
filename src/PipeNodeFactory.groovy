@@ -14,6 +14,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 	 */
 	public Shape createShape(String tagName, int x, int y) {
 	    switch(tagName.toLowerCase()){
+				case "and":
+					return new AndConditionNode(x,y);	    
 				case "choose":
 					return new ChooseNode(x,y);	    
 				case "construct":
@@ -30,6 +32,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new  IsEmptyConditionNode(x,y);
 				case "not":
 					return new  NotConditionNode(x,y);
+				case "or":
+					return new OrConditionNode(x,y);	    
 				case "parameter":
 					return new ParameterNode(x,y);
 				case "patch-gen":
@@ -82,6 +86,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 	public PipeNode createPipeNode(Element element, PipeEditor pipeEditor) {
 			String tagName = element.getTagName();
 			switch(tagName.toLowerCase()){
+			    case "and":
+			        return AndConditionNode.loadConfig(element,pipeEditor);
 			    case "choose":
 			        return ChooseNode.loadConfig(element,pipeEditor);
 				case "code":
@@ -100,6 +106,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return IsEmptyConditionNode.loadConfig(element,pipeEditor);
 				case "not":    
 					return NotConditionNode.loadConfig(element,pipeEditor);
+				case "or":    
+					return OrConditionNode.loadConfig(element,pipeEditor);
 				case "parameter":  
 					return ParameterNode.loadConfig(element,pipeEditor);
 				case "patch-executor":    

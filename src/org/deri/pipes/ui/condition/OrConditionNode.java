@@ -39,12 +39,10 @@
 
 package org.deri.pipes.ui.condition;
 
-import org.deri.pipes.ui.InOutNode;
 import org.deri.pipes.ui.PipeEditor;
 import org.deri.pipes.ui.PipeNode;
 import org.deri.pipes.ui.PipePortType;
-import org.deri.pipes.utils.XMLUtil;
-import org.integratedmodelling.zk.diagram.components.PortType;
+import org.integratedmodelling.zk.diagram.components.Port;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,7 +51,13 @@ import org.w3c.dom.Node;
  * @author robful
  *
  */
-public class IsEmptyConditionNode extends InOutNode {
+public class OrConditionNode extends PipeNode {
+	Port leftPort;
+	Port rightPort;
+	Port output;
+
+	private Element config;
+
 
 	/**
 	 * @param inPType
@@ -63,24 +67,57 @@ public class IsEmptyConditionNode extends InOutNode {
 	 * @param width
 	 * @param height
 	 */
-	public IsEmptyConditionNode(int x, int y) {
-    	super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.CONDITIONOUT),x,y,180,25);
-    	wnd.setTitle("Result is Empty");
-    	tagName = "is-empty";
+	public OrConditionNode(int x, int y) {
+    	super(x,y,80,60);
+        setToobar();
+        wnd.setTitle("Or");
+  
+    	tagName = "or";
 	}
+	
+
+
+	@Override
+	protected void initialize() {
+		leftPort = createPort(PipePortType.getPType(PipePortType.CONDITIONIN),40,32);
+		rightPort = createPort(PipePortType.getPType(PipePortType.CONDITIONIN),40,42);
+		output = createPort(PipePortType.getPType(PipePortType.CONDITIONOUT),"bottom");
+		if(config != null){
+			connectChildElement(config, "left", leftPort);  
+			connectChildElement(config, "right", rightPort);  
+		}
+		
+	}
+
+	public Node getSrcCode(Document doc,boolean config){
+		if(getWorkspace()!=null){
+			Element codeElm =doc.createElement(tagName);
+			if(config) setPosition(codeElm);
+			insertInSrcCode(codeElm, leftPort, "left", config);
+			insertInSrcCode(codeElm, rightPort, "right", config);
+			return codeElm;
+		}
+		return null;
+    }
 
 
 	/**
-	 * Creates a new HttpGetNode and adds it into the configuration.
+	 * Creates a new AndConditionNode and adds it into the configuration.
 	 * @param elm The element defining this http-get
 	 * @param wsp The PipeEditor workspace
 	 * @return
 	 */
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		IsEmptyConditionNode node= new IsEmptyConditionNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		OrConditionNode node= new OrConditionNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		node.config = elm;
 		wsp.addFigure(node);
-		node.connectSource(elm);
 		return node;
+	}
+
+
+
+	public void connectTo(Port port){
+		getWorkspace().connect(output,port,false);
 	}
 
 }

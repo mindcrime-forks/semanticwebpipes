@@ -50,10 +50,10 @@ public class TextBandBox extends Bandbox {
 	protected class TextChangeListener implements org.zkoss.zk.ui.event.EventListener {
 		   public void onEvent(Event event) throws  org.zkoss.zk.ui.UiException {
 						 if(event.getTarget()==textbox){
-							 setValue(textbox.getValue());
+							 setValue(textbox.getRawText());
 						 }
 						 else{
-							 textbox.setValue(getValue());
+							 textbox.setText(getValue());
 						 }
 				
 		   }    
@@ -61,35 +61,29 @@ public class TextBandBox extends Bandbox {
 	Textbox textbox;
 	Bandpopup group;
 	public TextBandBox(){
-		super();
-		group= new Bandpopup();
-		textbox= new Textbox();
-		textbox.setRows(8);
-		textbox.setCols(60);
-		textbox.addEventListener("onChange", new TextChangeListener());
-		group.appendChild(textbox);
-		appendChild(group);
-		addEventListener("onChange", new TextChangeListener());
+		this("");
 	}
 	
 	public TextBandBox(String q){
 		super(q);
 		group= new Bandpopup();
-		textbox= new Textbox(q);
+		textbox = new Textbox();
+		textbox.setMultiline(true);
 		textbox.setRows(8);
 		textbox.setCols(60);
 		textbox.addEventListener("onChange", new TextChangeListener());
 		group.appendChild(textbox);
 		appendChild(group);
 		addEventListener("onChange", new TextChangeListener());
+		setTextboxText(q);
 	}
 	
 	public String getTextboxText(){
-		return textbox.getValue();
+		return textbox.getRawText();
 	}
 	
 	public void setTextboxText(String q){
-		textbox.setValue(q);
+		textbox.setText(q);
 		setValue(q);
 	}
 }

@@ -57,7 +57,7 @@ public class TextNode extends InPipeNode implements ConnectingOutputNode{
 	Listbox listbox;
 	TextBandBox content;
 	public TextNode(int x,int y){
-		super(PipePortType.getPType(PipePortType.ANYOUT),x,y,250,120);
+		super(PipePortType.getPType(PipePortType.ANYOUT),x,y,180,70);
 		wnd.setTitle("Text");
         Vbox vbox=new Vbox();
         Hbox hbox= new Hbox();
