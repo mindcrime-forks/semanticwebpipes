@@ -50,7 +50,7 @@ public class RDFFetchNode extends SelectFetchNode{
 	final Logger logger = LoggerFactory.getLogger(RDFFetchNode.class);
 	
 	public RDFFetchNode(int x,int y){
-		super(PipePortType.RDFOUT,x,y,"RDF Fetch","rdffetch");
+		super(PipePortType.RDFOUT,x,y,"RDF Fetch");
          listbox =new Listbox();
          listbox.setMold("select");
          listbox.appendItem(RDFFormat.RDFXML.getName(), RDFFormat.RDFXML.getName());
@@ -67,5 +67,13 @@ public class RDFFetchNode extends SelectFetchNode{
 		wsp.addFigure(node);
 		node._loadConfig(elm);
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "rdffetch";
 	}
 }

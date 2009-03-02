@@ -71,7 +71,7 @@ public class ChooseNode extends PipeNode{
 	Element config;
 	
 	public ChooseNode(int x, int y){
-		super(x,y,120,80);
+		super(x,y,140,80);
         setToobar();
         Vbox vbox = new Vbox();
         vbox.appendChild(new Label("if"));
@@ -79,7 +79,6 @@ public class ChooseNode extends PipeNode{
         vbox.appendChild(new Label("else"));
         wnd.appendChild(vbox);
         wnd.setTitle("Choose");
-        tagName = "choose";
 	}
 	public void connectTo(Port port){
 		getWorkspace().connect(output,port,false);
@@ -103,7 +102,7 @@ public class ChooseNode extends PipeNode{
 	@Override
 	public Node getSrcCode(Document doc, boolean config) {
 		if(getWorkspace()!=null){
-			Element elm = doc.createElement(tagName);
+			Element elm = doc.createElement(getTagName());
 			if(config){
 				setPosition(elm);
 			}
@@ -121,6 +120,13 @@ public class ChooseNode extends PipeNode{
 		wsp.addFigure(node);
 	
 		return node;
+	}
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "choose";
 	}
 
 }

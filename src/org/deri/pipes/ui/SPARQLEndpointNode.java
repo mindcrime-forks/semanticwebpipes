@@ -86,7 +86,6 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 		vbox.appendChild(hbox);
 		        
         wnd.appendChild(vbox);
-		tagName="sparqlendpoint";
 	}
 	
 	protected void initialize(){
@@ -167,7 +166,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element srcCode =doc.createElement(tagName);
+			Element srcCode =doc.createElement(getTagName());
 			if(config) setPosition((Element)srcCode);
 			
 			Element endpointElm=doc.createElement("endpoint");
@@ -201,6 +200,14 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 		((PipeEditor)getWorkspace()).reloadTextDebug(getSrcCode(false)) ;
 		((PipeEditor)getWorkspace()).reloadTabularDebug(null);
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "sparqlendpoint";
 	}
 
 }

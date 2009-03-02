@@ -111,7 +111,6 @@ PipeCallNode extends InPipeNode implements ConnectingOutputNode{
 	private PipeCallNode(int x, int y, int nParams){
 		super(PipePortType.getPType(PipePortType.ANYOUT),x,y,WIDTH,BASE_HEIGHT+(nParams*PARAM_HEIGHT));
     	wnd.setTitle("Pipe Call");
-    	tagName = "pipe-call";
     	pipelist = new Listbox();
     	pipelist.setWidth("200px");
     	pipelist.setMold("select");
@@ -242,7 +241,7 @@ PipeCallNode extends InPipeNode implements ConnectingOutputNode{
 	 */
 	@Override
 	public Node getSrcCode(Document doc, boolean config) {
-		Element el = doc.createElement(tagName);
+		Element el = doc.createElement(getTagName());
 		if(config){
 			setPosition(el);
 		}
@@ -270,6 +269,14 @@ PipeCallNode extends InPipeNode implements ConnectingOutputNode{
 		PipeCallNode node= new PipeCallNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")),elm);
 		wsp.addFigure(node);
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "pipe-call";
 	}
 
 

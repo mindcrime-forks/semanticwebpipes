@@ -53,7 +53,6 @@ public class ConstructNode extends QueryNode {
 	public ConstructNode(int x, int y) {
 		super(PipePortType.getPType(PipePortType.RDFOUT),x, y,"Construct");
 		setTitle("Construct");
-		tagName="construct";
 	}
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
@@ -62,6 +61,14 @@ public class ConstructNode extends QueryNode {
 		node.setQuery(XMLUtil.getTextFromFirstSubEleByName(elm, "query"));
 		node.connectSource(elm);
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "construct";
 	}
 
 }

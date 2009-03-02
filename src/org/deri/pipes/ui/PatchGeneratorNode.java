@@ -47,7 +47,6 @@ public class PatchGeneratorNode extends InOutNode {
 		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x, y, 180,25);
 		// TODO Auto-generated constructor stub
 		wnd.setTitle("Patch generator");
-		tagName="patch-generator";
 	}
     
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
@@ -55,5 +54,13 @@ public class PatchGeneratorNode extends InOutNode {
 		wsp.addFigure(node);
 		node.connectSource(elm);  
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "patch-gen";
 	}
 }

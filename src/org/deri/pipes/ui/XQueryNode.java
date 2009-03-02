@@ -55,7 +55,6 @@ public class XQueryNode extends InOutNode{
 	Textbox contentTypeBox = null;
 	public XQueryNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.ANYOUT),x,y,250,120);
-		this.tagName = "xquery";
 		wnd.setTitle("XQuery");
 		Vbox vbox = new Vbox();
 		Hbox hbox1 = new Hbox();
@@ -125,6 +124,13 @@ public class XQueryNode extends InOutNode{
 		}
 		node.connectSource(elm);
 		return node;
+	}
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "xquery";
 	}
 
 }

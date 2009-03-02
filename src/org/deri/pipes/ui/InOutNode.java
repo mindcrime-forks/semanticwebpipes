@@ -87,7 +87,7 @@ public abstract class InOutNode extends PipeNode{
 	
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element codeElm =doc.createElement(tagName);
+			Element codeElm =doc.createElement(getTagName());
 			if(config) setPosition(codeElm);
 			insertInSrcCode(codeElm, input, "source", config);
 			return codeElm;

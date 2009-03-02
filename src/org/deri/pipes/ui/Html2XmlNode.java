@@ -60,9 +60,8 @@ public class Html2XmlNode extends InOutNode {
 	 * @param height
 	 */
 	public Html2XmlNode(int x, int y) {
-    	super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.XMLOUT),x,y,150,25);
+    	super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.XMLOUT),x,y,165,25);
     	wnd.setTitle("HTML --> XML");
-    	tagName = "html2xml";
 	}
 
 
@@ -77,6 +76,15 @@ public class Html2XmlNode extends InOutNode {
 		wsp.addFigure(node);
 		node.connectSource(elm);
 		return node;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return  "html2xml";
 	}
 
 }

@@ -49,7 +49,6 @@ public class SelectNode extends QueryNode {
 		super(PipePortType.getPType(PipePortType.SPARQLRESULTOUT),x, y,"Select");
 		// TODO Auto-generated constructor stub
 		setTitle("Select");
-		tagName="select";
 	}
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
@@ -58,5 +57,13 @@ public class SelectNode extends QueryNode {
 		node.setQuery(XMLUtil.getTextFromFirstSubEleByName(elm, "query"));
 		node.connectSource(elm);		
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "select";
 	}
 }

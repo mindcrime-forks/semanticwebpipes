@@ -69,7 +69,6 @@ public class NotConditionNode extends InOutNode {
 	public NotConditionNode(int x, int y) {
     	super(PipePortType.getPType(PipePortType.CONDITIONIN),PipePortType.getPType(PipePortType.CONDITIONOUT),x,y,180,25);
     	wnd.setTitle("Not");
-    	tagName = "not";
 	}
 	
 
@@ -86,7 +85,7 @@ public class NotConditionNode extends InOutNode {
 
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element codeElm =doc.createElement(tagName);
+			Element codeElm =doc.createElement(getTagName());
 			if(config) setPosition(codeElm);
 			insertInSrcCode(codeElm, input, "condition", config);
 			return codeElm;
@@ -106,6 +105,16 @@ public class NotConditionNode extends InOutNode {
 		node.config = elm;
 		wsp.addFigure(node);
 		return node;
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "not";
 	}
 
 }

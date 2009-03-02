@@ -52,7 +52,7 @@ public class HTMLFetchNode extends FetchNode{
 	final Logger logger = LoggerFactory.getLogger(HTMLFetchNode.class);
 	Hashtable<String,Checkbox> checkboxes=new Hashtable<String,Checkbox>();
 	public HTMLFetchNode(int x,int y){
-		super(PipePortType.RDFOUT,x,y,200,110,"HTML Fetch","htmlfetch");
+		super(PipePortType.RDFOUT,x,y,200,110,"HTML Fetch");
 		Vbox vbox=new Vbox();
 		Hbox hbox=new Hbox();
 		int count=0;
@@ -91,5 +91,13 @@ public class HTMLFetchNode extends FetchNode{
 		wsp.addFigure(node);
 		node._loadConfig(elm);
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "htmlfetch";
 	}
 }

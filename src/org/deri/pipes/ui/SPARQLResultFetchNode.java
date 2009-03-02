@@ -50,7 +50,7 @@ public class SPARQLResultFetchNode extends SelectFetchNode{
 	final Logger logger = LoggerFactory.getLogger(SPARQLResultFetchNode.class);
 	
 	public SPARQLResultFetchNode(int x,int y){
-		super(PipePortType.SPARQLRESULTOUT,x,y,"Sparql Result Fetch","sparqlresultfetch");
+		super(PipePortType.SPARQLRESULTOUT,x,y,"Sparql Result Fetch");
          listbox =new Listbox();
          listbox.setMold("select");
          listbox.appendItem(TupleQueryResultFormat.SPARQL.getName(), TupleQueryResultFormat.SPARQL.getName());
@@ -64,5 +64,13 @@ public class SPARQLResultFetchNode extends SelectFetchNode{
 		wsp.addFigure(node);
 		node._loadConfig(elm);
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "sparqlresultfetch";
 	}
 }

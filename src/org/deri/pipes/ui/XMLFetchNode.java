@@ -49,7 +49,7 @@ public class XMLFetchNode extends SimpleFetchNode{
 	final Logger logger = LoggerFactory.getLogger(XMLFetchNode.class);
 
 	public XMLFetchNode(int x,int y){
-		super(PipePortType.XMLOUT,x,y,"XML Fetch","xmlfetch");
+		super(PipePortType.XMLOUT,x,y,"XML Fetch");
 	}
 		
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
@@ -57,5 +57,13 @@ public class XMLFetchNode extends SimpleFetchNode{
 		wsp.addFigure(node);
 		node._loadConfig(elm);
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "xmlfetch";
 	}
 }

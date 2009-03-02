@@ -62,7 +62,6 @@ public class RDFExtractNode extends InOutNode {
 	public RDFExtractNode(int x, int y) {
     	super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,150,25);
     	wnd.setTitle("RDF Extract");
-    	tagName = "rdf-extract";
 	}
 
 
@@ -77,6 +76,15 @@ public class RDFExtractNode extends InOutNode {
 		wsp.addFigure(node);
 		node.connectSource(elm);
 		return node;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "rdf-extract";
 	}
 
 }

@@ -45,9 +45,8 @@ import org.w3c.dom.Element;
 public class RDFSMixNode extends InOutNode {
 	final Logger logger = LoggerFactory.getLogger(RDFSMixNode.class);
 	public RDFSMixNode(int x,int y){
-		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,130,25);
+		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,150,25);
 		wnd.setTitle("RDFS Mix");
-		tagName="rdfs";
 	}
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
@@ -55,5 +54,13 @@ public class RDFSMixNode extends InOutNode {
 		wsp.addFigure(node);
 		node.connectSource(elm);
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "rdfs";
 	}
 }

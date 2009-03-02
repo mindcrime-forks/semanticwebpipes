@@ -50,14 +50,13 @@ import org.zkoss.zul.Textbox;
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
  */
-public class SimpleFetchNode extends InPipeNode implements ConnectingInputNode{
+public abstract class SimpleFetchNode extends InPipeNode implements ConnectingInputNode{
 	final Logger logger = LoggerFactory.getLogger(SimpleFetchNode.class);
 	protected Textbox urlTextbox=null;
 	protected Port urlPort=null;
 
-	public SimpleFetchNode(byte portType,int x,int y,String title,String tagName){
+	public SimpleFetchNode(byte portType,int x,int y,String title){
 		super(PipePortType.getPType(portType),x,y,200,50);
-		this.tagName=tagName;
 		wnd.setTitle(title);
 		org.zkoss.zul.Label label=new org.zkoss.zul.Label(" URL: ");
         wnd.appendChild(label);
@@ -92,7 +91,7 @@ public class SimpleFetchNode extends InPipeNode implements ConnectingInputNode{
 		if(getWorkspace()!=null){
 			//return if srcCode was created
 			
-			Element srcCode = doc.createElement(tagName);
+			Element srcCode = doc.createElement(getTagName());
 			if (config) setPosition((Element)srcCode);
 			
 			Element locElm=doc.createElement("location");

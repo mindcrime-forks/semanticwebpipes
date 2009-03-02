@@ -73,7 +73,6 @@ public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
 
 	public HttpGetNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.ANYOUT),x,y,300,100);
-		this.tagName="http-get";
 		wnd.setTitle("HTTP Get");
 		Vbox vbox = new Vbox();
 		wnd.appendChild(vbox);
@@ -126,7 +125,7 @@ public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element srcCode = doc.createElement(tagName);
+			Element srcCode = doc.createElement(getTagName());
 			if(config){
 				super.setPosition(srcCode);
 			}
@@ -161,6 +160,15 @@ public class HttpGetNode extends InPipeNode implements ConnectingInputNode{
 		Element locElm=XMLUtil.getFirstSubElementByName(elm, "location");
 		node.loadConnectedConfig(locElm, node.urlPort, node.urlTextbox);
 		return node;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "http-get";
 	}
 
 }

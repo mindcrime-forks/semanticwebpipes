@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-public class QueryNode extends InOutNode{
+public abstract class QueryNode extends InOutNode{
 	final Logger logger = LoggerFactory.getLogger(QueryNode.class);
 	org.zkoss.zul.Label label;
 	TextBandBox textBandBox=null;	

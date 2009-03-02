@@ -68,11 +68,9 @@ public class AndConditionNode extends PipeNode {
 	 * @param height
 	 */
 	public AndConditionNode(int x, int y) {
-    	super(x,y,80,60);
+    	super(x,y,100,60);
         setToobar();
         wnd.setTitle("And");
-  
-    	tagName = "and";
 	}
 	
 
@@ -91,7 +89,7 @@ public class AndConditionNode extends PipeNode {
 
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element codeElm =doc.createElement(tagName);
+			Element codeElm =doc.createElement(getTagName());
 			if(config) setPosition(codeElm);
 			insertInSrcCode(codeElm, leftPort, "left", config);
 			insertInSrcCode(codeElm, rightPort, "right", config);
@@ -118,6 +116,16 @@ public class AndConditionNode extends PipeNode {
 
 	public void connectTo(Port port){
 		getWorkspace().connect(output,port,false);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "and";
 	}
 
 }

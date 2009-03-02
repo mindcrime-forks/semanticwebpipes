@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>DERI Pipes Operators Documentation</title>
+<link rel=StyleSheet href="style.css" type="text/css"/>
+
+</head>
+<body>
+<div class="toc"><a name="top"></a>
+	<div class='menugroup'><a href='#fetch_operators'>Fetch Operators</a>
+		<div class='menuitem'><a href='#rdffetch'>RDF Fetch</a></div>
+		<div class='menuitem'><a href='#htmlfetch'>HTML Fetch</a></div>
+		<div class='menuitem'><a href='#http-get'>HTTP GET</a></div>
+		<div class='menuitem'><a href='#sparqlresultfetch'>Sparql
+		Result Fetch</a></div>
+		<div class='menuitem'><a href='#xmlfetch'>XML Fetch</a></div>
+		<div class='menuitem'><a href='#xslfetch'>XSL Fetch</a></div>
+	</div>
+	<div class='menugroup'><a href='#general_operators'>General Operators</a>
+		<div class='menuitem'><a href='#simplemix'>Simple Mix</a></div>
+		<div class='menuitem'><a href='#rdfsmix'>RDFS Mix</a></div>
+		<div class='menuitem'><a href='#construct'>Construct</a></div>
+		<div class='menuitem'><a href='#select'>Select</a></div>
+		<div class='menuitem'><a href='#patch-gen'>Patch Generator</a></div>
+		<div class='menuitem'><a href='#patch-exec'>Patch Executor</a></div>
+		<div class='menuitem'><a href='#pipe-call'>Pipe Call</a></div>
+		<div class='menuitem'><a href='#rdf-extract'>RDF Extract</a></div>
+		<div class='menuitem'><a href='#smoosher'>Smoosher</a></div>
+		<div class='menuitem'><a href='#text'>Text</a></div>
+		<div class='menuitem'><a href='#for'>FOR loop</a></div>
+		<div class='menuitem'><a href='#xslt'>XSLT</a></div>
+		<div class='menuitem'><a href='#xquery'>XQuery</a></div>
+		<div class='menuitem'><a href='#html2xml'>HTML-&gt;XML</a></div>
+		<div class='menuitem'><a href='#stringify'>Stringify</a></div>
+	</div>
+	<div class='menugroup'><a href='#url_operators" label='>Url
+	Operators</a>
+		<div class='menuitem'><a href='#urlbuilder'>URL builder</a></div>
+		<div class='menuitem'><a href='#sparqlendpoint'>SPARQL
+		Endpoint</a></div>
+	</div>
+	<div class='menugroup'><a href='#input_operators'>Inputs</a>
+		<div class='menuitem'><a href='#parameter'>Parameter</a></div>
+		<div class='menuitem'><a href='#variable'>For-Variable</a></div>
+	</div>
+	<div class='menugroup'><a href='#choose_operators'>Choose Operators</a>
+		<div class='menuitem'><a href='#choose'>Choose (if/then/else)</a></div>
+		<div class='menuitem'><a href='#is-empty'>Condition: Input Is Empty</a></div>
+		<div class='menuitem'><a href='#and'>Condition: And</a></div>
+		<div class='menuitem'><a href='#or'>Condition: Or</a></div>
+		<div class='menuitem'><a href='#not'>Condition: Not</a></div>
+	</div>
+	<div class="operatorGroup"><a name="fetch_operators"></a>
+		<div class='title'>Fetch</div>
+			<div class='operator'>
+			<a name='rdffetch'></a>
+			<div class='title'>RDF Fetch</div>
+			<div class="synopsis">Retrieve a HTTP URL and extract the RDF content.</div>
+			
+			<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='htmlfetch' />
+		<div class='title'>HTML Fetch</div>
+			<div class="synopsis">Retrieve a HTML page using HTTP GET</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='http-get' />
+		<div class='title'>HTTP GET</div>
+			<div class="synopsis">Retrieve some content using HTTP GET</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>		
+		<div class='operator'><a name='sparqlresultfetch' />
+		<div class='title'>Sparql Result Fetch</div>
+			<div class="synopsis">Retrieve the result of a sparql query using HTTP</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='xmlfetch' />
+		<div class='title'>XML Fetch</div>
+			<div class="synopsis">Retrieve XML content using HTTP</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='xslfetch' />
+		<div class='title'>XSL Fetch</div>
+			<div class="synopsis">Retrieve XSL content using HTTP</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+	</div>
+	<div class="operatorGroup"><a name='general_operators'>
+				<div class='title'>General Operators</div>
+		<div class='operator'><a name='simplemix' />
+		<div class='title'>Simple Mix</div>
+			<div class="synopsis">Combine two or more RDF results</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='rdfsmix' />
+		<div class='title'>RDFS Mix</div>
+			<div class="synopsis">Combine two or more RDF results</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='construct' />
+			<div class="synopsis">Create triples by using SPARQL-CONSTRUCT query on specified RDF sources</div>
+		<div class='title'>Construct</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='select' />
+		<div class='title'>Select</div>
+		    <div class="synopsis">Execute a SELECT query and output SPARQL-Result XML</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='patch-generator' />
+		<div class='title'>Patch Generator</div>
+		    <div class="synopsis">Negate some RDF in order to subtract statements from another graph</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='patch-exec' />
+		<div class='title'>Patch Executor</div>
+		    <div class="synopsis">Combine one or more RDF results with a negated graph produced by a Patch Generator</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='pipe-call' />
+		<div class='title'>Pipe Call</div>
+		    <div class="synopsis">Execute another pipe and use the result it produces</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='rdf-extract' />
+		<div class='title'>RDF Extract</div>
+		    <div class="synopsis">Extract RDF from the incoming pipe</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='smoosher' />
+		<div class='title'>Smoosher</div>
+		    <div class="synopsis">Normalise triples by resolving owl:sameAs predicates</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='text' />
+		<div class='title'>Text</div>
+		    <div class="synopsis">Predefined text or rdf</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='for' />
+		<div class='title'>FOR loop</div>
+		    <div class="synopsis">Iterate over the results of a query, performing some operation on each</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='xslt' />
+		<div class='title'>XSLT</div>
+		    <div class="synopsis">Perform an xslt transformation of the input</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='xquery' />
+		<div class='title'>XQuery</div>
+		    <div class="synopsis">Perform an XQuery transformation of the input</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='html2xml' />
+		<div class='title'>HTML-&gt;XML</div>
+		    <div class="synopsis">Convert HTML to well formed XML</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='stringify' />
+		<div class='title'>Stringify</div>
+		    <div class="synopsis">Generate a string representation of the input</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+</div>
+	<div class="operatorGroup"><a name="url_operators"></a>
+		<div class='title'>Url Operators</div>
+			<div class='operator'>
+				<a name='urlbuilder' />
+				<div class='title'>URL builder</div>
+				    <div class="synopsis">Build a URL containing parameters or other inputs</div>		  
+				<div class=toplink><a href=#top>back to top</a></div>
+			</div>
+			<div class='operator'><a name='sparqlendpoint' />
+			<div class='title'>SPARQL Endpoint</div>
+				    <div class="synopsis">Create a URL containing a SPARQL query to be run against a SPARQL endpoint.</div>		  
+			<div class=toplink><a href=#top>back to top</a></div></div>
+	 </div>
+	<div class="operatorGroup">
+		<a name="input_operators"></a>
+		<div class='title'>Inputs</div>
+		<div class='operator'><a name='parameter' />
+		<div class='title'>Parameter</div>
+		   <div class="synopsis">Accept user input</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>		
+		<div class='operator'><a name='variable' /> <div class='title'>For-Variable</div>
+			<div class="synopsis">Name a field from a query result to be used within a loop</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+	</div>
+	<div class="operatorGroup"><a name="choose_operators"></a>
+	<div class='title'>Choose Operators</div>
+		<div class='operator'><a name='choose' />
+		<div class='title'>Choose (if/then/else)</div>
+			<div class="synopsis">Choose one of two inputs based on whether a condition is true</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='is-empty' />
+		<div class='title'>Condition: Input Is Empty</div>
+			<div class="synopsis">Return a positive result if the input is empty</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='and' />
+		<div class='title'>Condition: And</div>
+			<div class="synopsis">Return a positive result if both of two underlying conditions are true</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='or' />
+		<div class='title'>Condition: Or</div>
+			<div class="synopsis">Return a positive result if either of two conditions is true</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+		<div class='operator'><a name='not' />
+		<div class='title'>Condition: Not</div>
+			<div class="synopsis">Negate the underlying condition</div>
+		<div class=toplink><a href=#top>back to top</a></div></div>
+</div>
+</div>
+
+</body>
+</html>

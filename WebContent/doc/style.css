@@ -1,0 +1,11 @@
+@CHARSET "ISO-8859-1";
+a {text-decoration: none}
+a:link {color:#00f;background:none}
+a:visited {color:#800080;background:none}
+a:active {color:green;background:#FFD700}
+.menugroup {float: left; width: 200px; margin-left: 20px; margin-top: 20px;}
+.menuitem {margin-left: 20px; }
+.operatorGroup { clear: left; margin-left: 20px; margin-top: 20px; }
+.operator {margin-left: 20px; margin-top: 20px;}
+.title { font-size: larger; }
+.toplink a:visited {color:#00f}

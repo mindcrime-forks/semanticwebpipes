@@ -92,7 +92,6 @@ public class RegExNode extends InOutNode implements ConnectingInputNode{
 	public RegExNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,220,138);
 		wnd.setTitle("RDF Regex");
-		tagName="regex";
 		vbox=new Vbox();
 		wnd.appendChild(vbox);
 		addRule();
@@ -290,5 +289,13 @@ public class RegExNode extends InOutNode implements ConnectingInputNode{
 	public void debug(){
 		((PipeEditor)getWorkspace()).reloadTextDebug(getSrcCode(false)) ;
 		((PipeEditor)getWorkspace()).reloadTabularDebug(null);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "regex";
 	}
 }

@@ -49,7 +49,7 @@ import org.zkoss.zul.Listbox;
 public class TupleQueryResultFetchNode extends SelectFetchNode{
 	final Logger logger = LoggerFactory.getLogger(TupleQueryResultFetchNode.class);
 	public TupleQueryResultFetchNode (int x,int y){
-		super(PipePortType.SPARQLRESULTOUT,x,y,"Tuple Result Fetch","tuplefetch");
+		super(PipePortType.SPARQLRESULTOUT,x,y,"Tuple Result Fetch");
 		
          listbox =new Listbox();
          listbox.setMold("select");
@@ -65,5 +65,13 @@ public class TupleQueryResultFetchNode extends SelectFetchNode{
 		wsp.addFigure(node);
 		node._loadConfig(elm);
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "tuplefetch";
 	}
 }

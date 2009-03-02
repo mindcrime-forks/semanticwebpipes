@@ -52,9 +52,8 @@ public class XSLTNode extends InOutNode{
 	final Logger logger = LoggerFactory.getLogger(XSLTNode.class);
 	Port xslPort= null;
 	public XSLTNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.XMLIN),PipePortType.getPType(PipePortType.XMLOUT),x,y,200,25);
+		super(PipePortType.getPType(PipePortType.XMLIN),PipePortType.getPType(PipePortType.XMLOUT),x,y,220,25);
 		wnd.setTitle("XSLT Transformation");
-        tagName="xslt";
 	}
 	
 	protected void initialize(){
@@ -69,7 +68,7 @@ public class XSLTNode extends InOutNode{
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element srcCode = doc.createElement(tagName);
+			Element srcCode = doc.createElement(getTagName());
 			if(config) setPosition((Element)srcCode);
 	    	srcCode.appendChild(getConnectedCode(doc,"xmlsource",input,config));
 	    	srcCode.appendChild(getConnectedCode(doc,"xslsource",xslPort,config));
@@ -91,4 +90,12 @@ public class XSLTNode extends InOutNode{
 		xslNode.connectTo(node.getXSLPort());
 		return node;
     }
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "xslt";
+	}
 }

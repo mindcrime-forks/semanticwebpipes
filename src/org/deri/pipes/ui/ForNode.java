@@ -53,9 +53,8 @@ public class ForNode extends InOutNode{
 	final Logger logger = LoggerFactory.getLogger(ForNode.class);
 	Port loopPort= null;
 	public ForNode(int x,int y){		
-		super(PipePortType.getPType(PipePortType.SPARQLRESULTIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,130,25);
+		super(PipePortType.getPType(PipePortType.SPARQLRESULTIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,150,25);
 		wnd.setTitle("FOR loop");
-        tagName="for";
 	}
 	
 	protected void initialize(){
@@ -96,4 +95,12 @@ public class ForNode extends InOutNode{
 		loopNode.connectTo(node.getLoopPort());
 		return node;
     }
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "for";
+	}
 }

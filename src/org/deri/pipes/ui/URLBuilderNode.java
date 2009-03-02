@@ -117,9 +117,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	
 	public URLBuilderNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,220,BASE_HEIGHT);
-		wnd.setTitle("URL builder");
-		tagName="urlbuilder";
-		
+		wnd.setTitle("URL builder");		
 		vbox=new Vbox();
 		wnd.appendChild(vbox);
 		paraVbox =new Vbox();
@@ -153,7 +151,6 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 	public URLBuilderNode(int x,int y,Element elm){
 		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,220,getHeight(elm));
 		wnd.setTitle("URL builder");
-		tagName="urlbuilder";
 		
 		vbox=new Vbox();
 		wnd.appendChild(vbox);
@@ -320,7 +317,7 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 		if(getWorkspace()==null){
 			return null;
 		}
-		Element srcCode =doc.createElement(tagName);
+		Element srcCode =doc.createElement(getTagName());
 		if(config) setPosition((Element)srcCode);
 
 		Element baseElm = doc.createElement("base");
@@ -375,6 +372,14 @@ public class URLBuilderNode extends InPipeNode implements ConnectingInputNode,Co
 			((PipeEditor)getWorkspace()).reloadTextDebug(srcCode) ;
 			((PipeEditor)getWorkspace()).reloadTabularDebug(null);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "urlbuilder";
 	}
 
 

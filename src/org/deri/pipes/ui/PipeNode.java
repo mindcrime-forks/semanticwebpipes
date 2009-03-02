@@ -75,7 +75,6 @@ public abstract class PipeNode extends ZKNode{
 	final Logger logger = LoggerFactory.getLogger(PipeNode.class);
 
 	private static final long serialVersionUID = -1520720934219234911L;
-	protected String tagName=null;	
 	protected Window wnd=null;
 
 	public PipeNode(int x,int y,int width,int height){
@@ -258,10 +257,29 @@ public abstract class PipeNode extends ZKNode{
 		debugButton.setClass("drag");
 		debugButton.addEventListener("onClick", new DebugListener(this));
 		wnd.appendChild(caption);
+		Toolbarbutton infoButton = new Toolbarbutton("","img/info-16x16.png");
+		infoButton.setClass("drag");
+		infoButton.setHref(this.getDocumentationLink());
+		infoButton.setTarget("_blank");
+		infoButton.setTooltip("Click icon to show documentation in a new tab");
+		caption.appendChild(infoButton);
 		caption.appendChild(debugButton);
 		caption.appendChild(delButton);
 	}
 
+
+	/**
+	 * @return
+	 */
+	public String getDocumentationLink() {
+		return "doc/operators.html#"+getTagName();
+	}
+	
+	/*
+	 * Get the tag name for this node.
+	 */
+	public abstract String getTagName();
+	
 
 	public String getSrcCode(boolean config){
 		DocumentImpl doc =new DocumentImpl();

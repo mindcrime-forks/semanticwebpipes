@@ -110,4 +110,12 @@ public class OutPipeNode extends PipeNode{
 		public void connectTo(Port port) {
 			logger.warn("The output pipe node should not be invoked to connect()");
 		}
+
+		/* (non-Javadoc)
+		 * @see org.deri.pipes.ui.PipeNode#getTagName()
+		 */
+		@Override
+		public String getTagName() {
+			return "output";
+		}
 	}

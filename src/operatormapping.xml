@@ -65,7 +65,7 @@ class represented by that element.
     <java-class>org.deri.pipes.rdf.ForLoopBox</java-class>
   </entry>
   <entry>
-    <string>patch-generator</string>
+    <string>patch-gen</string>
     <java-class>org.deri.pipes.rdf.PatchGeneratorBox</java-class>
   </entry>
   <entry>
@@ -81,7 +81,7 @@ class represented by that element.
     <java-class>org.deri.pipes.rdf.RDFFetchBox</java-class>
   </entry>
   <entry>
-    <string>patch-executor</string>
+    <string>patch-exec</string>
     <java-class>org.deri.pipes.rdf.PatchExecutorBox</java-class>
   </entry>
   <entry>

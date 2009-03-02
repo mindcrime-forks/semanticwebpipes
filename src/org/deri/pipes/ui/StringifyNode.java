@@ -62,7 +62,6 @@ public class StringifyNode extends InOutNode implements ConnectingOutputNode {
 	public StringifyNode(int x, int y) {
     	super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.SOURCEORSTRINGOUT),x,y,150,25);
     	wnd.setTitle("Stringify");
-    	tagName = "stringify";
 	}
 	
 
@@ -86,6 +85,16 @@ public class StringifyNode extends InOutNode implements ConnectingOutputNode {
 		wsp.addFigure(node);
 		node.connectSource(elm);
 		return node;
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "stringify";
 	}
 
 }

@@ -62,7 +62,6 @@ public class VariableNode extends InPipeNode implements ConnectingOutputNode{
 		hbox.appendChild(nameBox=createBox(120,16));
 		vbox.appendChild(hbox);
 		wnd.appendChild(vbox);
-		tagName="variable";
 	}
 	
 	public void setName(String name){
@@ -75,9 +74,9 @@ public class VariableNode extends InPipeNode implements ConnectingOutputNode{
 	
 	public String getConfig(){
 		if(getWorkspace()!=null){
-			String code="<"+tagName+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
+			String code="<"+getTagName()+" x=\""+getX()+"\" y=\""+getY()+"\">\n";
 			code+=nameBox.getValue();			
-			code+="</"+tagName+">\n";
+			code+="</"+getTagName()+">\n";
 			return code;
 		}
 		return null;
@@ -100,6 +99,14 @@ public class VariableNode extends InPipeNode implements ConnectingOutputNode{
 	public Node getSrcCode(Document doc, boolean config) {
 		// TODO Auto-generated method stub
 		return doc.createTextNode(getCode());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "variable";
 	}
 
 

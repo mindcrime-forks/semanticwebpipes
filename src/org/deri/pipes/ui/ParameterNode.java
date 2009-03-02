@@ -56,7 +56,7 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	Textbox defaultBox;
 	public ParameterNode(int x,int y){
 		super(PipePortType.getPType(PipePortType.TEXTOUT),x,y,200,100);
-		wnd.setTitle("Text input");
+		wnd.setTitle("Parameter");
         Vbox vbox=new Vbox();
         Hbox hbox= new Hbox();
 		hbox.appendChild(new Label("Label:"));
@@ -73,7 +73,6 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 		hbox.appendChild(defaultBox=createBox(120,16));
 		vbox.appendChild(hbox);
 		wnd.appendChild(vbox);
-		tagName="parameter";
 	}
 	
 	public void setName(String name){
@@ -102,7 +101,7 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element srcCode =doc.createElement(tagName);
+			Element srcCode =doc.createElement(getTagName());
 			if(config) setPosition((Element)srcCode);
 			srcCode.appendChild(XMLUtil.createElmWithText(doc, "id", nameBox.getValue()));
 			srcCode.appendChild(XMLUtil.createElmWithText(doc, "label", labelBox.getValue()));
@@ -133,6 +132,14 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 		node.setDefaultValue(XMLUtil.getTextFromFirstSubEleByName(elm, "default"));
 		wsp.addParameter(node);
 		return node;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "parameter";
 	}
 
 }

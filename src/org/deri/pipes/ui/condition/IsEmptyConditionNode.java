@@ -66,7 +66,6 @@ public class IsEmptyConditionNode extends InOutNode {
 	public IsEmptyConditionNode(int x, int y) {
     	super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.CONDITIONOUT),x,y,180,25);
     	wnd.setTitle("Result is Empty");
-    	tagName = "is-empty";
 	}
 
 
@@ -81,6 +80,15 @@ public class IsEmptyConditionNode extends InOutNode {
 		wsp.addFigure(node);
 		node.connectSource(elm);
 		return node;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "is-empty";
 	}
 
 }

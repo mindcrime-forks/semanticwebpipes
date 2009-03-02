@@ -73,7 +73,6 @@ public class TextNode extends InPipeNode implements ConnectingOutputNode{
 		content = new TextBandBox();
 		vbox.appendChild(content);
 		wnd.appendChild(vbox);
-		tagName="text";
 	}
 	public String getFormat(){
 		if(listbox.getSelectedItem()!=null)
@@ -91,7 +90,7 @@ public class TextNode extends InPipeNode implements ConnectingOutputNode{
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element srcCode = doc.createElement(tagName);
+			Element srcCode = doc.createElement(getTagName());
 			if(config){
 				setPosition(srcCode);
 			}
@@ -114,6 +113,13 @@ public class TextNode extends InPipeNode implements ConnectingOutputNode{
 			node.content.setTextboxText(content);
 		}
 		return node;
+	}
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "text";
 	}
 
 

@@ -57,7 +57,6 @@ public class OWLNode extends InOutNode{
 	public OWLNode(int x,int y){		
 		super(PipePortType.getPType(PipePortType.RDFIN),PipePortType.getPType(PipePortType.RDFOUT),x,y,200,25);
 		wnd.setTitle("OWL Reasoner");
-        tagName="OWL";
 	}
 	
 	protected void initialize(){
@@ -96,4 +95,12 @@ public class OWLNode extends InOutNode{
 		
 		return node;
     }
+
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.ui.PipeNode#getTagName()
+	 */
+	@Override
+	public String getTagName() {
+		return "OWL";
+	}
 }
