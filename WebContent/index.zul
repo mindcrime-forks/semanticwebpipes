@@ -461,6 +461,7 @@
 	     alert("Your pipe was successfully saved");
 	     passwordchecking.visible=false;
 	     confirmation.visible=false;
+	     password.value="";
 	    }
 	    }
 	    rowRenderer.refreshPipeLists();

@@ -395,6 +395,8 @@ public class PipeEditor extends Workspace {
 		pipeid.setValue("Copy of "+config.getId());
 		bdid.setValue(pipeid.getValue());
 		pipename.setValue(config.getName().length()>0?"(Copy of) "+config.getName():"");
+		password.setText("");
+
 	}
 
 	public void newPipe(){
@@ -402,6 +404,7 @@ public class PipeEditor extends Workspace {
 		pipeid.setValue("");
 		bdid.setValue("");
 		pipename.setValue("");
+		password.setText("");
 	}
 
 	public void edit(String pid){
@@ -413,6 +416,7 @@ public class PipeEditor extends Workspace {
 		pipeid.setValue(pipeConfig.getId());
 		bdid.setValue(pipeConfig.getId());
 		pipename.setValue(pipeConfig.getName());
+		password.setText("");
 	}
 
 	/**
