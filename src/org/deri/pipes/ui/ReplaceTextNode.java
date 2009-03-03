@@ -38,9 +38,7 @@
  */
 package org.deri.pipes.ui;
 
-import org.deri.pipes.text.TextBox;
 import org.deri.pipes.utils.XMLUtil;
-import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -48,69 +46,51 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Label;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
 
-public class TextNode extends InPipeNode implements ConnectingOutputNode{
-	final Logger logger = LoggerFactory.getLogger(TextNode.class);
-	Listbox listbox;
-	TextBandBox content;
-	public TextNode(int x,int y){
-		super(PipePortType.getPType(PipePortType.ANYOUT),x,y,180,70);
-		wnd.setTitle("Text");
+public class ReplaceTextNode extends InOutNode{
+	TextBandBox pattern;
+	TextBandBox replacement;
+	public ReplaceTextNode(int x,int y){
+		super(PipePortType.getPType(PipePortType.ANYIN),PipePortType.getPType(PipePortType.TEXTOUT),x,y,250,70);
+		wnd.setTitle("Replace Text");
         Vbox vbox=new Vbox();
         Hbox hbox= new Hbox();
         hbox= new Hbox();
-		hbox.appendChild(new Label("Format:"));
-        listbox =new Listbox();
-        listbox.setMold("select");
-        listbox.appendItem(TextBox.RDFXML_FORMAT,TextBox.RDFXML_FORMAT);
-        listbox.appendItem(TextBox.SPARQL_FORMAT,TextBox.SPARQL_FORMAT);
-        listbox.appendItem(TextBox.TEXTPLAIN_FORMAT,TextBox.TEXTPLAIN_FORMAT);
-        hbox.appendChild(listbox);
+		hbox.appendChild(new Label("Pattern:"));
+		pattern = new TextBandBox();
+        hbox.appendChild(pattern);
 		vbox.appendChild(hbox);
-		content = new TextBandBox();
-		vbox.appendChild(content);
+		hbox = new Hbox();
+		hbox.appendChild(new Label("Replacement:"));
+		replacement = new TextBandBox();
+		hbox.appendChild(replacement);
+		vbox.appendChild(hbox);
 		wnd.appendChild(vbox);
 	}
-	public String getFormat(){
-		if(listbox.getSelectedItem()!=null)
-			return listbox.getSelectedItem().getValue().toString();
-		return listbox.getItemAtIndex(0).getValue().toString();
-	}
-	
-	public void setFormat(String format){
-		for(int i=0;i<listbox.getItemCount();i++)
-		 if(listbox.getItemAtIndex(i).getValue().toString().equalsIgnoreCase(format))
-				 listbox.setSelectedIndex(i);
-	}
-	
 	
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
-		if(getWorkspace()!=null){
-			Element srcCode = doc.createElement(getTagName());
-			if(config){
-				setPosition(srcCode);
-			}
-			srcCode.setAttribute("format", getFormat());
-			srcCode.appendChild(XMLUtil.createElmWithText(doc, "content", content.getTextboxText()));
-			return srcCode;
+		Element srcCode = (Element)super.getSrcCode(doc, config);
+		if(srcCode != null){
+			srcCode.appendChild(XMLUtil.createElmWithText(doc, "pattern", pattern.getTextboxText()));
+			srcCode.appendChild(XMLUtil.createElmWithText(doc, "replacement", replacement.getTextboxText()));
 		}
-		return null;
+		return srcCode;
 	}
 	
 	public static PipeNode loadConfig(Element elm,PipeEditor wsp){
-		TextNode node= new TextNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
+		ReplaceTextNode node= new ReplaceTextNode(Integer.parseInt(elm.getAttribute("x")),Integer.parseInt(elm.getAttribute("y")));
 		wsp.addFigure(node);
-		String content = XMLUtil.getTextFromFirstSubEleByName(elm, "content");
-		String format = elm.getAttribute("format");
-		if(format != null){
-			node.setFormat(format);
+		node.connectSource(elm);
+
+		String pattern = XMLUtil.getTextFromFirstSubEleByName(elm, "pattern");
+		if(pattern != null){
+			node.pattern.setTextboxText(pattern);
 		}
-		if(content != null){
-			node.content.setTextboxText(content);
+		String replacement = XMLUtil.getTextFromFirstSubEleByName(elm, "replacement");
+		if(replacement != null){
+			node.replacement.setTextboxText(replacement);
 		}
 		return node;
 	}
@@ -119,7 +99,7 @@ public class TextNode extends InPipeNode implements ConnectingOutputNode{
 	 */
 	@Override
 	public String getTagName() {
-		return "text";
+		return "replace-text";
 	}
 
 

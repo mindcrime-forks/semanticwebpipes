@@ -54,7 +54,7 @@ import org.deri.pipes.rdf.RegExBox;
 import org.deri.pipes.rdf.SameAsBox;
 import org.deri.pipes.rdf.SelectBox;
 import org.deri.pipes.rdf.SimpleMixBox;
-import org.deri.pipes.rdf.TextBox;
+import org.deri.pipes.text.TextBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

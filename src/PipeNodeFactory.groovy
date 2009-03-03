@@ -48,6 +48,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return new RDFFetchNode(x,y);
 				case "rdfsmix":
 					return new RDFSMixNode(x,y);
+	   			case "replace-text":
+					return new ReplaceTextNode(x,y);
 				case "select":
 					return new SelectNode(x,y);
 				case "simplemix":
@@ -120,6 +122,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return RDFExtractNode.loadConfig(element,pipeEditor);
 				case "rdffetch":    
 					return RDFFetchNode.loadConfig(element,pipeEditor);
+				case "replace-text":    
+					return ReplaceTextNode.loadConfig(element,pipeEditor);
 				case "select":    
 					return SelectNode.loadConfig(element,pipeEditor);
 				case "simplemix":   

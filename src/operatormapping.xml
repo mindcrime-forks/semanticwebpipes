@@ -54,7 +54,7 @@ class represented by that element.
   
   <entry>
     <string>text</string>
-    <java-class>org.deri.pipes.rdf.TextBox</java-class>
+    <java-class>org.deri.pipes.text.TextBox</java-class>
   </entry>
   <entry>
     <string>simplemix</string>
@@ -154,7 +154,7 @@ class represented by that element.
   </entry> 
   <entry>
     <string>stringify</string>
-    <java-class>org.deri.pipes.rdf.StringifyBox</java-class>
+    <java-class>org.deri.pipes.text.StringifyBox</java-class>
   </entry>    
   <entry>
     <string>pipe-call</string>
@@ -183,5 +183,9 @@ class represented by that element.
   <entry>
     <string>is-empty</string>
     <java-class>org.deri.pipes.condition.IsEmptyCondition</java-class>
-  </entry>    
+  </entry>
+  <entry>
+  	<string>replace-text</string>
+  	<java-class>org.deri.pipes.text.ReplaceTextBox</java-class>
+  </entry>
 </map>

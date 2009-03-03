@@ -38,11 +38,15 @@
  */
 package org.deri.pipes.core;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.deri.pipes.core.internals.ThreadedExecutor;
+import org.deri.pipes.text.ReplaceTextBox;
+import org.slf4j.Logger;
 
 import com.thoughtworks.xstream.XStream;
 /**
@@ -52,6 +56,7 @@ import com.thoughtworks.xstream.XStream;
  */
 public class Context {
 	Map <String,Operator> operators = new HashMap<String,Operator>();
+	StringBuilder log = new StringBuilder();
 	Map map = new HashMap();
 	private HttpClient httpClient;
 	private Engine engine;
@@ -127,5 +132,14 @@ public class Context {
 			engine = new Engine();
 		}
 		return engine;
+	}
+	/**
+	 * @param logger
+	 * @param replaceTextBox
+	 * @param string
+	 */
+	public synchronized void logInfo(Logger logger, Operator operator, String msg) {
+		log.append("[info] ").append(operator.getClass().getSimpleName()).append(msg);
+		logger.info(msg);
 	}
 }

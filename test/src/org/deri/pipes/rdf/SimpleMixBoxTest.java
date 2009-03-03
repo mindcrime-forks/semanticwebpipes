@@ -6,6 +6,7 @@ import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.PipeParser;
 import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.text.TextBox;
 
 public class SimpleMixBoxTest extends TestCase {
 	private SimpleMixBox fixture;

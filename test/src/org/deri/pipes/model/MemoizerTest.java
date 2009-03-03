@@ -43,7 +43,7 @@ import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.Operator;
-import org.deri.pipes.rdf.TextBox;
+import org.deri.pipes.text.TextBox;
 
 import junit.framework.TestCase;
 

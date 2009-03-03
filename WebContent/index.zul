@@ -288,6 +288,11 @@
 					</treeitem>
 					<treeitem>
 						<treerow>
+							<treecell id="replace-text"  draggable="true"  label="Replace Text" />
+						</treerow>	
+					</treeitem>
+					<treeitem>
+						<treerow>
 							<treecell id="for"  draggable="true"  label="FOR loop" />
 						</treerow>	
 					</treeitem>

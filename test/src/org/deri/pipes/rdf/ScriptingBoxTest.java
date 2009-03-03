@@ -44,6 +44,7 @@ import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Pipe;
 import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.text.TextBox;
 
 import junit.framework.TestCase;
 

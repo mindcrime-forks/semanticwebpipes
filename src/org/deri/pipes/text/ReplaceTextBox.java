@@ -37,44 +37,65 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.rdf;
+package org.deri.pipes.text;
 
 import org.deri.pipes.core.Context;
-import org.deri.pipes.core.Engine;
 import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.Pipe;
-import org.deri.pipes.endpoints.PipeConfig;
-import org.deri.pipes.text.TextBox;
+import org.deri.pipes.core.Operator;
+import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.model.TextBuffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import junit.framework.TestCase;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
+ * Performs a pattern replacement on the string representation
+ * of the incoming pipe, using String.replaceAll(pattern,replacement)
  * @author robful
  *
  */
-public class PipeCallBoxTest extends TestCase {
+@XStreamAlias("replace-text")
+public class ReplaceTextBox implements Operator {
+	transient Logger logger = LoggerFactory.getLogger(ReplaceTextBox.class);
+	private Source source;
+	private String pattern;
+	private String replacement;
 	
+	/* 
+	 * Execute the underlying source, then perform a string replacement
+	 * on the result.
+	 */
 	@Override
-	protected void setUp() throws Exception {
-		Pipe pipe1 = new Pipe();
-		TextBox x= new TextBox();
-		x.setFormat(TextBox.TEXTPLAIN_FORMAT);
-		x.setContent("hello ${word}");
-		pipe1.addOperator(x);
-		String syntax = Engine.defaultEngine().serialize(pipe1);
-		PipeConfig config = new PipeConfig();
-		config.setId("xxx");
-		config.setSyntax(syntax);
-		Engine.defaultEngine().getPipeStore().save(config);
+	public ExecBuffer execute(Context context) throws Exception {
+		ExecBuffer input = source.execute(context);
+		context.logInfo(logger, this, "replacing ["+pattern+"] with ["+replacement+"]");
+		String result  = input.toString().replaceAll(pattern, replacement);
+		return new TextBuffer(result);
 	}
 
-	public void test() throws Exception{		
-		PipeCallBox pipeCall = new PipeCallBox();
-		pipeCall.addParameter("word", "Giovanni Tummarello");
-		pipeCall.setPipeId("xxx");
-		Context context = Engine.defaultEngine().newContext();
-		ExecBuffer result = pipeCall.execute(context);
-		assertEquals("Wrong execute result","hello Giovanni Tummarello",result.toString());
+	public Source getSource() {
+		return source;
+	}
+
+	public void setSource(Source source) {
+		this.source = source;
+	}
+
+	public String getPattern() {
+		return pattern;
+	}
+
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
+	}
+
+	public String getReplacement() {
+		return replacement;
+	}
+
+	public void setReplacement(String replacement) {
+		this.replacement = replacement;
 	}
 
 }

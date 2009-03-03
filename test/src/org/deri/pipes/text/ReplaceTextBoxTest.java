@@ -37,14 +37,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.rdf;
+package org.deri.pipes.text;
 
 import org.deri.pipes.core.Context;
-import org.deri.pipes.core.Engine;
-import org.deri.pipes.core.ExecBuffer;
-import org.deri.pipes.core.Pipe;
-import org.deri.pipes.endpoints.PipeConfig;
-import org.deri.pipes.text.TextBox;
+import org.deri.pipes.core.internals.Source;
 
 import junit.framework.TestCase;
 
@@ -52,29 +48,15 @@ import junit.framework.TestCase;
  * @author robful
  *
  */
-public class PipeCallBoxTest extends TestCase {
-	
-	@Override
-	protected void setUp() throws Exception {
-		Pipe pipe1 = new Pipe();
-		TextBox x= new TextBox();
-		x.setFormat(TextBox.TEXTPLAIN_FORMAT);
-		x.setContent("hello ${word}");
-		pipe1.addOperator(x);
-		String syntax = Engine.defaultEngine().serialize(pipe1);
-		PipeConfig config = new PipeConfig();
-		config.setId("xxx");
-		config.setSyntax(syntax);
-		Engine.defaultEngine().getPipeStore().save(config);
+public class ReplaceTextBoxTest extends TestCase {
+	public void test() throws Exception{
+		TextBox input = new TextBox("foo foo");
+		input.setFormat("text/plain");
+		ReplaceTextBox x = new ReplaceTextBox();
+		x.setPattern("foo");
+		x.setReplacement("bar");
+		x.setSource(new Source(input));
+		String result = x.execute(new Context()).toString();
+		assertEquals("Wrong result","bar bar",result);
 	}
-
-	public void test() throws Exception{		
-		PipeCallBox pipeCall = new PipeCallBox();
-		pipeCall.addParameter("word", "Giovanni Tummarello");
-		pipeCall.setPipeId("xxx");
-		Context context = Engine.defaultEngine().newContext();
-		ExecBuffer result = pipeCall.execute(context);
-		assertEquals("Wrong execute result","hello Giovanni Tummarello",result.toString());
-	}
-
 }

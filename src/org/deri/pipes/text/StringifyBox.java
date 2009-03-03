@@ -37,7 +37,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.rdf;
+package org.deri.pipes.text;
 
 import java.io.ByteArrayOutputStream;
 

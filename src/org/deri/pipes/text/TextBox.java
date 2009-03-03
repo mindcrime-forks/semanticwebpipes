@@ -36,7 +36,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.deri.pipes.rdf;
+package org.deri.pipes.text;
 
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
