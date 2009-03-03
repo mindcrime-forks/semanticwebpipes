@@ -51,6 +51,7 @@ import org.integratedmodelling.zk.diagram.components.Port;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Vbox;
 
@@ -71,13 +72,17 @@ public class ChooseNode extends PipeNode{
 	Element config;
 	
 	public ChooseNode(int x, int y){
-		super(x,y,140,80);
+		super(x,y,180,50);
         setToobar();
-        Vbox vbox = new Vbox();
-        vbox.appendChild(new Label("if"));
-        vbox.appendChild(new Label("then"));
-        vbox.appendChild(new Label("else"));
-        wnd.appendChild(vbox);
+        Hbox hbox = new Hbox();
+        hbox.setWidth("180px");
+		Label label = new Label("If True");
+		label.setStyle("margin-left: 10px; float: left;");
+		hbox.appendChild(label);
+		label = new Label("If False");
+		label.setStyle("margin-right: 10px; float: right;");
+		hbox.appendChild(label);
+        wnd.appendChild(hbox);
         wnd.setTitle("Choose");
 	}
 	public void connectTo(Port port){
@@ -85,9 +90,12 @@ public class ChooseNode extends PipeNode{
 	}
 	
 	protected void initialize(){
-		ifPort = createPort(PipePortType.getPType(PipePortType.CONDITIONIN),20,32);
-		thenPort = createPort(PipePortType.getPType(PipePortType.ANYIN),35,49);
-		elsePort = createPort(PipePortType.getPType(PipePortType.ANYIN),34,66);		
+		ifPort = createPort(PipePortType.getPType(PipePortType.CONDITIONIN),"top");
+		ifPort.setTooltiptext("Condition to be evaluated");
+		thenPort = createPort(PipePortType.getPType(PipePortType.ANYIN),5,35);
+		thenPort.setTooltiptext("Source to use when condition is true");
+		elsePort = createPort(PipePortType.getPType(PipePortType.ANYIN),175,35);	
+		elsePort.setTooltiptext("Source to use when condition is false");
         output =createPort(PipePortType.getPType(PipePortType.ANYOUT),"bottom");
         if(config != null){
     		connectChildElement(config, "if", ifPort);

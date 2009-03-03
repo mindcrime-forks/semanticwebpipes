@@ -16,6 +16,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 	    switch(tagName.toLowerCase()){
 				case "and":
 					return new AndConditionNode(x,y);	    
+				case "compare":
+					return new CompareConditionNode(x,y);	    
 				case "choose":
 					return new ChooseNode(x,y);	    
 				case "construct":
@@ -92,6 +94,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 			switch(tagName.toLowerCase()){
 			    case "and":
 			        return AndConditionNode.loadConfig(element,pipeEditor);
+				case "compare":
+					return CompareConditionNode.loadConfig(element,pipeEditor);	    
 			    case "choose":
 			        return ChooseNode.loadConfig(element,pipeEditor);
 				case "code":

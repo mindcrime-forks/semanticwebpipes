@@ -43,7 +43,10 @@ package org.deri.pipes.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.deri.pipes.condition.Condition;
@@ -110,6 +113,9 @@ public class PipeParser {
 			try{
 			XStream xstream = new XStream();
 			Map<String,Class> defaultAliasMappings = (Map<String, Class>) xstream.fromXML(in);
+			if(false){
+				dumpMappings(defaultAliasMappings);
+			}
 			if(defaultAliasMappings.size() == 0){
 				logger.warn(cannotLoadMsg+" (no mappings defined in "+OPERATORMAPPING_XML+")");
 			}else{
@@ -126,6 +132,18 @@ public class PipeParser {
 					logger.debug("problem closing stream",e);
 				}
 			}
+		}
+	}
+
+	private static void dumpMappings(Map<String, Class> defaultAliasMappings) {
+		List<String> x = new ArrayList<String>();
+		x.addAll(defaultAliasMappings.keySet());
+		Collections.sort(x);
+		for(String key: x){
+			System.out.println("  <entry>");
+			System.out.println("    <string>"+key+"</string>");
+			System.out.println("    <java-class>"+defaultAliasMappings.get(key).getName()+"</java-class>");
+			System.out.println("  </entry>");
 		}
 	}
 	private Map <String,Class> aliasMappings = DEFAULT_ALIAS_MAPPINGS;

@@ -366,6 +366,11 @@
 					</treeitem>
 					<treeitem >
 				       <treerow>
+							<treecell label="Condition: Compare" id="compare"  draggable="true" />
+						</treerow>
+					</treeitem>
+					<treeitem >
+				       <treerow>
 							<treecell label="Condition: And" id="and"  draggable="true" />
 						</treerow>
 					</treeitem>

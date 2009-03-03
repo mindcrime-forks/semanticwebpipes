@@ -7,189 +7,191 @@ class represented by that element.
  -->
 <map>
   <entry>
-    <!--  required for normal operation of pipes -->
-    <string>pipe</string>
-    <java-class>org.deri.pipes.core.Pipe</java-class>
+    <string>and</string>
+    <java-class>org.deri.pipes.condition.AndCondition</java-class>
   </entry>
   <entry>
-    <!--  required for normal operation of pipes -->
+    <string>choose</string>
+    <java-class>org.deri.pipes.condition.ChooseBox</java-class>
+  </entry>
+  <entry>
     <string>code</string>
     <java-class>org.deri.pipes.core.internals.Source</java-class>
   </entry>
   <entry>
-    <!--  required for normal operation of pipes -->
-    <string>source</string>
-    <java-class>org.deri.pipes.core.internals.Source</java-class>
+    <string>compare</string>
+    <java-class>org.deri.pipes.condition.ComparisonCondition</java-class>
   </entry>
   <entry>
-    <!--  required for normal operation of pipes -->
-    <string>sourcelist</string>
-    <java-class>org.deri.pipes.core.internals.Source</java-class>
-  </entry>
-  <entry>
-    <!--  required for normal operation of pipes -->
-    <string>xmlsource</string>
-    <java-class>org.deri.pipes.core.internals.Source</java-class>
-  </entry>
-  <entry>
-    <!--  required for normal operation of pipes -->
     <string>condition</string>
     <java-class>org.deri.pipes.condition.ConditionWrapper</java-class>
-  </entry>
-  <entry>
-    <!--  required for normal operation of pipes -->
-    <string>left</string>
-    <java-class>org.deri.pipes.condition.ConditionWrapper</java-class>
-  </entry>
-  <entry>
-    <!--  required for normal operation of pipes -->
-    <string>right</string>
-    <java-class>org.deri.pipes.condition.ConditionWrapper</java-class>
-  </entry>
-  <entry>
-    <!--  required for normal operation of pipes -->
-    <string>xslsource</string>
-    <java-class>org.deri.pipes.core.internals.Source</java-class>
-  </entry>
-  
-  <entry>
-    <string>text</string>
-    <java-class>org.deri.pipes.text.TextBox</java-class>
-  </entry>
-  <entry>
-    <string>simplemix</string>
-    <java-class>org.deri.pipes.rdf.SimpleMixBox</java-class>
-  </entry>
-  <entry>
-    <string>for</string>
-    <java-class>org.deri.pipes.rdf.ForLoopBox</java-class>
-  </entry>
-  <entry>
-    <string>patch-gen</string>
-    <java-class>org.deri.pipes.rdf.PatchGeneratorBox</java-class>
-  </entry>
-  <entry>
-    <string>select</string>
-    <java-class>org.deri.pipes.rdf.SelectBox</java-class>
-  </entry>
-  <entry>
-    <string>regex</string>
-    <java-class>org.deri.pipes.rdf.RegExBox</java-class>
-  </entry>
-  <entry>
-    <string>rdffetch</string>
-    <java-class>org.deri.pipes.rdf.RDFFetchBox</java-class>
-  </entry>
-  <entry>
-    <string>patch-exec</string>
-    <java-class>org.deri.pipes.rdf.PatchExecutorBox</java-class>
-  </entry>
-  <entry>
-    <string>smoosher</string>
-    <java-class>org.deri.pipes.rdf.SameAsBox</java-class>
-  </entry>
-  <entry>
-    <string>htmlfetch</string>
-    <java-class>org.deri.pipes.rdf.HTMLFetchBox</java-class>
-  </entry>
-  <entry>
-    <string>rule</string>
-    <java-class>org.deri.pipes.rdf.RegExBox$Rule</java-class>
   </entry>
   <entry>
     <string>construct</string>
     <java-class>org.deri.pipes.rdf.ConstructBox</java-class>
   </entry>
   <entry>
-    <string>http-get</string>
-    <java-class>org.deri.pipes.rdf.HttpGetBox</java-class>
-  </entry>
-  <entry>
-    <string>xslt</string>
-    <java-class>org.deri.pipes.rdf.XSLTBox</java-class>
-  </entry>
-  <entry>
-    <string>xmlfetch</string>
-    <java-class>org.deri.pipes.rdf.XMLFetchBox</java-class>
-  </entry>
-  <entry>
-    <string>xslfetch</string>
-    <java-class>org.deri.pipes.rdf.XMLFetchBox</java-class>
-  </entry>
-  <entry>
-    <string>rdfs</string>
-    <java-class>org.deri.pipes.rdf.RDFSMixBox</java-class>
-  </entry>
-  <entry>
-    <string>scripting</string>
-    <java-class>org.deri.pipes.rdf.ScriptingBox</java-class>
-  </entry>
-  <entry>
-    <string>memory-context</string>
-    <java-class>org.deri.pipes.rdf.MemoryContextFetcher</java-class>
-  </entry>
-  <entry>
-    <string>stdin</string>
-    <java-class>org.deri.pipes.rdf.StdinBox</java-class>
-  </entry>
-  <entry>
-    <string>remember</string>
-    <java-class>org.deri.pipes.rdf.MemoryBox</java-class>
-  </entry>
-  <entry>
-    <string>xquery</string>
-    <java-class>org.deri.pipes.rdf.SaxonXqueryBox</java-class>
+    <string>for</string>
+    <java-class>org.deri.pipes.rdf.ForLoopBox</java-class>
   </entry>
   <entry>
     <string>html2xml</string>
     <java-class>org.deri.pipes.rdf.Html2XmlBox</java-class>
   </entry>
   <entry>
-    <string>sparqlresultfetch</string>
-    <java-class>org.deri.pipes.rdf.TupleQueryResultFetchBox</java-class>
-  </entry>  
+    <string>htmlfetch</string>
+    <java-class>org.deri.pipes.rdf.HTMLFetchBox</java-class>
+  </entry>
   <entry>
-    <string>urlbuilder</string>
-    <java-class>org.deri.pipes.rdf.URLBuilderBox</java-class>
-  </entry> 
-  <entry>
-    <string>stringify</string>
-    <java-class>org.deri.pipes.text.StringifyBox</java-class>
-  </entry>    
-  <entry>
-    <string>pipe-call</string>
-    <java-class>org.deri.pipes.rdf.PipeCallBox</java-class>
-  </entry>    
-  <entry>
-    <string>rdf-extract</string>
-    <java-class>org.deri.pipes.rdf.RDFExtractBox</java-class>
-  </entry>    
-  <entry>
-    <string>choose</string>
-    <java-class>org.deri.pipes.condition.ChooseBox</java-class>
-  </entry>    
-  <entry>
-    <string>or</string>
-    <java-class>org.deri.pipes.condition.OrCondition</java-class>
-  </entry>    
-  <entry>
-    <string>and</string>
-    <java-class>org.deri.pipes.condition.AndCondition</java-class>
-  </entry>    
-  <entry>
-    <string>not</string>
-    <java-class>org.deri.pipes.condition.NotCondition</java-class>
-  </entry>    
+    <string>http-get</string>
+    <java-class>org.deri.pipes.rdf.HttpGetBox</java-class>
+  </entry>
   <entry>
     <string>is-empty</string>
     <java-class>org.deri.pipes.condition.IsEmptyCondition</java-class>
+  </entry>
+  <entry>
+    <string>left</string>
+    <java-class>org.deri.pipes.condition.ConditionWrapper</java-class>
+  </entry>
+  <entry>
+    <string>leftSource</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
   </entry>
   <entry>
     <string>matches</string>
     <java-class>org.deri.pipes.condition.RegexMatchesCondition</java-class>
   </entry>
   <entry>
-  	<string>replace-text</string>
-  	<java-class>org.deri.pipes.text.ReplaceTextBox</java-class>
+    <string>memory-context</string>
+    <java-class>org.deri.pipes.rdf.MemoryContextFetcher</java-class>
+  </entry>
+  <entry>
+    <string>not</string>
+    <java-class>org.deri.pipes.condition.NotCondition</java-class>
+  </entry>
+  <entry>
+    <string>or</string>
+    <java-class>org.deri.pipes.condition.OrCondition</java-class>
+  </entry>
+  <entry>
+    <string>patch-exec</string>
+    <java-class>org.deri.pipes.rdf.PatchExecutorBox</java-class>
+  </entry>
+  <entry>
+    <string>patch-gen</string>
+    <java-class>org.deri.pipes.rdf.PatchGeneratorBox</java-class>
+  </entry>
+  <entry>
+    <string>pipe</string>
+    <java-class>org.deri.pipes.core.Pipe</java-class>
+  </entry>
+  <entry>
+    <string>pipe-call</string>
+    <java-class>org.deri.pipes.rdf.PipeCallBox</java-class>
+  </entry>
+  <entry>
+    <string>rdf-extract</string>
+    <java-class>org.deri.pipes.rdf.RDFExtractBox</java-class>
+  </entry>
+  <entry>
+    <string>rdffetch</string>
+    <java-class>org.deri.pipes.rdf.RDFFetchBox</java-class>
+  </entry>
+  <entry>
+    <string>rdfs</string>
+    <java-class>org.deri.pipes.rdf.RDFSMixBox</java-class>
+  </entry>
+  <entry>
+    <string>regex</string>
+    <java-class>org.deri.pipes.rdf.RegExBox</java-class>
+  </entry>
+  <entry>
+    <string>remember</string>
+    <java-class>org.deri.pipes.rdf.MemoryBox</java-class>
+  </entry>
+  <entry>
+    <string>replace-text</string>
+    <java-class>org.deri.pipes.text.ReplaceTextBox</java-class>
+  </entry>
+  <entry>
+    <string>right</string>
+    <java-class>org.deri.pipes.condition.ConditionWrapper</java-class>
+  </entry>
+  <entry>
+    <string>rightSource</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
+  <entry>
+    <string>rule</string>
+    <java-class>org.deri.pipes.rdf.RegExBox$Rule</java-class>
+  </entry>
+  <entry>
+    <string>scripting</string>
+    <java-class>org.deri.pipes.rdf.ScriptingBox</java-class>
+  </entry>
+  <entry>
+    <string>select</string>
+    <java-class>org.deri.pipes.rdf.SelectBox</java-class>
+  </entry>
+  <entry>
+    <string>simplemix</string>
+    <java-class>org.deri.pipes.rdf.SimpleMixBox</java-class>
+  </entry>
+  <entry>
+    <string>smoosher</string>
+    <java-class>org.deri.pipes.rdf.SameAsBox</java-class>
+  </entry>
+  <entry>
+    <string>source</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
+  <entry>
+    <string>sourcelist</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
+  <entry>
+    <string>sparqlresultfetch</string>
+    <java-class>org.deri.pipes.rdf.TupleQueryResultFetchBox</java-class>
+  </entry>
+  <entry>
+    <string>stdin</string>
+    <java-class>org.deri.pipes.rdf.StdinBox</java-class>
+  </entry>
+  <entry>
+    <string>stringify</string>
+    <java-class>org.deri.pipes.text.StringifyBox</java-class>
+  </entry>
+  <entry>
+    <string>text</string>
+    <java-class>org.deri.pipes.text.TextBox</java-class>
+  </entry>
+  <entry>
+    <string>urlbuilder</string>
+    <java-class>org.deri.pipes.rdf.URLBuilderBox</java-class>
+  </entry>
+  <entry>
+    <string>xmlfetch</string>
+    <java-class>org.deri.pipes.rdf.XMLFetchBox</java-class>
+  </entry>
+  <entry>
+    <string>xmlsource</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
+  <entry>
+    <string>xquery</string>
+    <java-class>org.deri.pipes.rdf.SaxonXqueryBox</java-class>
+  </entry>
+  <entry>
+    <string>xslfetch</string>
+    <java-class>org.deri.pipes.rdf.XMLFetchBox</java-class>
+  </entry>
+  <entry>
+    <string>xslsource</string>
+    <java-class>org.deri.pipes.core.internals.Source</java-class>
+  </entry>
+  <entry>
+    <string>xslt</string>
+    <java-class>org.deri.pipes.rdf.XSLTBox</java-class>
   </entry>
 </map>
