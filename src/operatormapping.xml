@@ -185,6 +185,10 @@ class represented by that element.
     <java-class>org.deri.pipes.condition.IsEmptyCondition</java-class>
   </entry>
   <entry>
+    <string>matches</string>
+    <java-class>org.deri.pipes.condition.RegexMatchesCondition</java-class>
+  </entry>
+  <entry>
   	<string>replace-text</string>
   	<java-class>org.deri.pipes.text.ReplaceTextBox</java-class>
   </entry>

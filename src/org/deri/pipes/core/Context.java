@@ -138,8 +138,8 @@ public class Context {
 	 * @param replaceTextBox
 	 * @param string
 	 */
-	public synchronized void logInfo(Logger logger, Operator operator, String msg) {
-		log.append("[info] ").append(operator.getClass().getSimpleName()).append(msg);
+	public synchronized void logInfo(Logger logger, Object owner, String msg) {
+		log.append("[info] ").append(owner.getClass().getSimpleName()).append(msg);
 		logger.info(msg);
 	}
 }

@@ -30,6 +30,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 				    return new HttpGetNode(x,y);
 				case "is-empty":
 					return new  IsEmptyConditionNode(x,y);
+				case "matches":
+					return new  RegexMatchesConditionNode(x,y);
 				case "not":
 					return new  NotConditionNode(x,y);
 				case "or":
@@ -106,6 +108,8 @@ public class PipeNodeFactory implements IPipeNodeFactory {
 					return HttpGetNode.loadConfig(element,pipeEditor);
 				case "is-empty":    
 					return IsEmptyConditionNode.loadConfig(element,pipeEditor);
+				case "matches":    
+					return RegexMatchesConditionNode.loadConfig(element,pipeEditor);
 				case "not":    
 					return NotConditionNode.loadConfig(element,pipeEditor);
 				case "or":    

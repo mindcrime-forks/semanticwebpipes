@@ -43,21 +43,16 @@ package org.deri.pipes.core;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.xerces.parsers.DOMParser;
-import org.deri.pipes.core.internals.BypassCGLibConverter;
-import org.deri.pipes.core.internals.BypassCGLibMapper;
+import org.deri.pipes.condition.Condition;
 import org.deri.pipes.core.internals.ConditionConverter;
-import org.deri.pipes.core.internals.OperatorMemoizerProvider;
 import org.deri.pipes.core.internals.ParaConverter;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.core.internals.SourceConverter;
 import org.deri.pipes.core.internals.StringOrSourceConverter;
-import org.deri.pipes.endpoints.Pipes;
+import org.deri.pipes.model.TextBuffer;
 import org.deri.pipes.rdf.ConstructBox;
 import org.deri.pipes.rdf.ForLoopBox;
 import org.deri.pipes.rdf.HTMLFetchBox;
@@ -68,28 +63,14 @@ import org.deri.pipes.rdf.RegExBox;
 import org.deri.pipes.rdf.SameAsBox;
 import org.deri.pipes.rdf.SelectBox;
 import org.deri.pipes.rdf.SimpleMixBox;
-import org.deri.pipes.store.DatabasePipeManager;
 import org.deri.pipes.text.TextBox;
 import org.deri.pipes.utils.CDataEnabledDomDriver;
 import org.deri.pipes.utils.IDTool;
-import org.deri.pipes.utils.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.zkoss.util.logging.Log;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.CGLIBEnhancedConverter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import com.thoughtworks.xstream.core.util.QuickWriter;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
-import com.thoughtworks.xstream.mapper.CGLIBMapper;
-import com.thoughtworks.xstream.mapper.MapperWrapper;
 /**
  * @author Danh Le Phuoc, danh.lephuoc@deri.org
  *
@@ -168,7 +149,22 @@ public class PipeParser {
 	 * @param syntax xml pipe syntax.
 	 */
 	public Operator parse(String syntax) {
-    	return (Operator) getXStream().fromXML(syntax);
+    	Object o =  getXStream().fromXML(syntax);
+    	try{
+    	return (Operator)o;
+    	}catch(ClassCastException e){
+        	if(o instanceof Condition){
+        		final Condition condition = (Condition)o;
+        		return new Operator(){
+					public ExecBuffer execute(Context context) throws Exception {
+						return new TextBuffer(condition.isTrue(context)?"true":"false");
+					}
+        			
+        		};
+        	}
+    		
+    	}
+    	throw new RuntimeException("Obect is neither an Operator nor a Condition :"+o.getClass());
 	}
 
     

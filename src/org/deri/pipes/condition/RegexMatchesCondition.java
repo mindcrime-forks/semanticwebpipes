@@ -37,23 +37,40 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.core.internals;
+package org.deri.pipes.condition;
 
 import org.deri.pipes.core.Context;
+import org.deri.pipes.core.ExecBuffer;
+import org.deri.pipes.core.PipeException;
+import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.model.BinaryContentBuffer;
+import org.deri.pipes.model.SesameMemoryBuffer;
+import org.deri.pipes.model.SesameTupleBuffer;
+import org.deri.pipes.model.TextBuffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Implemented to evaluate the outcome of an operation
- * as having met some condition.
  * @author robful
  *
  */
-public interface Condition {
-	
-	/**
-	 * Whether this condition is true for the given context.
-	 * @param context
-	 * @return
+@XStreamAlias("matches")
+public class RegexMatchesCondition implements Condition{
+	transient Logger logger = LoggerFactory.getLogger(RegexMatchesCondition.class);
+	Source source;
+	String pattern;
+	/* (non-Javadoc)
+	 * @see org.deri.pipes.condition.Condition#isTrue(org.deri.pipes.core.Context)
 	 */
-	public boolean isTrue(Context context);
+	@Override
+	public boolean isTrue(Context context) throws Exception {
+		ExecBuffer result = source.execute(context);
+		context.logInfo(logger, this, "checking whether pattern ["+pattern+"] is matched");
+		boolean matches = result.toString().matches(pattern);
+		context.logInfo(logger, this, "(it "+(matches?"matches":"doesn't match")+")");
+		return matches;
+	}
 
 }
