@@ -39,6 +39,7 @@
 package org.deri.pipes.model;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,6 +47,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.deri.pipes.core.Context;
@@ -166,17 +168,12 @@ public class SesameMemoryBuffer implements ExecBuffer {
 		}		
 	}
 
-	public void loadFromText(String text, String baseURL){
-		try{
+	public void loadFromText(String text, String baseURL) throws RDFParseException, RepositoryException, IOException{
 			String url = ((null!=baseURL)&&(baseURL.trim().length()>0))?baseURL.trim():DEFAULT_CONTEXT;
 			load(new StringReader(text),url, RDFFormat.RDFXML);
-		}
-		catch (Exception e) {
-			logger.warn("problem loading from text",e);
-		}
 	}
 
-	public void loadFromText(String text){
+	public void loadFromText(String text) throws RDFParseException, RepositoryException, IOException{
 		loadFromText(text,null);
 	}
 
@@ -219,7 +216,13 @@ public class SesameMemoryBuffer implements ExecBuffer {
 	}
 
 	public String toString(){
-		return toXMLStringBuffer().toString(); 	
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		stream(bout);
+		try {
+			return new String(bout.toByteArray(),"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public StringBuffer toXMLStringBuffer(){

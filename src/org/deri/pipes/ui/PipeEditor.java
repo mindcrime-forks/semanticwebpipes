@@ -334,8 +334,8 @@ public class PipeEditor extends Workspace {
 			}
 			try{
 				if(buff instanceof SesameMemoryBuffer){
-					buff = ((SesameMemoryBuffer)buff).toTupleBuffer();
 					textResult= buff.toString();
+					tuple=((SesameMemoryBuffer)buff).toTupleBuffer().getTupleQueryResult();
 				}
 				if(buff instanceof SesameTupleBuffer){
 					tuple=((SesameTupleBuffer)buff).getTupleQueryResult();

@@ -50,6 +50,7 @@ import org.apache.commons.io.IOUtils;
 import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.utils.UrlLoader;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,16 +80,17 @@ public class XMLStreamBuffer implements ExecBuffer,InputStreamProvider{
 	}
 
 	@Override
-	public void stream(ExecBuffer outputBuffer) {
+	public void stream(ExecBuffer outputBuffer) throws IOException{
 		stream(outputBuffer,null);
 	}
 
 	@Override
-	public void stream(ExecBuffer outputBuffer, String context) {
+	public void stream(ExecBuffer outputBuffer, String context) throws IOException {
+		try{
 		if(outputBuffer instanceof SesameMemoryBuffer){
 			if(url!=null) 
 				((SesameMemoryBuffer)outputBuffer).loadFromURL(url, RDFFormat.RDFXML);
-			else	
+			else
 				((SesameMemoryBuffer)outputBuffer).loadFromText(strBuff.toString(),null);
 		}
 		else if(outputBuffer instanceof SesameTupleBuffer){
@@ -98,6 +100,9 @@ public class XMLStreamBuffer implements ExecBuffer,InputStreamProvider{
 				((SesameTupleBuffer)outputBuffer).loadFromText(strBuff.toString());
 		}else{
 			logger.warn("cannot stream outputBuffer which is not a SesameMemoryBuffer or SesameTupleBuffer");
+		}
+		}catch(Exception e){
+			throw new IOException("Cannot stream to the output buffer",e);
 		}
 		
 	}

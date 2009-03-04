@@ -77,7 +77,7 @@ public class TextBox implements Operator{
 	}
 	
 	
-	public ExecBuffer execute(Context context){
+	public ExecBuffer execute(Context context) throws Exception{
 		ExecBuffer execBuffer = newExecBuffer(format);
 		// execBuffer.loadFromText(content); // would be nice?			
 		if(execBuffer instanceof SesameMemoryBuffer){

@@ -37,6 +37,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package org.deri.pipes.rdf;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -44,6 +45,8 @@ import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Context;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.model.SesameMemoryBuffer;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +93,7 @@ public class OWLBox extends AbstractMerge{
     	 return model;
      }
      
-     private void writeJenaModel(Model model,SesameMemoryBuffer buffer){
+     private void writeJenaModel(Model model,SesameMemoryBuffer buffer) throws RDFParseException, RepositoryException, IOException{
     	 StringWriter writer =new StringWriter();
     	 model.write(writer);
     	 buffer.loadFromText(writer.getBuffer().toString());

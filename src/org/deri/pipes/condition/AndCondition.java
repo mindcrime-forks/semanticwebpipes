@@ -58,7 +58,19 @@ public class AndCondition implements Condition{
 	 */
 	@Override
 	public boolean isTrue(Context context) throws Exception {
-		return left.isTrue(context) && right.isTrue(context);
+		String leftResult = "false";
+		String rightResult = "(not evaluated)";
+		boolean answer = false;
+		if(left.isTrue(context)){
+			leftResult = "true";
+			rightResult = "false";
+			if(right.isTrue(context)){
+				rightResult = "true";
+				answer = true;
+			}
+		}
+		context.logInfo(this, "left="+leftResult+", right="+rightResult+", answer="+answer);
+		return answer;
 	}
 
 }

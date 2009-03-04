@@ -1,0 +1,30 @@
+Changes for release 0.6.6
+===========================
+New Features
+------------
+[2009-03-04] Added sesame xpath functions library. 
+Example query using fn:concat follows:
+PREFIX fn: <http://www.w3.org/2005/xpath-functions#>
+select ?name where {?s ?p ?name .
+FILTER ( ?name=fn:concat('Giovanni ','Tummarello') )
+}
+[2009-03-03] Added link to documentation page from each operator on design page.
+Clicking the link opens the documentation page on another tab. Documentation is
+currently skeletal.
+[2009-03-03] Added a Choose (if/then/else) operator. This allows one or another
+input to be selected based on whether a condition is true. Some basic conditions
+have been provided including:
+Not Empty - is true if the input is not empty.
+Matches - is true if the source (converted to a string) matches a regular expression.
+Comparison - is true if one source compares (==,!=,>,<,<=,>=) to another source.
+And - is true if both of two underlying conditions are.
+Or - is true if either of two underlying conditions are true.
+Not - is true if the underlying condition is false.
+[2009-03-03] Added Replace Text operator, all occurrences of an pattern are replaced
+with a value.
+[2009-03-02] Added RDF Extract operator, which parses rdf/xml. (This will later be
+modified to extract metadata using any23).
+
+Bug Fixes
+---------
+[SWP-48] new lines lost in select queries and text box text

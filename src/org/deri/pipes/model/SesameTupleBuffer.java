@@ -91,14 +91,9 @@ public class SesameTupleBuffer implements ExecBuffer, Iterable<Map<String,String
 	}
 
 
-	public void copyBuffer(TupleQueryResult buffer){
+	public void copyBuffer(TupleQueryResult buffer) throws Exception{
 		reset();
-		try{
-			this.buffer=new MutableTupleQueryResult(buffer);
-		}
-		catch(org.openrdf.query.QueryEvaluationException  e){		
-			logger.warn("could not copy buffer",e);
-		}
+		this.buffer=new MutableTupleQueryResult(buffer);
 	}
 
 	public TupleQueryResult getTupleQueryResult(){		

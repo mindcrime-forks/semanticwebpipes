@@ -37,38 +37,53 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.deri.pipes.condition;
+package org.deri.pipes.rdf;
+
+import java.util.ArrayList;
 
 import org.deri.pipes.core.Context;
+import org.deri.pipes.core.internals.Source;
+import org.deri.pipes.text.TextBox;
+import org.openrdf.query.QueryEvaluationException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import junit.framework.TestCase;
 
 /**
  * @author robful
  *
  */
-@XStreamAlias("either")
-public class OrCondition implements Condition{
-	ConditionWrapper left;
-	ConditionWrapper right;
-	/* (non-Javadoc)
-	 * @see org.deri.pipes.core.internals.Condition#isTrue(org.deri.pipes.core.Context)
-	 */
-	@Override
-	public boolean isTrue(Context context) throws Exception {
-		String leftResult = "true";
-		String rightResult = "(not evaluated)";
-		boolean answer = true;
-		if(!left.isTrue(context)){
-			leftResult = "false";
-			rightResult = "true";
-			if(!right.isTrue(context)){
-				rightResult = "false";
-				answer = false;
+public class SelectBoxTest extends TestCase {
+	public void testSupportsFnConcat() throws Exception{
+		SelectBox x = new SelectBox();
+		x.source = new ArrayList<Source>();
+		TextBox delegate = new TextBox();
+		delegate.setFormat(TextBox.RDFXML_FORMAT);
+		delegate.setContent("<?xml version='1.0' encoding='UTF-8'?><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'" +
+				"\n xmlns:foaf='http://xmlns.com/foaf/0.1/'>" +
+				"\n<foaf:Person rdf:about='http://data.semanticweb.org/person/giovanni-tummarello'>" +
+				"\n<foaf:name>Giovanni Tummarello</foaf:name>" +
+				"\n</foaf:Person>" +
+				"</rdf:RDF>");
+		x.source.add(new Source(delegate));
+		x.setQuery(getFnConcatQuery());
+		try{
+			System.out.println(x.execute(new Context()).toString());
+		}catch(QueryEvaluationException e){
+			if(e.getMessage().indexOf("concat")>=0){
+				fail(e.getMessage());
 			}
+			throw e;
 		}
-		context.logInfo(this, "left="+leftResult+", right="+rightResult+", answer="+answer);
-		return answer;
 	}
 
+	/**
+	 * @return
+	 */
+	private String getFnConcatQuery() {
+		return "PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n"
+			+"\nselect ?name where {?s ?p ?name ."
+			+"\nFILTER ( ?name=fn:concat('Giovanni ','Tummarello') )"
+			+"\n}";
+
+	}
 }

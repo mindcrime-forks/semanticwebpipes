@@ -89,15 +89,11 @@ public class SelectBox extends AbstractMerge {
 		SesameTupleBuffer resultBuffer=new SesameTupleBuffer();       
 		SesameMemoryBuffer tmp= new SesameMemoryBuffer();
 		mergeInputs(tmp,context);
-		try{   
-			RepositoryConnection conn = tmp.getConnection();
-			TupleQuery preparedQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
-			TupleQueryResult result = preparedQuery.evaluate();
-			resultBuffer.copyBuffer(result);
-		}
-		catch(Exception e){ 
-			logger.warn("error during execution",e);
-		}
+		context.logInfo(logger, this, "executing query:["+query+"]");
+		RepositoryConnection conn = tmp.getConnection();
+		TupleQuery preparedQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+		TupleQueryResult result = preparedQuery.evaluate();
+		resultBuffer.copyBuffer(result);
 		return resultBuffer;
     }
    	public String getQuery() {
