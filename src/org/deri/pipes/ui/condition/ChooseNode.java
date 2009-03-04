@@ -39,25 +39,15 @@
 
 package org.deri.pipes.ui.condition;
 
-import java.util.List;
-
-import org.deri.pipes.ui.ParameterNode;
 import org.deri.pipes.ui.PipeEditor;
 import org.deri.pipes.ui.PipeNode;
 import org.deri.pipes.ui.PipePortType;
-import org.deri.pipes.ui.RegExNode;
-import org.deri.pipes.utils.XMLUtil;
 import org.integratedmodelling.zk.diagram.components.Port;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Label;
-import org.zkoss.zul.Vbox;
-
-import bsh.This;
-
-import com.sun.xml.internal.ws.util.xml.XmlUtil;
 
 /**
  * @author robful

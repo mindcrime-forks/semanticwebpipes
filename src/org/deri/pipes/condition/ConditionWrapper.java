@@ -39,7 +39,6 @@
 
 package org.deri.pipes.condition;
 
-import org.deri.pipes.condition.ChooseBoxTest.TestCondition;
 import org.deri.pipes.core.Context;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
