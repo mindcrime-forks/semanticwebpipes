@@ -8,7 +8,7 @@
 	    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
 	
     <!-- project-specific variables -->
-	<property name="version" value="0.6.6" />
+	<property name="version" value="0.6.7" />
     <property name="dest.dir" value="target" />
     <property name="jsp.dir.name" value="pipes" />
 	<property name="jar.name" value="${jsp.dir.name}-${version}.jar" />
@@ -78,7 +78,7 @@
         <fileset dir="${webcontent.dir}"/>
         <lib dir="${lib.dir}" />
       	<lib file="${jar.file}" />
-		<classes dir="${src.dir}" includes="*.pipe,*.xml,*.properties,*.list,*.groovy,cache.ccf" />
+		<classes dir="${src.dir}" includes="**/*.pipe,*.xml,*.properties,*.list,*.groovy,cache.ccf" />
       </war>
     </target>
 	<target name="engine" depends="jar">

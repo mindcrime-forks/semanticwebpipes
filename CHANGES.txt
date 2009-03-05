@@ -1,3 +1,24 @@
+Changes for release 0.6.7
+===========================
+New Features
+------------
+[2009-03-05] added linked data demonstration implementing the use case 
+described at http://www.opencalais.com/node/9501
+[2009-03-04] Added pipes:call function to xquery.
+usage is like:
+ pipes:call("myppipe","param1name",param1value,"param2name",param2value ... ) 
+
+
+Bugs Fixed
+[SWP-57] clicking play on Parameter node throws an Exception
+[SWP-58] For Variable debug play button does nothing
+[SWP-64] add blank rdf/xml when dropping in Text node.
+[SWP-65] default xquery text is not well formed
+
+Other Changes
+[2009-03-05] Moved pipes-guide to html document, doc/index.html
+[2009-03-05] Merged older pipes documentation from web page into doc/index.html (some requires updating)
+
 Changes for release 0.6.6
 ===========================
 New Features

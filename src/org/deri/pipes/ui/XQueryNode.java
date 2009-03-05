@@ -71,8 +71,13 @@ public class XQueryNode extends InOutNode{
 		textBandBox.setTextboxText("xquery version \"1.0\";\n<html>\n <head>\n  <title>xquery</title>" +
 				"\n </head>" +
 				"\n <body>" +
-				"\n{for $link in //a return\n"
-				+"\n<p>{$link}</p>" +
+				"\n{"+
+				"\n(:" +
+				" note: call another pipe like this:\n" +
+				" set $x = pipes:call('some-pipe','paramName',paramValue, 'param2Name', param2Value ... )" +
+				"\n:)" +
+				"\n\nfor $link in //a return\n"
+				+"\n<p>{$link}</p>}" +
 				"</body>" +
 		"\n</html>");
 		hbox2.appendChild(textBandBox);

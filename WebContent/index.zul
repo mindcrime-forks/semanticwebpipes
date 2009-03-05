@@ -57,8 +57,8 @@
 		</menu>
 		<menu label="Help">
 			<menupopup>
-				<menuitem label="Documentation"  href='http://pipes.deri.org/index.php/document'/>
-				<menuitem label="About" href="http://pipes.deri.org"/>					
+				<menuitem label="Documentation" target="_blank" href='doc'/>
+				<menuitem label="About" target="_blank" href="http://pipes.deri.org"/>					
 			</menupopup>
 		</menu>
 	</menubar>
