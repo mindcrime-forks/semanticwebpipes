@@ -1,0 +1,115 @@
+<pipeConfig>
+  <id>ldd/GetDbpediaIfLocationIsNewYorkCity</id>
+  <name>Retrieve the dbpedia linked data if the location is new york city. This pipe is called from within pipe selecting new york city merger acquisitions.</name>
+  <syntax><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters>
+      <parameter>
+         <id>dbpedialink</id>
+         <label>dbpedialink</label>
+         <default>http://dbpedia.org/resource/American_International_Group</default>
+      </parameter>
+   </parameters>
+   <code>
+      <rdf-extract>
+         <source>
+            <choose>
+               <if>
+                  <is-empty>
+                     <source>
+                        <select>
+                           <source>
+                              <construct>
+                                 <source>
+                                    <rdffetch format="RDF/XML">
+                                       <location>${dbpedialink}</location>
+                                    </rdffetch>
+                                 </source>
+                                 <query>CONSTRUCT { &lt;${dbpedialink}&gt; ?p ?o . }  WHERE { &lt;${dbpedialink}&gt; ?p ?o .  }</query>
+                              </construct>
+                           </source>
+                           <query>select ?subject where {?subject &lt;http://dbpedia.org/property/location&gt; &lt;http://dbpedia.org/resource/New_York_City&gt;}</query>
+                        </select>
+                     </source>
+                  </is-empty>
+               </if>
+               <then>
+                  <text format="rdfxml">
+                     <content>&lt;?xml version="1.0" encoding="UTF-8"?&gt; &lt;rdf:RDF  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"&gt; &lt;/rdf:RDF&gt;</content>
+                  </text>
+               </then>
+               <else>
+                  <construct>
+                     <source>
+                        <rdffetch format="RDF/XML">
+                           <location>${dbpedialink}</location>
+                        </rdffetch>
+                     </source>
+                     <query>CONSTRUCT { &lt;${dbpedialink}&gt; ?p ?o . }  WHERE { &lt;${dbpedialink}&gt; ?p ?o .  }</query>
+                  </construct>
+               </else>
+            </choose>
+         </source>
+      </rdf-extract>
+   </code>
+</pipe>]]></syntax>
+  <config><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters/>
+   <code x="227" y="881">
+      <rdf-extract x="260" y="780">
+         <source>
+            <choose x="313" y="614">
+               <if>
+                  <is-empty x="146" y="503">
+                     <source>
+                        <select x="38" y="323">
+                           <source>
+                              <construct x="37" y="227">
+                                 <source>
+                                    <rdffetch format="RDF/XML" x="69" y="35">
+                                       <location>
+                                          <parameter x="432" y="15">
+                                             <id>dbpedialink</id>
+                                             <label>dbpedialink</label>
+                                             <default>http://dbpedia.org/resource/American_International_Group</default>
+                                          </parameter>
+                                       </location>
+                                    </rdffetch>
+                                 </source>
+                                 <query>CONSTRUCT { &lt;${dbpedialink}&gt; ?p ?o . }  WHERE { &lt;${dbpedialink}&gt; ?p ?o .  }</query>
+                              </construct>
+                           </source>
+                           <query>select ?subject where {?subject &lt;http://dbpedia.org/property/location&gt; &lt;http://dbpedia.org/resource/New_York_City&gt;}</query>
+                        </select>
+                     </source>
+                  </is-empty>
+               </if>
+               <then>
+                  <text format="rdfxml" x="5" y="632">
+                     <content>&lt;?xml version="1.0" encoding="UTF-8"?&gt; &lt;rdf:RDF  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"&gt; &lt;/rdf:RDF&gt;</content>
+                  </text>
+               </then>
+               <else>
+                  <construct x="397" y="338">
+                     <source>
+                        <rdffetch format="RDF/XML" x="413" y="216">
+                           <location>
+                              <parameter x="432" y="15">
+                                 <id>dbpedialink</id>
+                                 <label>dbpedialink</label>
+                                 <default>http://dbpedia.org/resource/American_International_Group</default>
+                              </parameter>
+                           </location>
+                        </rdffetch>
+                     </source>
+                     <query>CONSTRUCT { &lt;${dbpedialink}&gt; ?p ?o . }  WHERE { &lt;${dbpedialink}&gt; ?p ?o .  }</query>
+                  </construct>
+               </else>
+            </choose>
+         </source>
+      </rdf-extract>
+   </code>
+</pipe>]]></config>
+  <password>secret1</password>
+</pipeConfig>

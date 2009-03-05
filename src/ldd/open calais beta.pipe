@@ -1,0 +1,82 @@
+<pipeConfig>
+  <id>ldd/open calais beta</id>
+  <name>Passes a web page to OpenCalais (beta) for processing to rdf</name>
+  <syntax><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters>
+      <parameter>
+         <id>url</id>
+         <label>Page to send to Open Calais</label>
+         <default>http://www.deri.ie</default>
+      </parameter>
+      <parameter>
+         <id>licenseId</id>
+         <label>Open Calais License ID</label>
+         <default>8zqqt6d7f7akn5vcnjhbd2qu</default>
+      </parameter>
+   </parameters>
+   <code>
+      <rdffetch format="RDF/XML">
+         <location>
+            <source>
+               <urlbuilder>
+                  <base>http://beta.opencalais.com/</base>
+                  <path>enlighten/rest</path>
+                  <para name="content">
+                     <source>
+                        <stringify>
+                           <source>
+                              <http-get resolveHtmlLinks="true">
+                                 <location>${url}</location>
+                              </http-get>
+                           </source>
+                        </stringify>
+                     </source>
+                  </para>
+                  <para name="licenseId">${licenseId}</para>
+                  <para name="paramsXML">&lt;c:params xmlns:c="http://s.opencalais.com/1/pred/"&gt;&lt;c:processingDirectives c:omitOutputtingOriginalText="TRUE"/&gt;&lt;c:userDirectives c:externalID="${url}" /&gt;&lt;/c:params&gt;</para>
+               </urlbuilder>
+            </source>
+         </location>
+      </rdffetch>
+   </code>
+</pipe>]]></syntax>
+  <config><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters/>
+   <code x="200" y="495">
+      <rdffetch format="RDF/XML" x="39" y="333">
+         <location>
+            <urlbuilder x="89" y="79">
+               <base>http://beta.opencalais.com/</base>
+               <path>enlighten/rest</path>
+               <para name="content">
+                  <stringify x="373" y="62">
+                     <source>
+                        <http-get resolveHtmlLinks="true" x="572" y="177">
+                           <location>
+                              <parameter x="677" y="39">
+                                 <id>url</id>
+                                 <label>Page to send to Open Calais</label>
+                                 <default>http://www.deri.ie</default>
+                              </parameter>
+                           </location>
+                        </http-get>
+                     </source>
+                  </stringify>
+               </para>
+               <para name="licenseId">
+                  <parameter x="353" y="200">
+                     <id>licenseId</id>
+                     <label>Open Calais License ID</label>
+                     <default>8zqqt6d7f7akn5vcnjhbd2qu</default>
+                  </parameter>
+               </para>
+               <para name="paramsXML">&lt;c:params xmlns:c="http://s.opencalais.com/1/pred/"&gt;&lt;c:processingDirectives c:omitOutputtingOriginalText="TRUE"/&gt;&lt;c:userDirectives c:externalID="${url}" /&gt;&lt;/c:params&gt;</para>
+            </urlbuilder>
+         </location>
+      </rdffetch>
+   </code>
+</pipe>]]></config>
+  <password>secret1</password>
+</pipeConfig>

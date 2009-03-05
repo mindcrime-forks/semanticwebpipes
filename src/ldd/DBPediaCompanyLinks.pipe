@@ -1,0 +1,27 @@
+<pipeConfig>
+  <id>ldd/DBPediaCompanyLinks</id>
+  <name>extracts owl:sameas links to dbpedia contained in the rdf located at the given uri (an open calais company identifier)</name>
+  <syntax><![CDATA[<?xml version="1.0" encoding="UTF-8"?><pipe><parameters><parameter><id>company</id><label>company</label><default>http://d.opencalais.com/er/company/ralg-tr1r/09ccd7c3-a2fd-3f32-bac1-07a66ff1a9b6</default></parameter></parameters><code><for><sourcelist><select><source><rdffetch format="RDF/XML"><location>${company}.rdf?=</location></rdffetch></source><query><![CDATA[select ?sameas where { <${company}> <http://www.w3.org/2002/07/owl#sameAs> ?sameas   }]]]]><![CDATA[></query></select></sourcelist><forloop><rdf-extract><source><choose><if><matches><source><text format="text/plain"><content>${{sameas}}</content></text></source><pattern>http://dbpedia.org/.*</pattern></matches></if><then><text format="rdfxml"><content><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF 
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#">
+<rdf:Description rdf:about="${company}">
+<owl:sameAs rdf:resource="${{sameas}}"/>
+</rdf:Description>
+</rdf:RDF>]]]]><![CDATA[></content></text></then><else><text format="rdfxml"><content><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF 
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+</rdf:RDF>]]]]><![CDATA[></content></text></else></choose></source></rdf-extract></forloop></for></code></pipe>]]></syntax>
+  <config><![CDATA[<?xml version="1.0" encoding="UTF-8"?><pipe><parameters/><code x="684" y="392"><for x="631" y="313"><sourcelist><select x="520" y="191"><source><rdffetch format="RDF/XML" x="563" y="62"><location><urlbuilder x="20" y="9"><base><parameter x="312" y="15"><id>company</id><label>company</label><default>http://d.opencalais.com/er/company/ralg-tr1r/09ccd7c3-a2fd-3f32-bac1-07a66ff1a9b6</default></parameter></base><path>.rdf</path><para name=""></para></urlbuilder></location></rdffetch></source><query><![CDATA[select ?sameas where { <${company}> <http://www.w3.org/2002/07/owl#sameAs> ?sameas   }]]]]><![CDATA[></query></select></sourcelist><forloop><rdf-extract x="421" y="389"><source><choose x="218" y="348"><if><matches x="74" y="249"><source><text format="text/plain" x="80" y="153"><content>${{sameas}}</content></text></source><pattern>http://dbpedia.org/.*</pattern></matches></if><then><text format="rdfxml" x="20" y="323"><content><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF 
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#">
+<rdf:Description rdf:about="${company}">
+<owl:sameAs rdf:resource="${{sameas}}"/>
+</rdf:Description>
+</rdf:RDF>]]]]><![CDATA[></content></text></then><else><text format="rdfxml" x="286" y="216"><content><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF 
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+</rdf:RDF>]]]]><![CDATA[></content></text></else></choose></source></rdf-extract></forloop></for></code></pipe>]]></config>
+  <password>secret1</password>
+</pipeConfig>

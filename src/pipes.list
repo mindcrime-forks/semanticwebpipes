@@ -4,3 +4,9 @@ image.pipe
 mixingfoaf.pipe
 TBLonTheSW.pipe
 calais.pipe
+ldd/DBPediaCompanyLinks.pipe
+ldd/GetDbpediaIfLocationIsNewYorkCity.pipe
+ldd/New York Merger Acquistion.pipe
+ldd/open calais beta.pipe
+ldd/rss2rdf.pipe
+ldd/RssNewYorkCityMergerAcquisition.pipe

@@ -1,0 +1,61 @@
+<pipeConfig>
+  <id>ldd/rss2rdf</id>
+  <name>retrieve an rss feed defined by rssurl parameter, and convert to rdf using openlink stylesheet</name>
+  <syntax><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters>
+      <parameter>
+         <id>URL of RSS</id>
+         <label>rssurl</label>
+         <default>http://rss.news.yahoo.com/rss/business</default>
+      </parameter>
+   </parameters>
+   <code>
+      <rdf-extract>
+         <source>
+            <xslt>
+               <xmlsource>
+                  <xmlfetch>
+                     <location>${URL of RSS}</location>
+                  </xmlfetch>
+               </xmlsource>
+               <xslsource>
+                  <xslfetch>
+                     <location>http://demo.openlinksw.com/DAV/VAD/wa/comp/rss2rdf.xsl</location>
+                  </xslfetch>
+               </xslsource>
+            </xslt>
+         </source>
+      </rdf-extract>
+   </code>
+</pipe>]]></syntax>
+  <config><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters/>
+   <code x="219" y="335">
+      <rdf-extract x="305" y="241">
+         <source>
+            <xslt x="391" y="180">
+               <xmlsource>
+                  <xmlfetch x="404" y="60">
+                     <location>
+                        <parameter x="696" y="51">
+                           <id>URL of RSS</id>
+                           <label>rssurl</label>
+                           <default>http://rss.news.yahoo.com/rss/business</default>
+                        </parameter>
+                     </location>
+                  </xmlfetch>
+               </xmlsource>
+               <xslsource>
+                  <xslfetch x="84" y="62">
+                     <location>http://demo.openlinksw.com/DAV/VAD/wa/comp/rss2rdf.xsl</location>
+                  </xslfetch>
+               </xslsource>
+            </xslt>
+         </source>
+      </rdf-extract>
+   </code>
+</pipe>]]></config>
+  <password>secret1</password>
+</pipeConfig>

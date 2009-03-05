@@ -1,0 +1,81 @@
+<pipeConfig>
+  <id>ldd/RssNewYorkCityMergerAcquisition</id>
+  <name>Retrieve an rss and generate rdf about the new york companies involved in merger or acquisition. Use case described at http://www.opencalais.com/node/9501</name>
+  <syntax><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters>
+      <parameter>
+         <id>rss</id>
+         <label>rss</label>
+         <default>http://finance.yahoo.com/rss/mergersaquisitions</default>
+      </parameter>
+   </parameters>
+   <code>
+      <for>
+         <sourcelist>
+            <select>
+               <source>
+                  <rdf-extract>
+                     <source>
+                        <pipe-call pipeid="ldd/rss2rdf">
+                           <para name="URL of RSS">${rss}</para>
+                        </pipe-call>
+                     </source>
+                  </rdf-extract>
+               </source>
+               <query>select ?story where {?story &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://purl.org/rss/1.0/item&gt;}</query>
+            </select>
+         </sourcelist>
+         <forloop>
+            <rdf-extract>
+               <source>
+                  <pipe-call pipeid="ldd/New York Merger Acquistion">
+                     <para name="Open Calais license">8zqqt6d7f7akn5vcnjhbd2qu</para>
+                     <para name="URL of web page">${{story}}</para>
+                  </pipe-call>
+               </source>
+            </rdf-extract>
+         </forloop>
+      </for>
+   </code>
+</pipe>]]></syntax>
+  <config><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters/>
+   <code x="315" y="368">
+      <for x="328" y="289">
+         <sourcelist>
+            <select x="267" y="200">
+               <source>
+                  <rdf-extract x="241" y="136">
+                     <source>
+                        <pipe-call pipeid="ldd/rss2rdf" x="331" y="10">
+                           <para name="URL of RSS">
+                              <parameter x="30" y="23">
+                                 <id>rss</id>
+                                 <label>rss</label>
+                                 <default>http://finance.yahoo.com/rss/mergersaquisitions</default>
+                              </parameter>
+                           </para>
+                        </pipe-call>
+                     </source>
+                  </rdf-extract>
+               </source>
+               <query>select ?story where {?story &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://purl.org/rss/1.0/item&gt;}</query>
+            </select>
+         </sourcelist>
+         <forloop>
+            <rdf-extract x="95" y="394">
+               <source>
+                  <pipe-call pipeid="ldd/New York Merger Acquistion" x="7" y="256">
+                     <para name="Open Calais license">8zqqt6d7f7akn5vcnjhbd2qu</para>
+                     <para name="URL of web page">${{story}}</para>
+                  </pipe-call>
+               </source>
+            </rdf-extract>
+         </forloop>
+      </for>
+   </code>
+</pipe>]]></config>
+  <password>secret1</password>
+</pipeConfig>

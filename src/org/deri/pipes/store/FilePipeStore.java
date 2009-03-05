@@ -157,7 +157,9 @@ public class FilePipeStore implements PipeStore {
 					logger.info("couldn't read "+pipeId);
 					return;
 				}
-				FileOutputStream out = new FileOutputStream(new File(rootFolder,pipeId));
+				File file = new File(rootFolder,pipeId);
+				file.getParentFile().mkdirs();
+				FileOutputStream out = new FileOutputStream(file);
 				try{
 					StreamUtils.copy(in, out);
 				}finally{
@@ -166,8 +168,8 @@ public class FilePipeStore implements PipeStore {
 			}finally{
 				in.close();
 			}
-		}catch(IOException e){
-			logger.warn("couldn't copy "+pipeId+" to "+rootFolder+" because "+e,e);
+		}catch(Throwable t){
+			logger.warn("couldn't copy "+pipeId+" to "+rootFolder+" because "+t,t);
 		}
 	}
 	/**
@@ -266,6 +268,12 @@ public class FilePipeStore implements PipeStore {
 
 			@Override
 			public int compare(File arg0, File arg1) {
+				if(arg0.isDirectory() && arg1.isFile()){
+					return 1;
+				}
+				if(arg0.isFile() && arg1.isDirectory()){
+					return -1;
+				}
 				return arg0.getName().compareToIgnoreCase(arg1.getName());
 			}
 			
