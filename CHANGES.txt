@@ -55,3 +55,45 @@ modified to extract metadata using any23).
 Bug Fixes
 ---------
 [SWP-48] new lines lost in select queries and text box text
+
+Changes for release 0.6.5
+=========================
+[2009-02-25] New PipeCall operator allows calling another saved pipe 
+same as using any other operator.
+[2009-02-25] New Stringify operator allows using output of some 
+operators as string input into another operator (for 
+instance using the output of one http call as a parameter 
+into another http call)
+[2009-02-25] New Text operator
+[2009-02-25] New 'mark as broken/mark as fixed' menu items to remove 
+broken pipes off the main screen (and back again when fixed)
+[2009-02-25] Improved workflow in 'save pipe' dialog.
+[2009-02-25] Improved caching of http responses
+
+
+Changes for release 0.6.4
+=========================
+Changes:
+[2009-02-18] New feature on http get to expand links. This changes relative hrefs to absolute.
+[2009-02-18] New feature on http get to set the Accept header.
+[2009-02-18] Changed fetch operators to allow string or source for location. This allows output from one fetch operator to be passed through stringify operator then as a param or path in another http request.
+[2009-02-18] Added example of calling OpenCalais web service.
+[2009-02-18] Some small bug fixes. 
+
+
+Changes for release 0.6.3
+=========================
+[2009-02-16] Fixed problem in URL Builder which was missing text input (parameter) nodes.
+[2009-02-16] Modified URL Builder not to inject '/' between path components.
+[2009-02-16] Some small bug fixes. 
+
+Changes for release 0.6.2
+=========================
+[2009-02-13] New html2xml operator 
+[2009-02-13] Caching of HTTP GET responses
+[2009-02-13] Some small bug fixes. 
+
+Changes for release 0.6.1
+=========================
+[2009-02-11] new XQuery Operator
+[2009-02-11] Some small bug fixes. 
