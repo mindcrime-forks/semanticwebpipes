@@ -141,6 +141,13 @@ public class ParameterNode extends InPipeNode implements ConnectingOutputNode{
 	public String getTagName() {
 		return "parameter";
 	}
+	
+	public void debug(){	   
+		PipeEditor pipeEditor = (PipeEditor)getWorkspace();
+		pipeEditor.reloadTabularDebug(null);
+		pipeEditor.reloadTextDebug("["+nameBox.getValue()+"]=["+defaultBox.getValue()+"]");
+	}
+
 
 }
 
