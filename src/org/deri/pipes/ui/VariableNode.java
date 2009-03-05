@@ -89,7 +89,10 @@ public class VariableNode extends InPipeNode implements ConnectingOutputNode{
 		return node;
 	}
 	public void debug(){
-		
+		PipeEditor pipeEditor = (PipeEditor)getWorkspace();
+		pipeEditor.reloadTabularDebug(null);
+		pipeEditor.reloadTextDebug(getCode());
+
 	}
 
 	/* (non-Javadoc)
