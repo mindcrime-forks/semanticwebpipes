@@ -82,19 +82,7 @@ public class XSLTBox implements Operator {
 		if(xmlBuff == null){
 			return null;
 		}
-		StreamSource xmlSrc=null;
-		if(xmlBuff instanceof XMLStreamBuffer) 
-			xmlSrc=((XMLStreamBuffer)xmlBuff).getStreamSource();
-		if((xmlBuff instanceof SesameTupleBuffer)||(xmlBuff instanceof SesameTupleBuffer)){ 
-			XMLStreamBuffer tmpBuff= new XMLStreamBuffer();
-			xmlBuff.stream(tmpBuff);
-			xmlSrc=tmpBuff.getStreamSource();
-		}
-		if(xmlSrc == null){
-			logger.warn("Could not convert buffer from "+xmlBuff.getClass()+" to StreamSource");
-		}
-		
-		return xmlSrc;
+		return new StreamSource(xmlBuff.getInputStream());
     }
 
 

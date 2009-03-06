@@ -54,11 +54,11 @@ public class HttpResponseData implements Serializable{
 	final static String ENCODING= "ISO-8859-1";
 	String body;
 	int response;
-	long lastVerified;
+	long expires;
 	String charSet;
 	String contentType;
 	String lastModified;
-	transient HttpMethodBase method;
+	private transient HttpMethodBase method;
 	void setBody(byte[] body) {
 		try {
 			this.body = new String(body,ENCODING);
@@ -97,11 +97,11 @@ public class HttpResponseData implements Serializable{
 	public String getLastModified() {
 		return lastModified;
 	}
-	long getLastVerified() {
-		return lastVerified;
+	long getExpires() {
+		return expires;
 	}
-	void setLastVerified(long lastVerified) {
-		this.lastVerified = lastVerified;
+	void setExpires(long expires) {
+		this.expires = expires;
 	}
 	/**
 	 * @return

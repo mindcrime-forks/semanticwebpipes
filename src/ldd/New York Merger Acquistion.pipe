@@ -1,13 +1,250 @@
 <pipeConfig>
   <id>ldd/New York Merger Acquistion</id>
   <name>Find New York based companies (or their New York subsidiaries) mentioned in articles about merger/acquisition</name>
-  <syntax><![CDATA[<?xml version="1.0" encoding="UTF-8"?><pipe><parameters><parameter><id>Open Calais license</id><label>licenseid</label><default>8zqqt6d7f7akn5vcnjhbd2qu</default></parameter><parameter><id>URL of web page</id><label>url</label><default>http://www.techcrunch.com/2006/10/09/google-has-acquired-youtube</default></parameter></parameters><code><choose><if><not><condition><is-empty><source><select><source><rdf-extract><source><pipe-call pipeid="ldd/open calais beta"><para name="licenseId">${Open Calais license}</para><para name="url">${URL of web page}</para></pipe-call></source></rdf-extract></source><query><![CDATA[select ?subject where { {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://s.opencalais.com/1/type/em/r/Acquisition>} UNION  {?subject  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://s.opencalais.com/1/type/em/r/Merger> } }]]]]><![CDATA[></query></select></source></is-empty></condition></not></if><then><for><sourcelist><select><source><for><sourcelist><select><source><rdf-extract><source><pipe-call pipeid="ldd/open calais beta"><para name="licenseId">${Open Calais license}</para><para name="url">${URL of web page}</para></pipe-call></source></rdf-extract></source><query><![CDATA[select ?company where { ?company <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://s.opencalais.com/1/type/er/Company> }]]]]><![CDATA[></query></select></sourcelist><forloop><rdf-extract><source><pipe-call pipeid="ldd/DBPediaCompanyLinks"><para name="company">${{company}}</para></pipe-call></source></rdf-extract></forloop></for></source><query><![CDATA[select ?dbpedialink  where { ?x <http://www.w3.org/2002/07/owl#sameAs> ?dbpedialink   }]]]]><![CDATA[></query></select></sourcelist><forloop><simplemix><source><rdf-extract><source><pipe-call pipeid="ldd/GetDbpediaIfLocationIsNewYorkCity"><para name="dbpedialink">${{dbpedialink}}</para></pipe-call></source></rdf-extract></source><source><for><sourcelist><select><source><rdffetch format="RDF/XML"><location>${{dbpedialink}}</location></rdffetch></source><query><![CDATA[select ?subsid where {
-<${{dbpedialink}}>
-<http://dbpedia.org/property/subsid>
-?subsid }]]]]><![CDATA[></query></select></sourcelist><forloop><rdf-extract><source><pipe-call pipeid="ldd/GetDbpediaIfLocationIsNewYorkCity"><para name="dbpedialink">http://dbpedia.org/resource/American_International_Group</para></pipe-call></source></rdf-extract></forloop></for></source></simplemix></forloop></for></then><else><text format="rdfxml"><content><![CDATA[<?xml version="1.0" encoding="UTF-8"?> <rdf:RDF  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> </rdf:RDF>]]]]><![CDATA[></content></text></else></choose></code></pipe>]]></syntax>
-  <config><![CDATA[<?xml version="1.0" encoding="UTF-8"?><pipe><parameters/><code x="615" y="834"><choose x="613" y="766"><if><not x="613" y="707"><condition><is-empty x="599" y="650"><source><select x="615" y="236"><source><rdf-extract x="394" y="177"><source><pipe-call pipeid="ldd/open calais beta" x="266" y="12"><para name="licenseId"><parameter x="610" y="10"><id>Open Calais license</id><label>licenseid</label><default>8zqqt6d7f7akn5vcnjhbd2qu</default></parameter></para><para name="url"><parameter x="11" y="17"><id>URL of web page</id><label>url</label><default>http://www.techcrunch.com/2006/10/09/google-has-acquired-youtube</default></parameter></para></pipe-call></source></rdf-extract></source><query><![CDATA[select ?subject where { {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://s.opencalais.com/1/type/em/r/Acquisition>} UNION  {?subject  <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://s.opencalais.com/1/type/em/r/Merger> } }]]]]><![CDATA[></query></select></source></is-empty></condition></not></if><then><for x="492" y="1022"><sourcelist><select x="410" y="349"><source><for x="389" y="299"><sourcelist><select x="61" y="182"><source><rdf-extract x="215" y="126"><source><pipe-call pipeid="ldd/open calais beta" x="266" y="12"><para name="licenseId"><parameter x="610" y="10"><id>Open Calais license</id><label>licenseid</label><default>8zqqt6d7f7akn5vcnjhbd2qu</default></parameter></para><para name="url"><parameter x="11" y="17"><id>URL of web page</id><label>url</label><default>http://www.techcrunch.com/2006/10/09/google-has-acquired-youtube</default></parameter></para></pipe-call></source></rdf-extract></source><query><![CDATA[select ?company where { ?company <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://s.opencalais.com/1/type/er/Company> }]]]]><![CDATA[></query></select></sourcelist><forloop><rdf-extract x="54" y="374"><source><pipe-call pipeid="ldd/DBPediaCompanyLinks" x="26" y="266"><para name="company">${{company}}</para></pipe-call></source></rdf-extract></forloop></for></source><query><![CDATA[select ?dbpedialink  where { ?x <http://www.w3.org/2002/07/owl#sameAs> ?dbpedialink   }]]]]><![CDATA[></query></select></sourcelist><forloop><simplemix x="383" y="979"><source><rdf-extract x="165" y="578"><source><pipe-call pipeid="ldd/GetDbpediaIfLocationIsNewYorkCity" x="108" y="476"><para name="dbpedialink">${{dbpedialink}}</para></pipe-call></source></rdf-extract></source><source><for x="298" y="926"><sourcelist><select x="175" y="790"><source><rdffetch format="RDF/XML" x="106" y="684"><location>${{dbpedialink}}</location></rdffetch></source><query><![CDATA[select ?subsid where {
-<${{dbpedialink}}>
-<http://dbpedia.org/property/subsid>
-?subsid }]]]]><![CDATA[></query></select></sourcelist><forloop><rdf-extract x="69" y="960"><source><pipe-call pipeid="ldd/GetDbpediaIfLocationIsNewYorkCity" x="10" y="843"><para name="dbpedialink">http://dbpedia.org/resource/American_International_Group</para></pipe-call></source></rdf-extract></forloop></for></source></simplemix></forloop></for></then><else><text format="rdfxml" x="718" y="478"><content><![CDATA[<?xml version="1.0" encoding="UTF-8"?> <rdf:RDF  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"> </rdf:RDF>]]]]><![CDATA[></content></text></else></choose></code></pipe>]]></config>
+  <syntax><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters>
+      <parameter>
+         <id>Open Calais license</id>
+         <label>licenseid</label>
+         <default>8zqqt6d7f7akn5vcnjhbd2qu</default>
+      </parameter>
+      <parameter>
+         <id>URL of web page</id>
+         <label>url</label>
+         <default>http://news.bbc.co.uk/1/hi/business/7850680.stm</default>
+      </parameter>
+   </parameters>
+   <code>
+      <choose>
+         <if>
+            <is-empty>
+               <source>
+                  <select>
+                     <source>
+                        <rdf-extract>
+                           <source>
+                              <pipe-call pipeid="ldd/open calais beta">
+                                 <para name="licenseId">${Open Calais license}</para>
+                                 <para name="url">${URL of web page}</para>
+                              </pipe-call>
+                           </source>
+                        </rdf-extract>
+                     </source>
+                     <query>select ?subject where { {?subject &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://s.opencalais.com/1/type/em/r/Acquisition&gt;} UNION  {?subject  &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://s.opencalais.com/1/type/em/r/Merger&gt; } }</query>
+                  </select>
+               </source>
+            </is-empty>
+         </if>
+         <then>
+            <text format="rdfxml">
+               <content>&lt;?xml version="1.0" encoding="UTF-8"?&gt; &lt;rdf:RDF  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"&gt; &lt;/rdf:RDF&gt;</content>
+            </text>
+         </then>
+         <else>
+            <for>
+               <sourcelist>
+                  <select>
+                     <source>
+                        <for>
+                           <sourcelist>
+                              <select>
+                                 <source>
+                                    <rdf-extract>
+                                       <source>
+                                          <pipe-call pipeid="ldd/open calais beta">
+                                             <para name="licenseId">${Open Calais license}</para>
+                                             <para name="url">${URL of web page}</para>
+                                          </pipe-call>
+                                       </source>
+                                    </rdf-extract>
+                                 </source>
+                                 <query>select ?company where { ?company &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://s.opencalais.com/1/type/er/Company&gt; }</query>
+                              </select>
+                           </sourcelist>
+                           <forloop>
+                              <rdf-extract>
+                                 <source>
+                                    <pipe-call pipeid="ldd/DBPediaCompanyLinks">
+                                       <para name="company">${{company}}</para>
+                                    </pipe-call>
+                                 </source>
+                              </rdf-extract>
+                           </forloop>
+                        </for>
+                     </source>
+                     <query>select ?dbpedialink  where { ?x &lt;http://www.w3.org/2002/07/owl#sameAs&gt; ?dbpedialink   }</query>
+                  </select>
+               </sourcelist>
+               <forloop>
+                  <simplemix>
+                     <source>
+                        <rdf-extract>
+                           <source>
+                              <pipe-call pipeid="ldd/GetDbpediaIfLocationIsNewYorkCity">
+                                 <para name="dbpedialink">${{dbpedialink}}</para>
+                              </pipe-call>
+                           </source>
+                        </rdf-extract>
+                     </source>
+                     <source>
+                        <for>
+                           <sourcelist>
+                              <select>
+                                 <source>
+                                    <rdffetch format="RDF/XML">
+                                       <location>${{dbpedialink}}</location>
+                                    </rdffetch>
+                                 </source>
+                                 <query>select ?subsid where { &lt;${{dbpedialink}}&gt; &lt;http://dbpedia.org/property/subsid&gt; ?subsid }</query>
+                              </select>
+                           </sourcelist>
+                           <forloop>
+                              <rdf-extract>
+                                 <source>
+                                    <pipe-call pipeid="ldd/GetDbpediaIfLocationIsNewYorkCity">
+                                       <para name="dbpedialink">${{subsid}}</para>
+                                    </pipe-call>
+                                 </source>
+                              </rdf-extract>
+                           </forloop>
+                        </for>
+                     </source>
+                  </simplemix>
+               </forloop>
+            </for>
+         </else>
+      </choose>
+   </code>
+</pipe>]]></syntax>
+  <config><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<pipe>
+   <parameters/>
+   <code x="615" y="834">
+      <choose x="591" y="733">
+         <if>
+            <is-empty x="771" y="588">
+               <source>
+                  <select x="615" y="236">
+                     <source>
+                        <rdf-extract x="394" y="177">
+                           <source>
+                              <pipe-call pipeid="ldd/open calais beta" x="266" y="12">
+                                 <para name="licenseId">
+                                    <parameter x="610" y="10">
+                                       <id>Open Calais license</id>
+                                       <label>licenseid</label>
+                                       <default>8zqqt6d7f7akn5vcnjhbd2qu</default>
+                                    </parameter>
+                                 </para>
+                                 <para name="url">
+                                    <parameter x="-1" y="-2">
+                                       <id>URL of web page</id>
+                                       <label>url</label>
+                                       <default>http://news.bbc.co.uk/1/hi/business/7850680.stm</default>
+                                    </parameter>
+                                 </para>
+                              </pipe-call>
+                           </source>
+                        </rdf-extract>
+                     </source>
+                     <query>select ?subject where { {?subject &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://s.opencalais.com/1/type/em/r/Acquisition&gt;} UNION  {?subject  &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://s.opencalais.com/1/type/em/r/Merger&gt; } }</query>
+                  </select>
+               </source>
+            </is-empty>
+         </if>
+         <then>
+            <text format="rdfxml" x="549" y="531">
+               <content>&lt;?xml version="1.0" encoding="UTF-8"?&gt; &lt;rdf:RDF  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"&gt; &lt;/rdf:RDF&gt;</content>
+            </text>
+         </then>
+         <else>
+            <for x="492" y="1022">
+               <sourcelist>
+                  <select x="410" y="349">
+                     <source>
+                        <for x="389" y="299">
+                           <sourcelist>
+                              <select x="84" y="189">
+                                 <source>
+                                    <rdf-extract x="229" y="130">
+                                       <source>
+                                          <pipe-call pipeid="ldd/open calais beta" x="283" y="3">
+                                             <para name="licenseId">
+                                                <parameter x="610" y="10">
+                                                   <id>Open Calais license</id>
+                                                   <label>licenseid</label>
+                                                   <default>8zqqt6d7f7akn5vcnjhbd2qu</default>
+                                                </parameter>
+                                             </para>
+                                             <para name="url">
+                                                <parameter x="-1" y="-2">
+                                                   <id>URL of web page</id>
+                                                   <label>url</label>
+                                                   <default>http://news.bbc.co.uk/1/hi/business/7850680.stm</default>
+                                                </parameter>
+                                             </para>
+                                          </pipe-call>
+                                       </source>
+                                    </rdf-extract>
+                                 </source>
+                                 <query>select ?company where { ?company &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://s.opencalais.com/1/type/er/Company&gt; }</query>
+                              </select>
+                           </sourcelist>
+                           <forloop>
+                              <rdf-extract x="54" y="374">
+                                 <source>
+                                    <pipe-call pipeid="ldd/DBPediaCompanyLinks" x="26" y="266">
+                                       <para name="company">${{company}}</para>
+                                    </pipe-call>
+                                 </source>
+                              </rdf-extract>
+                           </forloop>
+                        </for>
+                     </source>
+                     <query>select ?dbpedialink  where { ?x &lt;http://www.w3.org/2002/07/owl#sameAs&gt; ?dbpedialink   }</query>
+                  </select>
+               </sourcelist>
+               <forloop>
+                  <simplemix x="383" y="979">
+                     <source>
+                        <rdf-extract x="165" y="578">
+                           <source>
+                              <pipe-call pipeid="ldd/GetDbpediaIfLocationIsNewYorkCity" x="108" y="476">
+                                 <para name="dbpedialink">${{dbpedialink}}</para>
+                              </pipe-call>
+                           </source>
+                        </rdf-extract>
+                     </source>
+                     <source>
+                        <for x="298" y="926">
+                           <sourcelist>
+                              <select x="175" y="790">
+                                 <source>
+                                    <rdffetch format="RDF/XML" x="42" y="678">
+                                       <location>${{dbpedialink}}</location>
+                                    </rdffetch>
+                                 </source>
+                                 <query>select ?subsid where { &lt;${{dbpedialink}}&gt; &lt;http://dbpedia.org/property/subsid&gt; ?subsid }</query>
+                              </select>
+                           </sourcelist>
+                           <forloop>
+                              <rdf-extract x="69" y="960">
+                                 <source>
+                                    <pipe-call pipeid="ldd/GetDbpediaIfLocationIsNewYorkCity" x="11" y="849">
+                                       <para name="dbpedialink">${{subsid}}</para>
+                                    </pipe-call>
+                                 </source>
+                              </rdf-extract>
+                           </forloop>
+                        </for>
+                     </source>
+                  </simplemix>
+               </forloop>
+            </for>
+         </else>
+      </choose>
+   </code>
+</pipe>]]></config>
   <password>secret1</password>
 </pipeConfig>

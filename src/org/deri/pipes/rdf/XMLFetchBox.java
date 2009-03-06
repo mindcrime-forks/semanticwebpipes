@@ -54,6 +54,12 @@ public class XMLFetchBox extends FetchBox implements Operator {
 	@Override
 	public ExecBuffer execute(Context context) throws Exception{
 		String url = location.expand(context);
+		if((url+"").toLowerCase().startsWith("http")){
+			HttpGetBox getBox = new HttpGetBox();
+			getBox.setLocation(url);
+			getBox.acceptContentType = "text/xml";
+			return getBox.execute(context);
+		}
 		XMLStreamBuffer buffer = new XMLStreamBuffer(url);
 		return buffer;
 	}
