@@ -492,7 +492,8 @@
 	    pipesyntax.setValue(workspace.getPipeConfig().getSyntax());
 	    pipesyntax.invalidate();
 	}
-	
+	String pipeid = Executions.getCurrent().getParameter("pipeid");
+	workspace.edit(pipeid);
 	 ]]>
 	</zscript>
 </zk>

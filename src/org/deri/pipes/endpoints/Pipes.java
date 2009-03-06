@@ -177,6 +177,11 @@ public class Pipes extends HttpServlet {
 				}
 
 				String pipeid = req.getParameter("id");
+				String editorlink = "../";
+				if(pipeid!=null){
+					editorlink+="?pipeid="+URLEncoder.encode(pipeid,"UTF-8");
+				}
+				outputString = outputString.replace("$editor$", editorlink);
 				PipeConfig config = engine.getPipeStore().getPipe(pipeid);
 				String syntax = config ==  null?"":config.getSyntax();
 				String pipeName = config == null?"":config.getName();

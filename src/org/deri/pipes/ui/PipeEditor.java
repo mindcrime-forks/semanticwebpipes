@@ -408,11 +408,14 @@ public class PipeEditor extends Workspace {
 	}
 
 	public void edit(String pid){
-		PipeConfig pipeConfig=engine.getPipeStore().getPipe(pid);
-		if(pipeConfig == null){
-			pipeConfig = new PipeConfig();
+		PipeConfig pipeConfig = new PipeConfig();
+		if(!(pid==null || "".equals(pid.trim()))){
+			pipeConfig=engine.getPipeStore().getPipe(pid);
+			if(pipeConfig == null){
+				pipeConfig = new PipeConfig();
+			}
+			reload(pipeConfig.getConfig());
 		}
-		reload(pipeConfig.getConfig());
 		pipeid.setValue(pipeConfig.getId());
 		bdid.setValue(pipeConfig.getId());
 		pipename.setValue(pipeConfig.getName());
