@@ -1,8 +1,14 @@
 Changes for release 0.7.0
 =========================
+New Features
+------------
 [2009-03-06] added link from results page to show pipe in editor
 [2009-03-06] changed default http cache time from 1 minute to 5 minutes.
 [2009-03-06] Honour HTTP Expires header if longer than default http cache time.
+
+bugs fixed
+----------
+[SWP-68] redirect not followed by rdffetch
 
 Changes for release 0.6.7
 ===========================
