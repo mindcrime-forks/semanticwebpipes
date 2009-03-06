@@ -136,6 +136,7 @@ public class HttpResponseCache {
 						}
 						if(location.length()<2000){
 							HeadMethod headMethod = new HeadMethod(location);
+							headMethod.setFollowRedirects(true);
 							addRequestHeaders(headMethod,requestHeaders);
 
 							try{
@@ -219,6 +220,7 @@ public class HttpResponseCache {
 				}
 				method = postMethod;
 			}
+			method.setFollowRedirects(true);
 			addRequestHeaders(method,requestHeaders);
 			int response = client.executeMethod(method);
 			HttpResponseData data = new HttpResponseData();
