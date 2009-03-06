@@ -204,6 +204,7 @@ public class HttpResponseCache {
 			String location, Map<String, String> requestHeaders)
 	throws IOException, HttpException {
 		HttpMethodBase method = new GetMethod(location);
+		method.setFollowRedirects(true);
 		try{
 			if(location.length() > 2000 && location.indexOf('?')>=0){
 				logger.info("Using post method because request location is very long");
@@ -220,7 +221,6 @@ public class HttpResponseCache {
 				}
 				method = postMethod;
 			}
-			method.setFollowRedirects(true);
 			addRequestHeaders(method,requestHeaders);
 			int response = client.executeMethod(method);
 			HttpResponseData data = new HttpResponseData();
