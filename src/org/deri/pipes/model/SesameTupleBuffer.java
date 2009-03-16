@@ -146,17 +146,19 @@ public class SesameTupleBuffer implements ExecBuffer, Iterable<Map<String,String
 	}
 
 	@Override
-	public void stream(ExecBuffer outputBuffer) {
+	public void stream(ExecBuffer outputBuffer) throws IOException{
 		stream(outputBuffer,(String)null);
 	}
 
 	@Override
-	public void stream(ExecBuffer outputBuffer, String context) {
+	public void stream(ExecBuffer outputBuffer, String context) throws IOException {
 		//TODO: why is context ignored.
 		if(outputBuffer instanceof XMLStreamBuffer){
 			((XMLStreamBuffer)outputBuffer).setStreamSource(new StringBuffer(toString()));
 		}else{
-			logger.warn("Cannot stream outputBuffer which is not an XMLStreamBuffer");
+			XMLStreamBuffer x = new XMLStreamBuffer();
+			x.setStreamSource(new StringBuffer(toString()));
+			x.stream(outputBuffer, context);
 		}
 	}
 
