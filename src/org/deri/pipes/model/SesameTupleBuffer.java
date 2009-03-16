@@ -59,7 +59,7 @@ import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.repository.RepositoryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-public class SesameTupleBuffer implements ExecBuffer, Iterable<Map<String,String>>, Closeable{
+public class SesameTupleBuffer implements ExecBuffer, Iterable<Map<String,String>>, Closeable, InputStreamProvider{
 	private transient Logger logger = LoggerFactory.getLogger(SesameTupleBuffer.class);
 	private MutableTupleQueryResult buffer= null;
 
@@ -156,9 +156,7 @@ public class SesameTupleBuffer implements ExecBuffer, Iterable<Map<String,String
 		if(outputBuffer instanceof XMLStreamBuffer){
 			((XMLStreamBuffer)outputBuffer).setStreamSource(new StringBuffer(toString()));
 		}else{
-			XMLStreamBuffer x = new XMLStreamBuffer();
-			x.setStreamSource(new StringBuffer(toString()));
-			x.stream(outputBuffer, context);
+			logger.warn("Cannot stream outputBuffer which is not an XMLStreamBuffer");
 		}
 	}
 
