@@ -1,3 +1,10 @@
+Changes for release 0.7.1
+==========================
+
+bugs fixed
+----------
+[SWP-73] xquery doesn't work for query results
+
 Changes for release 0.7.0
 =========================
 New Features
