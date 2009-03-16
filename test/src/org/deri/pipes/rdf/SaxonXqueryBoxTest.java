@@ -40,6 +40,7 @@
 package org.deri.pipes.rdf;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
 import org.deri.pipes.core.Context;
@@ -48,6 +49,8 @@ import org.deri.pipes.core.ExecBuffer;
 import org.deri.pipes.core.Operator;
 import org.deri.pipes.core.internals.Source;
 import org.deri.pipes.endpoints.PipeConfig;
+import org.deri.pipes.text.TextBox;
+import org.openrdf.query.QueryEvaluationException;
 
 import junit.framework.TestCase;
 
@@ -195,5 +198,52 @@ public class SaxonXqueryBoxTest extends TestCase {
 		}
 		System.out.println(x);
 	}
+	
+	public void testCanUseTupleBufferInput() throws Exception{
+		SelectBox selectBox = new SelectBox();
+		selectBox.source = new ArrayList<Source>();
+		TextBox delegate = new TextBox();
+		delegate.setFormat(TextBox.RDFXML_FORMAT);
+		delegate.setContent("<?xml version='1.0' encoding='UTF-8'?><rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'" +
+				"\n xmlns:foaf='http://xmlns.com/foaf/0.1/'>" +
+				"\n<foaf:Person rdf:about='http://data.semanticweb.org/person/giovanni-tummarello'>" +
+				"\n<foaf:name>Giovanni Tummarello</foaf:name>" +
+				"\n</foaf:Person>" +
+				"</rdf:RDF>");
+		selectBox.source.add(new Source(delegate));
+		selectBox.setQuery(getFnConcatQuery());
+		SaxonXqueryBox x = new SaxonXqueryBox();
+		x.setQuery(createXQueryForTuples());
+		x.setSource(new Source(selectBox));
+		Context context = Engine.defaultEngine().newContext();
+		ExecBuffer result = x.execute(context);
+		String answer = result.toString();
+		assertTrue("The tuple buffer didn't expand was:["+answer+"]",answer.indexOf("<literal>")>0);
+		System.out.println(answer);
+		
+		
+	}
+	private String createXQueryForTuples() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("xquery version \"1.0\";");
+		sb.append("\n<x>");
+		sb.append("\n{ for $x in //*:literal");
+		sb.append("\n return");
+		sb.append("\n<literal>{$x/text()}</literal>");
+		sb.append("\n}");
+		sb.append("\n </x>");
+		return sb.toString();
+	}
 
+
+	/**
+	 * @return
+	 */
+	private String getFnConcatQuery() {
+		return "PREFIX fn: <http://www.w3.org/2005/xpath-functions#>\n"
+			+"\nselect ?name where {?s ?p ?name ."
+			+"\nFILTER ( ?name=fn:concat('Giovanni ','Tummarello') )"
+			+"\n}";
+
+	}
 }
