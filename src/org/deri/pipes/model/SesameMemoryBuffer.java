@@ -230,7 +230,7 @@ public class SesameMemoryBuffer implements ExecBuffer {
 		try{
 			RepositoryConnection connection = getConnection();
 			try{
-			connection.export(new RDFXMLPrettyWriter(stBuff));
+				connection.export(Rio.createWriter(RDFFormat.RDFXML, stBuff));
 			return stBuff.getBuffer();
 			}finally{
 				connection.close();

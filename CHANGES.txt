@@ -4,6 +4,7 @@ Changes for release 0.7.1
 bugs fixed
 ----------
 [SWP-73] xquery doesn't work for query results
+[SWP-74] Do not use broken sesame rdfxmlprettywriter (reported and fixed by Peter Ansell)
 
 Changes for release 0.7.0
 =========================
