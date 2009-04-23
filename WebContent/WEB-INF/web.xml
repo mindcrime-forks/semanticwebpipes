@@ -57,7 +57,15 @@
 		<url-pattern>/pipes/</url-pattern>
 	</servlet-mapping>   
 	
-		
+<servlet>
+		<servlet-name>sparql</servlet-name>
+		<servlet-class>org.deri.pipes.endpoints.SindiceProxy</servlet-class>
+  </servlet>  
+  
+	<servlet-mapping>
+		<servlet-name>sparql</servlet-name>
+		<url-pattern>/sparql/</url-pattern>
+	</servlet-mapping>		
 
 <resource-ref>
   <description>  Pipe Database  </description>

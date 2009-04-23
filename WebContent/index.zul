@@ -1,8 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?page title="DERI Pipes" ?>
  <?link href="favicon.ico" rel="shortcut icon" ?>
+ <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
 <zk>
-<style src="/CSS/recycling.css"/>
+<style>
+.drag
+{
+	cursor: pointer;
+	border: 1px solid silver;
+	padding: 2px;
+	font-family: Arial;
+	font-weight: bold;
+	color: #C06401;
+	background-color: #F1ECD6;
+}
+.drop
+{
+	font-family: Arial;
+	font-weight: bold;
+	color: #7FBB28;
+}
+.subTitle
+{
+	font-family: Arial;
+	font-weight: bold;
+	color: #525252;
+}
+
+.pipe-sindice-search {
+    padding: 2px 0 1px 18px;
+    background: white url(${c:encodeURL(c:browser('ie6-') ? '/img/search.gif' : '/img/search.png')}) no-repeat scroll 0 0;
+}
+</style>
 	<window id="passwordchecking" border="normal" width="350px" visible="false" sizable="false" >
         <caption label="Confirm password for editing Pipe"/>
 		<separator bar="true"/>
@@ -148,16 +177,19 @@
      <tabs>
      <tab label ="Published pipes"></tab>
      <tab label ="Operators"></tab>
+     <tab label ="Search"></tab>
      <tab label ="(broken)"></tab>
+      
      </tabs>
      <tabpanels>
      <tabpanel id="publishedPipes" style="overflow:auto;">
       <vbox align="center">
       <zscript>
+      <![CDATA[
       import org.zkoss.zk.ui.event.*;
            import org.zkoss.zul.*;
            import org.integratedmodelling.zk.diagram.components.*;
-           
+           import org.deri.pipes.ui.events.*;
            import org.deri.pipes.ui.*;
      import org.deri.pipes.ui.events.*;     
      ViewPort viewPort=new ViewPort("99%","93%");
@@ -168,14 +200,14 @@
 	 workspace.setTextDebugPanel(debugView);
 	 workspace.setTabularDebugPanel(tabularDebugView);
 	 workspace.setConfigComps(pipeid,bd,pipename,password);
-	    public class DropListener implements org.zkoss.zk.ui.event.EventListener {
+	   /* public class DropListener implements org.zkoss.zk.ui.event.EventListener {
 				   public void onEvent(Event event) throws UiException {    
 				         createFigure(event.x,event.y,event.dragged.id);   
 				   }    
-	    }
+	    }*/
     
     workspace.setDroppable("true");
-    workspace.addEventListener("onDrop",new DropListener());
+    workspace.addEventListener("onDrop",new DropOnEditorListener(workspace));
     workspace.addEventListener("onConnectionCreated",new ConnectionCreatedListener());
     workspace.addEventListener("onConnectionDeleted",new ConnectionDeletedListener());
      
@@ -186,6 +218,10 @@
     RowRenderer rowRenderer = new org.deri.pipes.endpoints.PipeListRenderer(workspace,deleteWin,"pipeGrid","brokenPipeGrid");
     ListModel okModel = new SimpleListModel(rowRenderer.getOkPipes());
     ListModel brokenModel = new SimpleListModel(rowRenderer.getBrokenPipes());
+    
+    RowRenderer searchRenderer= new org.deri.pipes.endpoints.SindiceSearchRenderer("searchGrid","searchPageId",workspace);
+    ListModel searchModel = new SimpleListModel(searchRenderer.searchSindice("Tim berners lee",1));
+    ]]>
     </zscript>
      	      	
 	      	<separator bar="false"/>
@@ -392,11 +428,27 @@
     </tabpanel>
     <tabpanel style="overflow:auto;">
       <vbox align="center">
+      	   <panel>
+			<toolbar>
+				<label value="Sindice search: "/><textbox id="searchText" cols="30" value="Tim berners lee" type="text" onChange="searchRenderer.refreshSearch(searchText.value,1);" sclass="pipe-sindice-search"></textbox>
+			</toolbar>
+			<panelchildren>
+				<grid id="searchGrid" model="${searchModel}" rowRenderer="${searchRenderer}" mold="paging" pageSize="10" align="left"/>
+				Page :
+		<combobox id="searchPageId">			
+		</combobox>
+			</panelchildren>
+		</panel>
+      </vbox>
+    </tabpanel>
+    <tabpanel style="overflow:auto;">
+      <vbox align="center">
       	   <separator bar="false"/>
       
 			<grid id="brokenPipeGrid" model="${brokenModel}" rowRenderer="${rowRenderer}" mold="paging" pageSize="10" align="left"/>
       </vbox>
     </tabpanel>
+    
     </tabpanels>
     </tabbox>
     			

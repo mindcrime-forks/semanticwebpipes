@@ -144,7 +144,7 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 		textBandBox.setTextboxText(query);
 	}
 	
-	public String getSrcCode(boolean config){
+	/*public String getSrcCode(boolean config){
 		if(getWorkspace()!=null){
 			if (config) return "";
 			String code="";
@@ -161,23 +161,40 @@ public class SPARQLEndpointNode extends InPipeNode implements ConnectingInputNod
 			return code;
 		}
 		return null;
-	}
+	}*/
 	
 	@Override
 	public Node getSrcCode(Document doc,boolean config){
 		if(getWorkspace()!=null){
-			Element srcCode =doc.createElement(getTagName());
-			if(config) setPosition((Element)srcCode);
+			Node srcCode;
+			if(config) {
+				srcCode =doc.createElement(getTagName());
+				setPosition((Element)srcCode);
 			
-			Element endpointElm=doc.createElement("endpoint");
-			endpointElm.appendChild(getConnectedCode(doc, endpoint, endpointPort, config));
-			srcCode.appendChild(endpointElm);
-			
-			Element graphElm=doc.createElement("default-graph-uri");
-			graphElm.appendChild(getConnectedCode(doc, defaulturi, defaulturiPort, config));
-			srcCode.appendChild(endpointElm);
-			
-			srcCode.appendChild(XMLUtil.createElmWithText(doc, "query", textBandBox.getText()));
+				Element endpointElm=doc.createElement("endpoint");
+				endpointElm.appendChild(getConnectedCode(doc, endpoint, endpointPort, config));
+				srcCode.appendChild(endpointElm);
+				
+				Element graphElm=doc.createElement("default-graph-uri");
+				graphElm.appendChild(getConnectedCode(doc, defaulturi, defaulturiPort, config));
+				srcCode.appendChild(endpointElm);
+				
+				srcCode.appendChild(XMLUtil.createElmWithText(doc, "query", textBandBox.getText()));
+			}
+			else{
+				String code="";
+				code+=getConnectedCode(endpoint, endpointPort);
+				String uri=getConnectedCode(defaulturi, defaulturiPort);
+				try{
+					code+="?query="+URLEncoder.encode(textBandBox.getValue(),"UTF-8");
+					if((null!=uri)&&(uri.indexOf("://")>0))					
+							code+="&default-graph-uri="+URLEncoder.encode(uri.trim(),"UTF-8");
+				}
+				catch(java.io.UnsupportedEncodingException e){
+					logger.info("UTF-8 support is required by the JVM specification",e);
+				}
+			    srcCode=doc.createCDATASection(code);
+			}
 			return srcCode;
 		}
 		return null;
