@@ -1,3 +1,9 @@
+bugfixes
+[SWP-76]Can not execute the SPARQLendpoint operator
+
+New features: 
+[2009-04-25]: Add Sindice search tab
+ 
 Changes for release 0.7.1
 ==========================
 
