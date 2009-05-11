@@ -81,6 +81,10 @@ public class HttpResponseCache {
 	/**
 	 * 
 	 */
+	private static final String EXPIRES_HEADER = "Expires";
+	/**
+	 * 
+	 */
 	private static final String HEADER_USER_AGENT = "User-Agent";
 	/**
 	 * 
@@ -183,7 +187,7 @@ public class HttpResponseCache {
 	 */
 	private static void setExpires(HttpResponseData data, HttpMethodBase method) {
 		long expires = System.currentTimeMillis()+MINIMUM_CACHE_TIME_MILLIS;
-		Header expiresHeader = method.getResponseHeader("Expires");
+		Header expiresHeader = method.getResponseHeader(EXPIRES_HEADER);
 		if(expiresHeader != null){
 			try{
 				Date expiresDate = DateUtil.parseDate(expiresHeader.getValue());
